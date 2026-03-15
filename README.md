@@ -1,70 +1,222 @@
-# Getting Started with Create React App
+# CloudBox: Scalable Multi-Cloud File Management
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Overview
 
-## Available Scripts
+CloudBox is a scalable cloud-based file management system that allows users to securely manage and access files across multiple cloud platforms. The system provides authentication, secure APIs, and a user-friendly interface for managing accounts and future cloud storage integrations.
 
-In the project directory, you can run:
+This repository contains the **Week 1 implementation**, which focuses on setting up the development environment, building the authentication system, and creating the basic frontend interface.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Technologies Used
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Backend
 
-### `npm test`
+* Java
+* Spring Boot
+* Spring Security
+* JWT Authentication
+* Spring Data JPA
+* MySQL
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend
 
-### `npm run build`
+* React.js
+* Axios
+* React Router
+* CSS Styling
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Tools
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* IntelliJ IDEA
+* VS Code
+* MySQL Workbench
+* Postman
+* GitHub
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## Project Structure
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+CloudBox
+│
+├── cloudbox-backend
+│   └── src/main/java/com/cloudbox
+│       ├── config
+│       ├── controller
+│       ├── service
+│       ├── repository
+│       ├── model
+│       ├── dto
+│       ├── security
+│       └── util
+│
+└── cloudbox-frontend
+    └── src
+        ├── pages
+        ├── components
+        ├── services
+        └── styles
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Week 1 Features
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Backend
 
-## Learn More
+* Spring Boot project setup
+* MySQL database integration
+* User entity and repository
+* User registration API
+* User login API
+* JWT token generation
+* Reset password API
+* Basic security configuration
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Frontend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+* React project setup
+* Login page
+* Register page
+* Reset password page
+* Admin dashboard page
+* Axios API integration
+* Basic CSS styling
+* Routing using React Router
 
-### Code Splitting
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Authentication APIs
 
-### Analyzing the Bundle Size
+### Register User
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```
+POST /api/auth/register
+```
 
-### Making a Progressive Web App
+Example Request:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```json
+{
+  "name": "David",
+  "email": "david@gmail.com",
+  "password": "123456"
+}
+```
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Login User
 
-### Deployment
+```
+POST /api/auth/login
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Example Request:
 
-### `npm run build` fails to minify
+```json
+{
+  "email": "david@gmail.com",
+  "password": "123456"
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Response:
+
+```
+JWT Token
+```
+
+---
+
+### Reset Password
+
+```
+POST /api/auth/reset-password
+```
+
+Example Request:
+
+```json
+{
+  "email": "david@gmail.com",
+  "newPassword": "newpassword123"
+}
+```
+
+---
+
+## Running the Backend
+
+1. Open the backend project in IntelliJ
+2. Configure MySQL database in `application.properties`
+3. Run the Spring Boot application
+
+Server runs on:
+
+```
+http://localhost:8081
+```
+
+---
+
+## Running the Frontend
+
+Navigate to the frontend folder:
+
+```
+cd cloudbox-frontend
+```
+
+Install dependencies:
+
+```
+npm install
+```
+
+Start the React app:
+
+```
+npm start
+```
+
+Frontend runs on:
+
+```
+http://localhost:3000
+```
+
+---
+
+## User Flow
+
+1. User registers using the registration page
+2. User logs in using email and password
+3. Backend returns a JWT authentication token
+4. User can reset password if needed
+5. Admin dashboard is accessible without login (as per project requirement)
+
+---
+
+## Future Enhancements (Next Weeks)
+
+* File upload and management
+* Multi-cloud integration (AWS, Google Drive, etc.)
+* Role-based access control
+* Secure file sharing
+* Advanced dashboard
+* Storage analytics
+
+---
+
+## Contributors
+
+* Team CloudBox Development Team
+
+---
+
+## License
+
+This project is developed for academic and learning purposes as part of the internship program.
