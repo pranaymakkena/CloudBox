@@ -1,20 +1,48 @@
+# ==============================
+# Spring Boot / Java
+# ==============================
+
 target/
 *.log
 *.class
 *.jar
 *.war
 
-# IDE
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# ==============================
+# React / Node
+# ==============================
+
+node_modules/
+dist/
+build/
+coverage/
+
+# Vite
+.vite/
+
+# ==============================
+# Environment Variables
+# ==============================
+
+.env
+.env.local
+.env.development.local
+.env.production.local
+
+# ==============================
+# IDE Files
+# ==============================
+
 .idea/
 .vscode/
 *.iml
 
-# OS
+# ==============================
+# OS Files
+# ==============================
+
 .DS_Store
 Thumbs.db
-
-# Env
-.env
-
-# Maven wrapper
-.mvn/wrapper/maven-wrapper.jar
