@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { registerUser } from "../services/authService";
+import { useNavigate } from "react-router-dom";
+import "../styles/style.css";
 
 function Register() {
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -22,64 +27,129 @@ function Register() {
   };
 
   const handleRegister = async () => {
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword
+    } = formData;
 
-    if (formData.password !== formData.confirmPassword) {
+    // Basic validation
+    if (!firstName || !lastName || !email || !password) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    if (password !== confirmPassword) {
       alert("Passwords do not match");
       return;
     }
 
-    try {
+    setLoading(true);
 
+    try {
       await registerUser(formData);
 
-      alert("Registration Successful");
+      alert("Registration Successful 🎉");
+
+      // Redirect to login after success
+      navigate("/login");
 
     } catch (error) {
-
       console.log(error);
       alert("Registration Failed");
-
+    } finally {
+      setLoading(false);
     }
-
   };
 
   return (
+    <div className="auth-wrapper">
+      <div className="auth-container">
+        <h2>Create Account</h2>
 
-    <div className="container">
+        <input
+          name="firstName"
+          placeholder="First Name"
+          value={formData.firstName}
+          onChange={handleChange}
+        />
 
-      <h2>Create Account</h2>
+        <input
+          name="lastName"
+          placeholder="Last Name"
+          value={formData.lastName}
+          onChange={handleChange}
+        />
 
-      <input name="firstName" placeholder="First Name" onChange={handleChange} />
+        <select
+          name="gender"
+          value={formData.gender}
+          onChange={handleChange}
+          style={{
+            width: "100%",
+            padding: "12px 14px",
+            marginBottom: "18px",
+            borderRadius: "8px",
+            border: "1px solid #d1d5db",
+            background: "#fafafa"
+          }}
+        >
+          <option value="">Select Gender</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+          <option value="OTHER">Other</option>
+        </select>
 
-      <input name="lastName" placeholder="Last Name" onChange={handleChange} />
+        <input
+          type="date"
+          name="dob"
+          value={formData.dob}
+          onChange={handleChange}
+        />
 
-      <select name="gender" onChange={handleChange}>
-        <option value="">Select Gender</option>
-        <option value="MALE">Male</option>
-        <option value="FEMALE">Female</option>
-        <option value="OTHER">Other</option>
-      </select>
+        <input
+          name="location"
+          placeholder="Location"
+          value={formData.location}
+          onChange={handleChange}
+        />
 
-      <input type="date" name="dob" onChange={handleChange} />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email address"
+          value={formData.email}
+          onChange={handleChange}
+        />
 
-      <input name="location" placeholder="Location" onChange={handleChange} />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+        />
 
-      <input name="email" placeholder="Email" onChange={handleChange} />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+        />
 
-      <input type="password" name="password" placeholder="Password" onChange={handleChange} />
+        <button onClick={handleRegister} disabled={loading}>
+          {loading ? "Creating account..." : "Register"}
+        </button>
 
-      <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} />
+        <div className="divider"></div>
 
-      <button onClick={handleRegister}>Register</button>
-
-      <p>
-        Already have an account? <a href="/login">Login</a>
-      </p>
-
+        <a href="/login">Already have an account? Login</a>
+      </div>
     </div>
-
   );
-
 }
 
 export default Register;

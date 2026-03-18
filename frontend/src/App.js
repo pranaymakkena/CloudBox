@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./auth/ProtectedRoute.";
+import ProtectedRoute from "./auth/ProtectedRoute";
 import Landing from "./pages/Landing";
 import "./index.css"
 function App() {
@@ -18,7 +19,7 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
-
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/dashboard"
           element={

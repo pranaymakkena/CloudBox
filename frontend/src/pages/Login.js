@@ -1,59 +1,70 @@
 import { useState } from "react";
 import { loginUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import "../styles/style.css";
 
 function Login() {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
+
+    setLoading(true);
 
     try {
-
       const res = await loginUser({ email, password });
 
+      // Save token
       localStorage.setItem("token", res.data);
 
+      // Redirect
       navigate("/dashboard");
 
     } catch (err) {
-
       alert("Invalid Credentials");
-
+    } finally {
+      setLoading(false);
     }
-
   };
 
   return (
+    <div className="auth-wrapper">
+      <div className="auth-container">
+        <h2>Login to CloudBox</h2>
 
-    <div className="container">
+        <input
+          type="email"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-      <h2>Login</h2>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-      <input
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <button onClick={handleLogin} disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <a href="/reset-password">Forgot Password?</a>
 
-      <button onClick={handleLogin}>Login</button>
+        <div className="divider"></div>
 
-      <p>
-        Don't have an account? <a href="/register">Register</a>
-      </p>
-
+        <a href="/register">Create an account</a>
+      </div>
     </div>
-
   );
-
 }
 
 export default Login;

@@ -1,55 +1,70 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "../styles/style.css";
 
-function ResetPassword(){
+function ResetPassword() {
+  const navigate = useNavigate();
 
- const [email,setEmail] = useState("");
- const [newPassword,setNewPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
- const handleReset = async () => {
+  const handleReset = async () => {
+    if (!email || !newPassword) {
+      alert("Please fill all fields");
+      return;
+    }
 
-   try{
+    setLoading(true);
 
-     await axios.post("http://localhost:8080/api/auth/reset-password",{
-       email,
-       newPassword
-     });
+    try {
+      await axios.post("http://localhost:8080/api/auth/reset-password", {
+        email,
+        newPassword
+      });
 
-     alert("Password updated successfully");
+      alert("Password updated successfully ✅");
 
-   }catch(err){
-     alert("Reset failed");
-   }
+      // Redirect to login
+      navigate("/login");
 
- }
+    } catch (err) {
+      alert("Reset failed ❌");
+    } finally {
+      setLoading(false);
+    }
+  };
 
- return(
+  return (
+    <div className="auth-wrapper">
+      <div className="auth-container">
+        <h2>Reset Password</h2>
 
-   <div className="container">
+        <input
+          type="email"
+          placeholder="Enter Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-     <h2>Reset Password</h2>
+        <input
+          type="password"
+          placeholder="Enter New Password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
 
-     <input
-       placeholder="Enter Email"
-       onChange={(e)=>setEmail(e.target.value)}
-     />
+        <button onClick={handleReset} disabled={loading}>
+          {loading ? "Updating..." : "Reset Password"}
+        </button>
 
-     <input
-       type="password"
-       placeholder="Enter New Password"
-       onChange={(e)=>setNewPassword(e.target.value)}
-     />
+        <div className="divider"></div>
 
-     <button onClick={handleReset}>Reset Password</button>
-
-     <div className="link">
-       <a href="/">Back to Login</a>
-     </div>
-
-   </div>
-
- )
-
+        <a href="/login">Back to Login</a>
+      </div>
+    </div>
+  );
 }
 
 export default ResetPassword;
