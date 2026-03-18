@@ -1,54 +1,58 @@
 import { useState } from "react";
-import axios from "axios";
+import { loginUser } from "../services/authService";
+import { useNavigate } from "react-router-dom";
 
-function Login(){
+function Login() {
 
- const [email,setEmail] = useState("");
- const [password,setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
- const handleLogin = async () => {
+  const navigate = useNavigate();
 
-   try{
+  const handleLogin = async () => {
 
-     const res = await axios.post("http://localhost:8080/api/auth/login",{
-       email,
-       password
-     });
+    try {
 
-     localStorage.setItem("token",res.data);
+      const res = await loginUser({ email, password });
 
-     alert("Login Successful");
+      localStorage.setItem("token", res.data);
 
-   }catch(err){
-     alert("Login Failed");
-   }
+      navigate("/dashboard");
 
- }
+    } catch (err) {
 
- return(
+      alert("Invalid Credentials");
 
-   <div className="container">
+    }
 
-    <h2>User Login</h2>
+  };
 
-    <input placeholder="Email" onChange={(e)=>setEmail(e.target.value)} />
+  return (
 
-    <br/>
+    <div className="container">
 
-    <input type="password" placeholder="Password" onChange={(e)=>setPassword(e.target.value)} />
+      <h2>Login</h2>
 
-    <br/>
+      <input
+        placeholder="Email"
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-    <button onClick={handleLogin}>Login</button>
-    <div className="link">
-      <a href="/register">Don't have an account? Register</a>
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <button onClick={handleLogin}>Login</button>
+
+      <p>
+        Don't have an account? <a href="/register">Register</a>
+      </p>
+
     </div>
-    <div className="link">
-      <a href="/reset-password">Forgot Password?</a>
-    </div>
-   </div>
 
- )
+  );
 
 }
 

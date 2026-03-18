@@ -1,58 +1,84 @@
 import { useState } from "react";
-import axios from "axios";
+import { registerUser } from "../services/authService";
 
 function Register() {
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    gender: "",
+    dob: "",
+    location: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleRegister = async () => {
 
-    try {
-
-      await axios.post("http://localhost:8080/api/auth/register", {
-        name,
-        email,
-        password
-      });
-
-      alert("User Registered Successfully");
-
-    } catch (err) {
-      console.log(err);
-      alert("Registration Failed");
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
     }
 
-  }
+    try {
+
+      await registerUser(formData);
+
+      alert("Registration Successful");
+
+    } catch (error) {
+
+      console.log(error);
+      alert("Registration Failed");
+
+    }
+
+  };
 
   return (
 
     <div className="container">
 
-      <h2>User Register</h2>
+      <h2>Create Account</h2>
 
-      <input placeholder="Name" onChange={(e) => setName(e.target.value)} />
+      <input name="firstName" placeholder="First Name" onChange={handleChange} />
 
-      <br />
+      <input name="lastName" placeholder="Last Name" onChange={handleChange} />
 
-      <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <select name="gender" onChange={handleChange}>
+        <option value="">Select Gender</option>
+        <option value="MALE">Male</option>
+        <option value="FEMALE">Female</option>
+        <option value="OTHER">Other</option>
+      </select>
 
-      <br />
+      <input type="date" name="dob" onChange={handleChange} />
 
-      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+      <input name="location" placeholder="Location" onChange={handleChange} />
 
-      <br />
+      <input name="email" placeholder="Email" onChange={handleChange} />
+
+      <input type="password" name="password" placeholder="Password" onChange={handleChange} />
+
+      <input type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} />
 
       <button onClick={handleRegister}>Register</button>
 
-      <div className="link">
-        <a href="/">Already have an account? Login</a>
-      </div>
+      <p>
+        Already have an account? <a href="/login">Login</a>
+      </p>
 
     </div>
 
-  )
+  );
 
 }
 

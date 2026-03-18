@@ -1,31 +1,38 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import "./styles/style.css";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import AdminDashboard from "./pages/AdminDashboard";
-import ResetPassword from "./pages/ResetPassword";
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./auth/ProtectedRoute.";
+import Landing from "./pages/Landing";
+import "./index.css"
+function App() {
 
-function App(){
+  return (
 
- return(
+    <BrowserRouter>
 
-   <BrowserRouter>
+      <Routes>
 
-     <Routes>
+      <Route path="/" element={<Landing/>}/>
 
-       <Route path="/" element={<Login/>} />
+        <Route path="/login" element={<Login />} />
 
-       <Route path="/register" element={<Register/>} />
+        <Route path="/register" element={<Register />} />
 
-       <Route path="/admin" element={<AdminDashboard/>} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
 
-       <Route path="/reset-password" element={<ResetPassword/>} />
+      </Routes>
 
-     </Routes>
+    </BrowserRouter>
 
-   </BrowserRouter>
-
- )
+  );
 
 }
 
