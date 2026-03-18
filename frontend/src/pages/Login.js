@@ -19,25 +19,21 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await loginUser({ email, password });
+      // ✅ loginUser already:
+      // - stores token
+      // - stores role
+      // - returns decoded user
+      const user = await loginUser({ email, password });
 
-      // Save token
-      localStorage.setItem("token", res.data);
-
-      //set role
-      // localStorage.setItem("role", res.data.role);
-      // console.log("User Role:", res);
-
-      // Redirect
-      if(localStorage.getItem("role") === "ADMIN") {
+      // ✅ Just redirect
+      if (user.role === "ADMIN") {
         navigate("/admin");
       } else {
         navigate("/home");
       }
-      // navigate("/dashboard");
 
     } catch (err) {
-      alert("Invalid Credentials");
+      alert(err.response?.data || "Invalid Credentials");
     } finally {
       setLoading(false);
     }

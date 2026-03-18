@@ -4,8 +4,11 @@ import com.cloudbox.model.User;
 import com.cloudbox.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/user")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     private final UserService userService;
@@ -14,16 +17,16 @@ public class UserController {
         this.userService = userService;
     }
 
+    // ✅ GET PROFILE (SECURE)
     @GetMapping("/profile")
-    public User getProfile(@RequestParam String email) {
-
-        return userService.getProfile(email);
+    public User getProfile(Principal principal) {
+        return userService.getProfile(principal.getName());
     }
 
+    // ✅ UPDATE PROFILE (SECURE)
     @PutMapping("/profile")
-    public User updateProfile(@RequestParam String email,
-                              @RequestBody User user) {
-
-        return userService.updateProfile(email, user);
+    public User updateProfile(@RequestBody User user,
+                              Principal principal) {
+        return userService.updateProfile(principal.getName(), user);
     }
 }

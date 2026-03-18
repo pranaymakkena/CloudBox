@@ -1,17 +1,18 @@
 package com.cloudbox.security;
 
 import com.cloudbox.util.JwtUtil;
-// import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -33,19 +34,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             try {
 
+                // ✅ Extract email
                 String email = jwtUtil.extractEmail(token);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        email,
-                        null,
-                        Collections.emptyList());
+                // ✅ Extract all claims
+                Claims claims = jwtUtil.extractAllClaims(token);
+
+                // ✅ Get role
+                String role = claims.get("role", String.class);
+
+                // ✅ Set authority
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                email,
+                                null,
+                                List.of(new SimpleGrantedAuthority(role))
+                        );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (Exception e) {
-
                 System.out.println("Invalid JWT Token");
-
             }
         }
 

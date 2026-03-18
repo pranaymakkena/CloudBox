@@ -13,14 +13,19 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // ✅ GET PROFILE
     public User getProfile(String email) {
-        return userRepository.findByEmail(email).orElseThrow();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    // ✅ UPDATE PROFILE
     public User updateProfile(String email, User updatedUser) {
 
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // ✅ update allowed fields only
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setGender(updatedUser.getGender());
