@@ -20,16 +20,17 @@ function Login() {
 
     try {
       const user = await loginUser({ email, password });
+      localStorage.setItem("name", email.split("@")[0]);
 
-      // ✅ Redirect based on role
       if (user.role === "ADMIN") {
         navigate("/admin");
       } else {
-        navigate("/home");
+        navigate("/dashboard");
       }
 
     } catch (err) {
-      alert(err.response?.data || "Invalid Credentials");
+      console.error("Login error:", err);
+      alert(err.response?.data?.error || "Invalid Credentials");
     } finally {
       setLoading(false);
     }

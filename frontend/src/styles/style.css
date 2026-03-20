@@ -50,8 +50,8 @@ h2 {
 /* =========================
    INPUTS
 ========================= */
-input,
-select {
+.auth-container input,
+.auth-container select {
   width: 100%;
   padding: 12px 14px;
   margin-bottom: 18px;
@@ -66,8 +66,8 @@ input::placeholder {
   color: #9ca3af;
 }
 
-input:focus,
-select:focus {
+.auth-container input:focus,
+.auth-container select:focus {
   outline: none;
   background: #ffffff;
   border-color: #22c55e;
@@ -149,7 +149,8 @@ button:disabled {
 /* =========================
    LINKS
 ========================= */
-a {
+
+.auth-container a {
   display: block;
   margin-top: 18px;
   text-align: center;
@@ -158,6 +159,7 @@ a {
   text-decoration: none;
   font-weight: 500;
 }
+
 
 a:hover {
   text-decoration: underline;

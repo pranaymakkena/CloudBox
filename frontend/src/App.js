@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import Landing from "./pages/Landing";
 import "./index.css";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function App() {
   return (
@@ -20,10 +21,10 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route
-          path="/home"
+          path="/dashboard"
           element={
             <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <Home />
+              <UserDashboard />
             </ProtectedRoute>
           }
         />
@@ -36,16 +37,8 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="*" element={<h1>Page Not Found</h1>} />
       </Routes>
     </BrowserRouter>
   );

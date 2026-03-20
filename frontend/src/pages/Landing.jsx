@@ -1,5 +1,14 @@
 import "../styles/Landing.css";
-import { Hero, Features, Navbar, Footer } from "../components/LandingComponents";
+import {
+    Hero,
+    Features,
+    Navbar,
+    Footer,
+    HowItWorks,
+    WhyChoose,
+    CTA,
+    Pricing
+} from "../components/LandingComponents";
 
 export default function Landing() {
     return (
@@ -9,6 +18,14 @@ export default function Landing() {
             <Hero />
 
             <Features />
+
+            <HowItWorks />
+
+            <WhyChoose />
+
+            <Pricing />
+
+            <CTA />
 
             <Footer />
 

@@ -10,19 +10,18 @@ export const registerUser = (data) => {
 export const loginUser = async (data) => {
   const response = await API.post("/auth/login", data);
 
+  // ✅ FIXED
   const token = response.data;
 
-  // ✅ store token
+  console.log("Received token:", response); // Debugging log
   localStorage.setItem("token", token);
 
-  // ✅ decode token
   const decoded = jwtDecode(token);
 
-  // ✅ store role + email
   localStorage.setItem("role", decoded.role);
   localStorage.setItem("email", decoded.sub);
 
-  return decoded; // return decoded user info (cleaner)
+  return decoded;
 };
 
 // ✅ LOGOUT

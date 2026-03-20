@@ -1,135 +1,115 @@
-import { useEffect, useState } from "react";
-import "../styles/style.css";
+import Layout from "../components/layout/Layout";
+import "../components/layout/layout.css";
+import "../components/common/card.css";
 
 function UserDashboard() {
-  const [user, setUser] = useState({});
-  const [editMode, setEditMode] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch profile
-  useEffect(() => {
-    fetch("http://localhost:8080/api/user/profile", {
-      headers: {
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    })
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch");
-        return res.json();
-      })
-      .then(data => {
-        setUser(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
-
-  // ✅ Handle input change
-  const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
-
-  // ✅ Update profile
-  const updateProfile = () => {
-    fetch("http://localhost:8080/api/user/profile", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      body: JSON.stringify(user),
-    })
-      .then(res => res.json())
-      .then(data => {
-        setUser(data);
-        setEditMode(false);
-        alert("Profile updated successfully");
-      });
-  };
-
-  // ⏳ Loading state
-  if (loading) {
-    return <h3 className="text-center mt-10">Loading profile...</h3>;
-  }
+  const rawName = localStorage.getItem("name");
+  const name = rawName
+    ? rawName.charAt(0).toUpperCase() + rawName.slice(1)
+    : "User";
 
   return (
-  <div className="profile-wrapper">
-    <div className="profile-card">
+    <Layout type="user">
 
-      <h2>User Profile</h2>
+      <div className="content">
 
-      {!editMode ? (
-        <>
-          <div className="profile-row">
-            <span>First Name</span>
-            <strong>{user.firstName}</strong>
+        <h2 style={{ marginBottom: "10px" }}>User Dashboard</h2>
+
+        {/* Welcome message */}
+        <div className="welcome-box">
+          <div className="welcome-left">
+            <div className="welcome-icon">
+              <i className="fa-solid fa-hand"></i>
+            </div>
+            <div>
+              <h3>Welcome back, {name}</h3>
+              <p>Here's what's happening with your files today.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="dashboard-grid">
+
+          {/* LEFT SIDE */}
+          <div>
+
+            <div className="card">
+
+              <div className="card-title">My Files Overview</div>
+
+              {/* STATS */}
+              <div className="stats-row">
+
+                <div className="stat-card stat-green">
+                  <div className="stat-icon user-icon-files">
+                    <i className="fa-solid fa-folder"></i>
+                  </div>
+                  <div className="stat-text">
+                    <h4>Total Files</h4>
+                    <h2>120</h2>
+                  </div>
+                </div>
+
+                <div className="stat-card stat-blue">
+                  <div className="stat-icon user-icon-storage">
+                    <i className="fa-solid fa-cloud"></i>
+                  </div>
+                  <div className="stat-text">
+                    <h4>Storage Used</h4>
+                    <h2>25GB</h2>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* RECENT FILES */}
+              <div className="card-title">Recent Files</div>
+
+              <div className="list-item user-icon-file">
+                <i className="fa-solid fa-file"></i> file1.pdf
+              </div>
+
+              <div className="list-item user-icon-file">
+                <i className="fa-solid fa-file"></i> file2.docx
+              </div>
+
+            </div>
+
           </div>
 
-          <div className="profile-row">
-            <span>Last Name</span>
-            <strong>{user.lastName}</strong>
+          {/* RIGHT SIDE */}
+          <div>
+
+            <div className="card">
+              <div className="card-title">My Files Overview</div>
+
+              <div className="list-item">
+                <i className="fa-solid fa-folder user-icon-docs"></i> Documents
+              </div>
+
+              <div className="list-item">
+                <i className="fa-solid fa-photo-film user-icon-media"></i> Media
+              </div>
+
+              <div className="list-item">
+                <i className="fa-solid fa-link user-icon-links"></i> Shortcuts
+              </div>
+            </div>
+
+            <div className="card" style={{ marginTop: "20px" }}>
+              <div className="card-title">Notifications</div>
+             <p><i className="fa-solid fa-bell user-icon-bell"></i> No new notifications</p>
+            </div>
+
           </div>
 
-          <div className="profile-row">
-            <span>Gender</span>
-            <strong>{user.gender}</strong>
-          </div>
+        </div>
 
-          <div className="profile-row">
-            <span>Age</span>
-            <strong>{user.age}</strong>
-          </div>
+      </div>
 
-          <div className="profile-row">
-            <span>Location</span>
-            <strong>{user.location}</strong>
-          </div>
-
-          <button
-            className="btn btn-primary btn-full mt-10"
-            onClick={() => setEditMode(true)}
-          >
-            Edit Profile
-          </button>
-        </>
-      ) : (
-        <>
-          <label>First Name</label>
-          <input name="firstName" value={user.firstName || ""} onChange={handleChange} />
-
-          <label>Last Name</label>
-          <input name="lastName" value={user.lastName || ""} onChange={handleChange} />
-
-          <label>Gender</label>
-          <select name="gender" value={user.gender || ""} onChange={handleChange}>
-            <option value="">Select</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-
-          <label>Age</label>
-          <input name="age" value={user.age || ""} onChange={handleChange} />
-
-          <label>Location</label>
-          <input name="location" value={user.location || ""} onChange={handleChange} />
-
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button className="btn btn-success btn-full" onClick={updateProfile}>
-              Save
-            </button>
-
-            <button className="btn btn-danger btn-full" onClick={() => setEditMode(false)}>
-              Cancel
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  </div>
-);
+    </Layout>
+  );
 }
 
 export default UserDashboard;
