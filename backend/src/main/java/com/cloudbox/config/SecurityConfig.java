@@ -42,8 +42,9 @@ public class SecurityConfig {
                 // User + Admin
                 .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
 
-                // Files (WEEK 2)
-                .requestMatchers("/api/files/**").hasAnyRole("USER", "ADMIN")
+                // Files
+                    .requestMatchers("/api/files/preview/**").permitAll()
+                    .requestMatchers("/api/files/**").hasAnyRole("USER", "ADMIN")
 
                 // Everything else
                 .anyRequest().authenticated()

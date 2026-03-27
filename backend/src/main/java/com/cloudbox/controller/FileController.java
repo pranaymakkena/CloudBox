@@ -170,11 +170,18 @@ public class FileController {
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
         Path path = Paths.get(file.getFilePath());
-
         Resource resource = new UrlResource(path.toUri());
 
+        String contentType = Files.probeContentType(path);
+
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + file.getFileName())
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + file.getFileName() + "\"")
                 .body(resource);
     }
 }

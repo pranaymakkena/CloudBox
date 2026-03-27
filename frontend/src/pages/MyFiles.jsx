@@ -30,6 +30,10 @@ function MyFiles() {
     fetchFolders();
   }, []);
 
+  const getPreviewUrl = (file) => {
+    return `http://localhost:8080/api/files/preview/${file.id}`;
+  };
+
   const deleteFile = async (id) => {
     try {
       await API.delete(`/files/${id}`);
@@ -172,20 +176,18 @@ function MyFiles() {
               </div>
 
               <div style={{ display: "flex", gap: "10px" }}>
+          
                 <button
-                  className="btn btn-primary"
-                  onClick={() => setPreviewFile(file)}
+                  className="btn btn-success"
+                  onClick={() => downloadFile(file.id, file.fileName)}
                 >
-                  Preview
-                </button>
-
-                <button className="btn btn-success"
-                  onClick={() => downloadFile(file.id, file.fileName)}>
                   Download
                 </button>
 
-                <button className="btn btn-danger"
-                  onClick={() => deleteFile(file.id)}>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => deleteFile(file.id)}
+                >
                   Delete
                 </button>
 
@@ -196,47 +198,52 @@ function MyFiles() {
           {files.length === 0 && <p>No files uploaded yet</p>}
 
         </div>
+
+        {/* PREVIEW MODAL */}
+
         {previewFile && (
+          <div className="preview-modal">
+            <div className="preview-content">
 
-          <div style={{
-            marginTop: "30px",
-            background: "#fff",
-            padding: "20px",
-            borderRadius: "10px"
-          }}>
+              <button onClick={() => setPreviewFile(null)}>
+                Close
+              </button>
 
-            <h3>File Preview</h3>
+              {/* IMAGE */}
+              {previewFile.fileType.startsWith("image") && (
+                <img
+                  src={getPreviewUrl(previewFile)}
+                  alt="preview"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "80vh",
+                    objectFit: "contain"
+                  }}
+                />
+              )}
 
-            {(() => {
+              {/* PDF */}
+              {previewFile.fileType.includes("pdf") && (
+                <iframe
+                  src={getPreviewUrl(previewFile)}
+                  width="100%"
+                  height="600px"
+                />
+              )}
 
-              const fileUrl = `https://your-ngrok-url/api/files/preview/${previewFile.id}`;
-              const ext = previewFile.fileName.split(".").pop().toLowerCase();
+              {/* DOCX */}
+              {previewFile.fileType.includes("word") && (
+                <iframe
+                  src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(getPreviewUrl(previewFile))}`}
+                  width="100%"
+                  height="600px"
+                />
+              )}
 
-              if (["png","jpg","jpeg","gif","webp"].includes(ext)) {
-                return <img src={fileUrl} style={{maxWidth:"100%"}} />;
-              }
-
-              if (ext === "pdf") {
-                return <iframe src={fileUrl} width="100%" height="500px" />;
-              }
-
-              if (["doc","docx","ppt","pptx","xls","xlsx"].includes(ext)) {
-                return (
-                  <iframe
-                    src={`https://view.officeapps.live.com/op/embed.aspx?src=${fileUrl}`}
-                    width="100%"
-                    height="500px"
-                    style={{border:"none"}}
-                  />
-                );
-              }
-
-              return <p>No preview available</p>;
-
-            })()}
-
+            </div>
           </div>
         )}
+
       </div>
     </Layout>
   );

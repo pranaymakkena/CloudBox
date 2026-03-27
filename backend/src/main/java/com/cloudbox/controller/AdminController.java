@@ -3,11 +3,7 @@ package com.cloudbox.controller;
 import com.cloudbox.dto.AdminFileDTO;
 import com.cloudbox.dto.AdminSettingsRequest;
 import com.cloudbox.dto.FileShareDTO;
-import com.cloudbox.model.AdminNotification;
-import com.cloudbox.model.AdminSetting;
-import com.cloudbox.model.SystemLog;
-import com.cloudbox.model.User;
-import com.cloudbox.model.FileEntity;
+import com.cloudbox.model.*;
 import com.cloudbox.service.AdminService;
 import com.cloudbox.service.FileService;
 import com.cloudbox.repository.UserRepository;
@@ -90,7 +86,7 @@ public class AdminController {
         Map<String, Object> data = new HashMap<>();
 
         // 📊 stats
-        data.put("totalUsers", userRepository.count());
+        data.put("totalUsers", userRepository.countByRole(Role.USER));
         data.put("totalFiles", fileService.getTotalFiles());
         data.put("totalStorage", fileService.getTotalStorage());
 
