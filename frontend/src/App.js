@@ -7,6 +7,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import Home from "./pages/Home";
 import Landing from "./pages/Landing";
+import Documents from "./pages/Documents";
+import Media from "./pages/Media";
+import Shortcuts from "./pages/Shortcuts";
 
 import MyFiles from "./pages/MyFiles";
 import Upload from "./pages/Upload";
@@ -136,6 +139,33 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+  path="/documents"
+  element={
+    <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+      <Documents />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/media"
+  element={
+    <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+      <Media />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/shortcuts"
+  element={
+    <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+      <Shortcuts />
+    </ProtectedRoute>
+  }
+/>
 
         {/* ================= ADMIN ================= */}
 

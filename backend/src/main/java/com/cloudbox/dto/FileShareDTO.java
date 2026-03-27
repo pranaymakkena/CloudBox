@@ -12,6 +12,14 @@ public class FileShareDTO {
     private String permission;
     private LocalDateTime createdAt;
 
+    // ✅ NEW FIELDS (VERY IMPORTANT)
+    private boolean canView;
+    private boolean canDownload;
+
+    // =========================
+    // GETTERS & SETTERS
+    // =========================
+
     public Long getId() {
         return id;
     }
@@ -66,5 +74,23 @@ public class FileShareDTO {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    // ✅ NEW METHODS
+
+    public boolean isCanView() {
+        return canView;
+    }
+
+    public void setCanView(boolean canView) {
+        this.canView = canView;
+    }
+
+    public boolean isCanDownload() {
+        return canDownload;
+    }
+
+    public void setCanDownload(boolean canDownload) {
+        this.canDownload = canDownload;
     }
 }

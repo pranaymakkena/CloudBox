@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API from "../api/axiosConfig";
+import { useNavigate } from "react-router-dom"; // ✅ ADDED
 
 import Layout from "../components/layout/Layout";
 import "../components/layout/layout.css";
 import "../components/common/card.css";
 
 function UserDashboard() {
+
+  const navigate = useNavigate(); // ✅ ADDED
 
   const rawName = localStorage.getItem("name");
   const token = localStorage.getItem("token");
@@ -95,7 +98,11 @@ function UserDashboard() {
               {/* STATS */}
               <div className="stats-row">
 
-                <div className="stat-card stat-yellow">
+                {/* TOTAL FILES */}
+                <div
+                  className="stat-card stat-yellow clickable"
+                  onClick={() => navigate("/files")}
+                >
                   <div className="stat-icon user-icon-files">
                     <i className="fa-solid fa-folder"></i>
                   </div>
@@ -105,7 +112,11 @@ function UserDashboard() {
                   </div>
                 </div>
 
-                <div className="stat-card stat-blue">
+                {/* STORAGE */}
+                <div
+                  className="stat-card stat-blue clickable"
+                  onClick={() => navigate("/storage")}
+                >
                   <div className="stat-icon user-icon-storage">
                     <i className="fa-solid fa-cloud"></i>
                   </div>
@@ -121,7 +132,11 @@ function UserDashboard() {
               <div className="card-title">Recent Files</div>
 
               {files.slice(0, 5).map(file => (
-                <div key={file.id} className="list-item user-icon-file">
+                <div
+                  key={file.id}
+                  className="list-item user-icon-file clickable"
+                  onClick={() => navigate(`/file/${file.id}`)} // 🔥 open file page
+                >
                   <i className="fa-solid fa-file"></i> {file.fileName}
                 </div>
               ))}
@@ -139,27 +154,39 @@ function UserDashboard() {
             <div className="card">
               <div className="card-title">My Files Overview</div>
 
-              <div className="list-item">
+              <div
+                className="list-item clickable"
+                onClick={() => navigate("/documents")}
+              >
                 <i className="fa-solid fa-folder user-icon-docs"></i> Documents
               </div>
 
-              <div className="list-item">
+              <div
+                className="list-item clickable"
+                onClick={() => navigate("/media")}
+              >
                 <i className="fa-solid fa-photo-film user-icon-media"></i> Media
               </div>
 
-              <div className="list-item">
+              <div
+                className="list-item clickable"
+                onClick={() => navigate("/shortcuts")}
+              >
                 <i className="fa-solid fa-link user-icon-links"></i> Shortcuts
               </div>
             </div>
 
             <div className="card" style={{ marginTop: "20px" }}>
               <div className="card-title">Notifications</div>
+
               {notifications.length > 0 ? (
                 notifications.map((notification) => (
                   <div key={notification.id} className="list-item">
                     <div>
                       <strong>{notification.title}</strong>
-                      <p style={{ margin: "6px 0 0" }}>{notification.message}</p>
+                      <p style={{ margin: "6px 0 0" }}>
+                        {notification.message}
+                      </p>
                     </div>
                   </div>
                 ))

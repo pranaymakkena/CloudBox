@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -64,6 +65,7 @@ public class FileService {
         if (settings != null && settings.getStorageLimit() != null && settings.getStorageLimit() > 0) {
             long maxBytes = settings.getStorageLimit() * 1024 * 1024;
             long currentUsage = getUserStorage(userEmail);
+
             if (currentUsage + file.getSize() > maxBytes) {
                 throw new RuntimeException("Storage limit exceeded for this user");
             }
@@ -75,7 +77,6 @@ public class FileService {
         }
 
         String uniqueName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-
         Path filePath = Paths.get(directory.getAbsolutePath(), uniqueName);
 
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -90,8 +91,12 @@ public class FileService {
         entity.setUploadedAt(LocalDateTime.now());
 
         FileEntity savedFile = fileRepository.save(entity);
-        systemEventService.log(userEmail, "UPLOAD_FILE", "Uploaded " + savedFile.getFileName() + " to folder " + folder);
-        systemEventService.notifyAdmins("File Uploaded", userEmail + " uploaded " + savedFile.getFileName());
+
+        systemEventService.log(userEmail, "UPLOAD_FILE",
+                "Uploaded " + savedFile.getFileName() + " to folder " + folder);
+
+        systemEventService.notifyAdmins("File Uploaded",
+                userEmail + " uploaded " + savedFile.getFileName());
 
         return savedFile;
     }
@@ -105,21 +110,24 @@ public class FileService {
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
         boolean isOwner = file.getOwnerEmail().equals(userEmail);
-        boolean hasShareAccess = fileShareService.canDownloadFile(fileId, userEmail);
 
-        if (!isOwner && !hasShareAccess) {
+        boolean canDownload = fileShareService.canDownloadFile(fileId, userEmail);
+
+        if (!isOwner && !canDownload) {
             throw new RuntimeException("Unauthorized");
         }
 
         if (isOwner) {
-            systemEventService.log(userEmail, "DOWNLOAD_FILE", "Downloaded own file " + file.getFileName());
+            systemEventService.log(userEmail, "DOWNLOAD_FILE",
+                    "Downloaded own file " + file.getFileName());
         } else {
             systemEventService.log(userEmail, "DOWNLOAD_SHARED_FILE",
-                    "Downloaded shared file " + file.getFileName() + " from " + file.getOwnerEmail());
+                    "Downloaded shared file " + file.getFileName());
+
             systemEventService.notifyUser(
                     file.getOwnerEmail(),
                     "Shared File Downloaded",
-                    userEmail + " downloaded your shared file " + file.getFileName()
+                    userEmail + " downloaded your file " + file.getFileName()
             );
         }
 
@@ -144,9 +152,12 @@ public class FileService {
 
         fileShareService.deleteSharesForFile(fileId);
         collaborationCommentRepository.deleteByFileId(fileId);
+
         Files.deleteIfExists(Paths.get(file.getFilePath()));
         fileRepository.delete(file);
-        systemEventService.log(userEmail, "DELETE_FILE", "Deleted file " + file.getFileName());
+
+        systemEventService.log(userEmail, "DELETE_FILE",
+                "Deleted file " + file.getFileName());
     }
 
     // =========================
@@ -206,12 +217,36 @@ public class FileService {
 
         fileShareService.deleteSharesForFile(fileId);
         collaborationCommentRepository.deleteByFileId(fileId);
+
         Files.deleteIfExists(Paths.get(file.getFilePath()));
         fileRepository.delete(file);
 
         systemEventService.log(adminEmail, "ADMIN_DELETE_FILE",
-                "Admin deleted " + file.getFileName() + " owned by " + file.getOwnerEmail());
+                "Admin deleted " + file.getFileName());
+
         systemEventService.notifyAdmins("File Deleted by Admin",
-                adminEmail + " deleted " + file.getFileName() + " owned by " + file.getOwnerEmail());
+                adminEmail + " deleted " + file.getFileName());
+    }
+
+    // =========================
+    // 🔐 FILE ACCESS (FIXED)
+    // =========================
+    public FileEntity getFileIfAccessible(Long fileId, String userEmail) {
+
+        FileEntity file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        boolean isOwner = file.getOwnerEmail().equals(userEmail);
+
+        // ✅ FIX: allow VIEW OR DOWNLOAD
+        boolean hasAccess =
+                fileShareService.canViewFile(fileId, userEmail) ||
+                fileShareService.canDownloadFile(fileId, userEmail);
+
+        if (!isOwner && !hasAccess) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        return file;
     }
 }

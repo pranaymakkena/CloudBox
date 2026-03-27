@@ -1,7 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../styles/style.css";
+import cloudImg from "../assets/cloud-illustration.png";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -25,8 +26,6 @@ function ResetPassword() {
       });
 
       alert("Password updated successfully ✅");
-
-      // Redirect to login
       navigate("/login");
 
     } catch (err) {
@@ -37,32 +36,58 @@ function ResetPassword() {
   };
 
   return (
-    <div className="auth-wrapper">
-      <div className="auth-container">
-        <h2>Reset Password</h2>
+    <div className="auth-page">
 
-        <input
-          type="email"
-          placeholder="Enter Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+      {/* LEFT SIDE (same as login/register) */}
+      <div className="auth-left">
+        <h1>Reset your password</h1>
+        <p>
+          No worries. Enter your email and set a new password to regain access
+          to your CloudBox account.
+        </p>
+
+        <img
+          src={cloudImg}
+          alt="cloud"
+          className="auth-illustration"
         />
-
-        <input
-          type="password"
-          placeholder="Enter New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-        />
-
-        <button onClick={handleReset} disabled={loading}>
-          {loading ? "Updating..." : "Reset Password"}
-        </button>
-
-        <div className="divider"></div>
-
-        <a href="/login">Back to Login</a>
       </div>
+
+      {/* RIGHT SIDE */}
+      <div className="auth-right">
+        <div className="auth-container">
+
+          <h2>Reset Password</h2>
+
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            type="password"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+
+          <button
+            className="btn btn-primary btn-full"
+            onClick={handleReset}
+            disabled={loading}
+          >
+            {loading ? "Updating..." : "Reset Password"}
+          </button>
+
+          <div className="divider"></div>
+
+          <Link to="/login">Back to Login</Link>
+
+        </div>
+      </div>
+
     </div>
   );
 }

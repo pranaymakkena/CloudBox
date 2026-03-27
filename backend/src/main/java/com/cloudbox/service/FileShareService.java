@@ -149,6 +149,16 @@ public class FileShareService {
                 "Your access to " + fileName + " was revoked by an administrator"
         );
     }
+    
+    public boolean canViewFile(Long fileId, String userEmail) {
+    return fileShareRepository
+            .findByFileIdAndSharedWithEmail(fileId, userEmail)
+            .map(share ->
+                    share.getPermission().equals("VIEW") ||
+                    share.getPermission().equals("DOWNLOAD")
+            )
+            .orElse(false);
+}
 
     public boolean canDownloadFile(Long fileId, String userEmail) {
         return fileShareRepository.findByFileIdAndSharedWith(fileId, userEmail)

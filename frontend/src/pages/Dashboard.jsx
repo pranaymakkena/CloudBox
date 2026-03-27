@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [editMode, setEditMode] = useState(false);
-
   const [profilePic, setProfilePic] = useState(
     localStorage.getItem("profilePic") || null
   );
 
+  const fileInputRef = useRef(null);
+  const navigate = useNavigate();
+
+  // ✅ Calculate Age
   const calculateAge = (dob) => {
     if (!dob) return "Not set";
 
@@ -25,9 +29,15 @@ function Dashboard() {
     return age;
   };
 
+  // ✅ Fetch User
   useEffect(() => {
     const email = localStorage.getItem("email");
     const token = localStorage.getItem("token");
+
+    if (!email || !token) {
+      navigate("/login");
+      return;
+    }
 
     axios
       .get(`http://localhost:8080/api/user/profile?email=${email}`, {
@@ -36,9 +46,13 @@ function Dashboard() {
         },
       })
       .then((res) => setUser(res.data))
-      .catch((err) => console.log(err));
-  }, []);
+      .catch((err) => {
+        console.error(err);
+        alert("Failed to load profile");
+      });
+  }, [navigate]);
 
+  // ✅ Update Profile
   const handleUpdate = () => {
     const email = localStorage.getItem("email");
     const token = localStorage.getItem("token");
@@ -54,12 +68,16 @@ function Dashboard() {
         }
       )
       .then(() => {
-        alert("Profile updated");
+        alert("Profile updated successfully");
         setEditMode(false);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error(err);
+        alert("Update failed");
+      });
   };
 
+  // ✅ Image Upload
   const handleImageChange = (e) => {
     const file = e.target.files[0];
 
@@ -75,12 +93,15 @@ function Dashboard() {
     }
   };
 
+  // ✅ Remove Image
   const handleDeleteImage = () => {
     if (!window.confirm("Remove profile picture?")) return;
+
     setProfilePic(null);
     localStorage.removeItem("profilePic");
   };
 
+  // ✅ Delete Account
   const handleDeleteAccount = () => {
     if (!window.confirm("Delete your account permanently?")) return;
 
@@ -95,27 +116,42 @@ function Dashboard() {
       })
       .then(() => {
         localStorage.clear();
-        window.location.href = "/login";
+        navigate("/login");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error(err);
+        alert("Delete failed");
+      });
   };
 
+  // ✅ Logout
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = "/login";
+    navigate("/login");
   };
 
   if (!user) return <p>Loading...</p>;
 
   return (
     <>
-      {/* 🔥 SMALL PROFESSIONAL LOGOUT BUTTON */}
+      {/* Logout Button */}
       <button className="logout-btn" onClick={handleLogout}>
         Logout
       </button>
 
       <div className="profile-container">
+        {/* LEFT SIDE */}
         <div className="profile-left">
+          {/* Hidden File Input */}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleImageChange}
+          />
+
+          {/* Profile Image (CLICK ALWAYS WORKS) */}
           <img
             src={
               profilePic
@@ -124,13 +160,11 @@ function Dashboard() {
             }
             alt="profile"
             className="profile-img"
+            onClick={() => fileInputRef.current.click()} // 🔥 FIXED
+            style={{ cursor: "pointer" }}
           />
 
           <p>{profilePic ? "Profile Image" : "No Profile"}</p>
-
-          {editMode && (
-            <input type="file" accept="image/*" onChange={handleImageChange} />
-          )}
 
           {profilePic && (
             <button className="small-btn" onClick={handleDeleteImage}>
@@ -139,6 +173,7 @@ function Dashboard() {
           )}
         </div>
 
+        {/* RIGHT SIDE */}
         <div className="profile-right">
           <h2>My Profile</h2>
 
@@ -162,21 +197,24 @@ function Dashboard() {
           ) : (
             <>
               <input
-                value={user.firstName}
+                placeholder="First Name"
+                value={user.firstName || ""}
                 onChange={(e) =>
                   setUser({ ...user, firstName: e.target.value })
                 }
               />
 
               <input
-                value={user.lastName}
+                placeholder="Last Name"
+                value={user.lastName || ""}
                 onChange={(e) =>
                   setUser({ ...user, lastName: e.target.value })
                 }
               />
 
               <input
-                value={user.gender}
+                placeholder="Gender"
+                value={user.gender || ""}
                 onChange={(e) =>
                   setUser({ ...user, gender: e.target.value })
                 }
@@ -191,7 +229,8 @@ function Dashboard() {
               />
 
               <input
-                value={user.location}
+                placeholder="Location"
+                value={user.location || ""}
                 onChange={(e) =>
                   setUser({ ...user, location: e.target.value })
                 }

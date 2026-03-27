@@ -29,7 +29,8 @@ function Header({ type }) {
           <FaBell onClick={() => navigate(role === "ADMIN" ? "/admin/notifications" : "/notifications")} />
         </div>
 
-        <div className="icon-btn">
+        <div className="icon-btn" onClick={() => navigate("/settings")}
+>
           <FaUserCircle />
         </div>
 

@@ -1,0 +1,89 @@
+/* GRID */
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* CARD */
+.file-card {
+  background: white;
+  border-radius: 14px;
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.file-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+}
+
+/* IMAGE WRAPPER */
+.file-thumb-wrapper {
+  width: 100%;
+  height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+/* IMAGE */
+.file-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* IMAGE HOVER ZOOM */
+.file-card:hover .file-thumb {
+  transform: scale(1.05);
+}
+
+/* ICON */
+.file-icon {
+  font-size: 50px;
+  color: #9ca3af;
+  margin: 30px 0;
+}
+
+/* NAME */
+.file-name {
+  font-size: 13px;
+  margin: 10px 0;
+  color: #111827;
+  word-break: break-word;
+}
+
+/* 🔥 ACTIONS (hidden by default) */
+.file-actions {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  background: rgba(0,0,0,0.4);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  border-radius: 14px;
+}
+
+/* SHOW ON HOVER */
+.file-card:hover .file-actions {
+  opacity: 1;
+}
+
+/* BUTTONS */
+.file-actions button {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+}

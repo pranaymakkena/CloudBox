@@ -2,7 +2,7 @@ import { useState } from "react";
 import { loginUser } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/style.css";
-import ParticlesBackground from "../components/ParticlesBackground";
+import cloudImg from "../assets/cloud-illustration.png";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,53 +37,60 @@ function Login() {
   };
 
  return (
-<>
-  
-  <div className="auth-bg">
-    <div className="blob blob1"></div>
-    <div className="blob blob2"></div>
-    <div className="blob blob3"></div>
-    <ParticlesBackground />
-  </div>
+  <div className="auth-page">
 
-  <div className="auth-wrapper">
+    {/* LEFT SIDE */}
+    <div className="auth-left">
+      <h1>Welcome back</h1>
+      <p>
+        Store, share and access your files securely anytime.
+        CloudBox keeps your data safe and organized.
+      </p>
 
-    <div className="auth-container">
-
-      <h2>Login to CloudBox</h2>
-
-      <input
-        type="email"
-        placeholder="Email address"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+      <img
+        src={cloudImg}
+        alt="cloud"
+        className="auth-illustration"
       />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-
-      <button
-        className="btn btn-primary btn-full"
-        onClick={handleLogin}
-        disabled={loading}
-      >
-        {loading ? "Logging in..." : "Login"}
-      </button>
-
-      <Link to="/reset-password">Forgot Password?</Link>
-
-      <div className="divider"></div>
-
-      <Link to="/register">Create an account</Link>
-
     </div>
 
+    {/* RIGHT SIDE */}
+    <div className="auth-right">
+
+      <div className="auth-container">
+        <h2>Login</h2>
+
+        <input
+          type="email"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <button
+          className="btn btn-primary btn-full"
+          onClick={handleLogin}
+          disabled={loading}
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+        <Link to="/reset-password">Forgot Password?</Link>
+
+        <div className="divider"></div>
+
+        <Link to="/register">Create an account</Link>
+      </div>
+
+    </div>
   </div>
-</>
 );
 }
 

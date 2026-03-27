@@ -164,24 +164,29 @@ public class FileController {
         return ResponseEntity.ok(collaborationService.addComment(request, auth.getName()));
     }
     @GetMapping("/preview/{id}")
-    public ResponseEntity<Resource> previewFile(@PathVariable Long id) throws Exception {
+public ResponseEntity<Resource> previewFile(
+        @PathVariable Long id,
+        Authentication auth
+) throws Exception {
 
-        FileEntity file = fileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("File not found"));
+    String email = auth.getName();
 
-        Path path = Paths.get(file.getFilePath());
-        Resource resource = new UrlResource(path.toUri());
+    // 🔥 FIX: validate access properly
+    FileEntity file = fileService.getFileIfAccessible(id, email);
 
-        String contentType = Files.probeContentType(path);
+    Path path = Paths.get(file.getFilePath());
+    Resource resource = new UrlResource(path.toUri());
 
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
+    String contentType = file.getFileType();
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" + file.getFileName() + "\"")
-                .body(resource);
+    if (contentType == null) {
+        contentType = "application/octet-stream";
     }
+
+    return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(contentType))
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                    "inline; filename=\"" + file.getFileName() + "\"")
+            .body(resource);
+}
 }
