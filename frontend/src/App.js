@@ -32,13 +32,7 @@ import CollaborationActivity from "./pages/admin/CollaborationActivity";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminSettings from "./pages/admin/AdminSettings";
 
-<<<<<<< HEAD
 import StorageUsed from "./pages/StorageUsed";
-=======
-// 🔥 Testing
-import Kanban from "./pages/Kanban";
-
->>>>>>> 303ca9a99f2e89b776346bd1b794ece786512390
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { SearchProvider } from "./context/SearchContext";
 
@@ -250,7 +244,6 @@ function App() {
           }
         />
 
-<<<<<<< HEAD
         <Route
           path="/storage"
           element={
@@ -259,13 +252,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-=======
-
-        {/* ================= TESTING ================= */}
-        <Route path="/kanban" element={<Kanban />} />
-
-
->>>>>>> 303ca9a99f2e89b776346bd1b794ece786512390
 
         {/* ================= FALLBACK ================= */}
         <Route path="*" element={<h1>Page Not Found</h1>} />
