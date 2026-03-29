@@ -20,12 +20,14 @@ function UserDashboard() {
 
   const [files, setFiles] = useState([]);
   const [totalSize, setTotalSize] = useState(0);
+  const [storageLimit, setStorageLimit] = useState(15360); // MB
   const [notifications, setNotifications] = useState([]);
 
   // 📡 FETCH FILES
   useEffect(() => {
     fetchFiles();
     fetchNotifications();
+    fetchStorageInfo();
   }, []);
 
   const fetchFiles = async () => {
@@ -55,6 +57,16 @@ function UserDashboard() {
       setNotifications(res.data.slice(0, 3));
     } catch (err) {
       console.error("Error fetching notifications", err);
+    }
+  };
+
+  const fetchStorageInfo = async () => {
+    try {
+      const res = await API.get("/user/storage");
+      setTotalSize(res.data.usedBytes);
+      setStorageLimit(res.data.limitMb);
+    } catch (err) {
+      console.error("Error fetching storage info", err);
     }
   };
 
@@ -123,7 +135,17 @@ function UserDashboard() {
                   <div className="stat-text">
                     <h4>Storage Used</h4>
                     <h2>{formatSize(totalSize)}</h2>
-                  </div>
+                    <div style={{ fontSize: "12px", marginTop: "4px", opacity: 0.85 }}>
+                      of 15 GB
+                    </div>
+                    <div style={{ background: "rgba(255,255,255,0.3)", borderRadius: "4px", height: "6px", marginTop: "6px" }}>
+                      <div style={{
+                        background: "#fff",
+                        borderRadius: "4px",
+                        height: "6px",
+                        width: Math.min((totalSize / (storageLimit * 1024 * 1024)) * 100, 100) + "%"
+                      }} />
+                    </div>                  </div>
                 </div>
 
               </div>

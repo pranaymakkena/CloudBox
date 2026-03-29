@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import Toast from "../components/common/Toast";
+import { useToast } from "../hooks/useToast";
 import "../styles/login.css";
 
 function ResetPassword() {
@@ -8,22 +10,20 @@ function ResetPassword() {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { messages, removeToast, toast } = useToast();
 
   const handleReset = async () => {
     if (!email || !newPassword) {
-      alert("Please fill all fields");
+      toast.warning("Please fill all fields");
       return;
     }
     setLoading(true);
     try {
-      await axios.post("http://localhost:8080/api/auth/reset-password", {
-        email,
-        newPassword,
-      });
-      alert("Password updated successfully ✅");
-      navigate("/login");
+      await axios.post("http://localhost:8080/api/auth/reset-password", { email, newPassword });
+      toast.success("Password updated successfully");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
-      alert(err.response?.data || "Reset failed");
+      toast.error(err.response?.data || "Reset failed");
     } finally {
       setLoading(false);
     }
@@ -129,6 +129,7 @@ function ResetPassword() {
         </svg>
         <span>English</span>
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </div>
   );
 }

@@ -1,21 +1,18 @@
 import { useState } from "react";
 import { registerUser } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
+import Toast from "../components/common/Toast";
+import { useToast } from "../hooks/useToast";
 import "../styles/login.css";
 
 function Register() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const { messages, removeToast, toast } = useToast();
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    gender: "",
-    age: "",
-    location: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+    firstName: "", lastName: "", gender: "", age: "",
+    location: "", email: "", password: "", confirmPassword: "",
   });
 
   const handleChange = (e) => {
@@ -25,21 +22,20 @@ function Register() {
   const handleRegister = async () => {
     const { firstName, lastName, email, password, confirmPassword } = formData;
     if (!firstName || !lastName || !email || !password) {
-      alert("Please fill all required fields");
+      toast.warning("Please fill all required fields");
       return;
     }
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
     setLoading(true);
     try {
       await registerUser(formData);
-      alert("Registration Successful 🎉");
-      navigate("/login");
+      toast.success("Registration successful! Redirecting...");
+      setTimeout(() => navigate("/login"), 1500);
     } catch (error) {
-      console.log(error);
-      alert("Registration Failed");
+      toast.error("Registration failed");
     } finally {
       setLoading(false);
     }
@@ -204,6 +200,7 @@ function Register() {
         </svg>
         <span>English</span>
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </div>
   );
 }

@@ -60,4 +60,9 @@ public class UserController {
         userService.markAllNotificationsRead(principal.getName());
         return "Notifications marked as read";
     }
+
+    @GetMapping("/storage")
+    public java.util.Map<String, Long> getStorageInfo(Principal principal) {
+        return userService.getStorageInfo(principal.getName());
+    }
 }

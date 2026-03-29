@@ -2,32 +2,30 @@ import { useEffect, useState } from "react";
 import { renderAsync } from "docx-preview";
 import * as XLSX from "xlsx";
 import API from "../api/axiosConfig";
-
 import Layout from "../components/layout/Layout";
+import Toast from "../components/common/Toast";
+import { useToast } from "../hooks/useToast";
 import "../styles/style.css";
 import "../components/layout/layout.css";
 import "../components/common/card.css";
 
 function Upload() {
-
+  const { messages, removeToast, toast } = useToast();
   const [file, setFile] = useState(null);
   const [folders, setFolders] = useState(["root"]);
   const [selectedFolder, setSelectedFolder] = useState("root");
-
   const [preview, setPreview] = useState(null);
   const [fileType, setFileType] = useState("");
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    fetchFolders();
-  }, []);
+  useEffect(() => { fetchFolders(); }, []);
 
   const fetchFolders = async () => {
     try {
       const res = await API.get("/files/folders");
       setFolders(res.data);
     } catch {
-      alert("Failed to load folders");
+      toast.error("Failed to load folders");
     }
   };
 
@@ -96,7 +94,7 @@ function Upload() {
   const handleUpload = async () => {
 
     if (!file) {
-      alert("Select a file");
+      toast.warning("Select a file");
       return;
     }
 
@@ -114,13 +112,11 @@ function Upload() {
         }
       });
 
-      alert("Uploaded successfully!");
-
+      toast.success("Uploaded successfully!");
       setFile(null);
       setPreview(null);
-
     } catch {
-      alert("Upload failed");
+      toast.error("Upload failed");
     }
 
     setUploading(false);
@@ -248,6 +244,7 @@ function Upload() {
 
       </div>
 
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

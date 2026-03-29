@@ -14,6 +14,9 @@ import com.cloudbox.service.CollaborationService;
 import com.cloudbox.service.FolderService;
 import com.cloudbox.service.FileShareService;
 import com.cloudbox.service.FileService;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -23,11 +26,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/files")
@@ -164,29 +168,80 @@ public class FileController {
         return ResponseEntity.ok(collaborationService.addComment(request, auth.getName()));
     }
     @GetMapping("/preview/{id}")
-public ResponseEntity<Resource> previewFile(
-        @PathVariable Long id,
-        Authentication auth
-) throws Exception {
+    public ResponseEntity<Resource> previewFile(
+            @PathVariable Long id,
+            Authentication auth
+    ) throws Exception {
 
-    String email = auth.getName();
+        String email = auth.getName();
+        FileEntity file = fileService.getFileIfAccessible(id, email);
 
-    // 🔥 FIX: validate access properly
-    FileEntity file = fileService.getFileIfAccessible(id, email);
+        Path path = Paths.get(file.getFilePath());
+        Resource resource = new UrlResource(path.toUri());
 
-    Path path = Paths.get(file.getFilePath());
-    Resource resource = new UrlResource(path.toUri());
+        String contentType = file.getFileType();
+        if (contentType == null) contentType = "application/octet-stream";
 
-    String contentType = file.getFileType();
-
-    if (contentType == null) {
-        contentType = "application/octet-stream";
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + file.getFileName() + "\"")
+                .body(resource);
     }
 
-    return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(contentType))
-            .header(HttpHeaders.CONTENT_DISPOSITION,
-                    "inline; filename=\"" + file.getFileName() + "\"")
-            .body(resource);
-}
+    // ── Extract plain text from a DOCX for editing ──
+    @GetMapping("/docx-text/{id}")
+    public ResponseEntity<Map<String, String>> getDocxText(
+            @PathVariable Long id,
+            Authentication auth
+    ) throws Exception {
+        FileEntity file = fileService.getFileIfAccessible(id, auth.getName());
+
+        if (!file.getFileName().toLowerCase().matches(".*\\.docx?$")) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        try (XWPFDocument doc = new XWPFDocument(new FileInputStream(file.getFilePath()))) {
+            for (XWPFParagraph p : doc.getParagraphs()) {
+                sb.append(p.getText()).append("\n");
+            }
+        }
+        return ResponseEntity.ok(Map.of("text", sb.toString(), "fileName", file.getFileName()));
+    }
+
+    // ── Save edited plain text back into the DOCX ──
+    @PutMapping("/docx-text/{id}")
+    public ResponseEntity<String> saveDocxText(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body,
+            Authentication auth
+    ) throws Exception {
+        FileEntity file = fileService.getFileIfAccessible(id, auth.getName());
+
+        if (!file.getOwnerEmail().equals(auth.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only the owner can edit this file");
+        }
+
+        String newText = body.getOrDefault("text", "");
+        String[] lines = newText.split("\n", -1);
+
+        try (XWPFDocument doc = new XWPFDocument(new FileInputStream(file.getFilePath()))) {
+            // Clear existing paragraphs
+            int size = doc.getParagraphs().size();
+            for (int i = size - 1; i >= 0; i--) {
+                doc.removeBodyElement(doc.getPosOfParagraph(doc.getParagraphs().get(i)));
+            }
+            // Write new paragraphs
+            for (String line : lines) {
+                XWPFParagraph para = doc.createParagraph();
+                XWPFRun run = para.createRun();
+                run.setText(line);
+            }
+            try (FileOutputStream out = new FileOutputStream(file.getFilePath())) {
+                doc.write(out);
+            }
+        }
+        return ResponseEntity.ok("Saved");
+    }
 }

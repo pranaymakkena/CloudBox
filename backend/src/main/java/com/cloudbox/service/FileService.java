@@ -62,13 +62,16 @@ public class FileService {
         folderService.ensureFolderExists(userEmail, folder);
 
         AdminSetting settings = adminSettingRepository.findById(1L).orElse(null);
-        if (settings != null && settings.getStorageLimit() != null && settings.getStorageLimit() > 0) {
-            long maxBytes = settings.getStorageLimit() * 1024 * 1024;
-            long currentUsage = getUserStorage(userEmail);
+        long limitMb = (settings != null && settings.getStorageLimit() != null && settings.getStorageLimit() > 0)
+                ? settings.getStorageLimit()
+                : 15360L; // default 15 GB
 
-            if (currentUsage + file.getSize() > maxBytes) {
-                throw new RuntimeException("Storage limit exceeded for this user");
-            }
+        long maxBytes = limitMb * 1024 * 1024;
+        long currentUsage = getUserStorage(userEmail);
+
+        if (currentUsage + file.getSize() > maxBytes) {
+            throw new RuntimeException("Storage limit exceeded. You have used " +
+                    (currentUsage / (1024 * 1024)) + " MB of your " + limitMb + " MB limit.");
         }
 
         File directory = new File(uploadDir + userEmail + "/" + folder);

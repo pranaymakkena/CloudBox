@@ -1,15 +1,18 @@
 package com.cloudbox.service;
 
 import com.cloudbox.dto.UserProfileDTO;
+import com.cloudbox.model.AdminSetting;
 import com.cloudbox.model.SystemLog;
 import com.cloudbox.model.User;
 import com.cloudbox.model.UserNotification;
+import com.cloudbox.repository.AdminSettingRepository;
 import com.cloudbox.repository.SystemLogRepository;
 import com.cloudbox.repository.UserNotificationRepository;
 import com.cloudbox.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
@@ -18,17 +21,23 @@ public class UserService {
     private final SystemLogRepository systemLogRepository;
     private final UserNotificationRepository userNotificationRepository;
     private final SystemEventService systemEventService;
+    private final FileService fileService;
+    private final AdminSettingRepository adminSettingRepository;
 
     public UserService(
             UserRepository userRepository,
             SystemLogRepository systemLogRepository,
             UserNotificationRepository userNotificationRepository,
-            SystemEventService systemEventService
+            SystemEventService systemEventService,
+            FileService fileService,
+            AdminSettingRepository adminSettingRepository
     ) {
         this.userRepository = userRepository;
         this.systemLogRepository = systemLogRepository;
         this.userNotificationRepository = userNotificationRepository;
         this.systemEventService = systemEventService;
+        this.fileService = fileService;
+        this.adminSettingRepository = adminSettingRepository;
     }
 
     // ================= GET PROFILE (SAFE) =================
@@ -82,6 +91,15 @@ public class UserService {
         List<UserNotification> notifications = userNotificationRepository.findTop20ByUserEmailOrderByCreatedAtDesc(email);
         notifications.forEach(notification -> notification.setRead(true));
         userNotificationRepository.saveAll(notifications);
+    }
+
+    public Map<String, Long> getStorageInfo(String email) {
+        long used = fileService.getUserStorage(email);
+        AdminSetting settings = adminSettingRepository.findById(1L).orElse(null);
+        long limitMb = (settings != null && settings.getStorageLimit() != null && settings.getStorageLimit() > 0)
+                ? settings.getStorageLimit()
+                : 15360L;
+        return Map.of("usedBytes", used, "limitMb", limitMb);
     }
 
     private boolean isCollaborationAction(String action) {

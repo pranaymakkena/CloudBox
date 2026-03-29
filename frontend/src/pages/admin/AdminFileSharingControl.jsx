@@ -1,32 +1,32 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
+import Toast from "../../components/common/Toast";
+import { useToast } from "../../hooks/useToast";
 
 function AdminFileSharingControl() {
-
+  const { messages, removeToast, toast } = useToast();
   const [shares, setShares] = useState([]);
 
-  useEffect(() => {
-    fetchShares();
-  }, []);
+  useEffect(() => { fetchShares(); }, []);
 
   const fetchShares = async () => {
     try {
       const res = await API.get("/admin/shares");
       setShares(res.data);
     } catch (err) {
-      alert("Failed to load sharing data");
+      toast.error("Failed to load sharing data");
     }
   };
 
   const revokeAccess = async (id) => {
     if (!window.confirm("Revoke access?")) return;
-
     try {
       await API.delete(`/admin/share/${id}`);
       fetchShares();
+      toast.success("Access revoked");
     } catch (err) {
-      alert(err.response?.data || "Failed");
+      toast.error(err.response?.data || "Failed");
     }
   };
 
@@ -77,6 +77,7 @@ function AdminFileSharingControl() {
         </div>
 
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

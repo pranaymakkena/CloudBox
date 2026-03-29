@@ -1,56 +1,47 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
+import Toast from "../../components/common/Toast";
+import { useToast } from "../../hooks/useToast";
 
 function AdminUsers() {
-
+  const { messages, removeToast, toast } = useToast();
   const [users, setUsers] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
   const fetchUsers = async () => {
     try {
       const res = await API.get("/admin/users");
       setUsers(res.data);
     } catch (err) {
-      console.error(err);
-      alert("Failed to fetch users");
+      toast.error("Failed to fetch users");
     }
   };
 
-  // ✅ Suspend / Activate
   const toggleSuspend = async (user) => {
     try {
       setLoadingId(user.id);
-
-      const url = user.suspended
-        ? `/admin/unsuspend/${user.id}`
-        : `/admin/suspend/${user.id}`;
-
+      const url = user.suspended ? `/admin/unsuspend/${user.id}` : `/admin/suspend/${user.id}`;
       await API.put(url);
-
       fetchUsers();
+      toast.success(user.suspended ? "User activated" : "User suspended");
     } catch (err) {
-      console.error(err);
-      alert("Action failed");
+      toast.error("Action failed");
     } finally {
       setLoadingId(null);
     }
   };
 
-  // ✅ Delete
   const deleteUser = async (id) => {
     if (!window.confirm("Delete user?")) return;
-
     try {
       await API.delete(`/admin/delete/${id}`);
       fetchUsers();
+      toast.success("User deleted");
     } catch (err) {
-      console.error(err);
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   };
 
@@ -117,6 +108,7 @@ function AdminUsers() {
         </div>
 
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

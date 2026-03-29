@@ -1,33 +1,32 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
+import Toast from "../../components/common/Toast";
+import { useToast } from "../../hooks/useToast";
 
 function AdminFiles() {
-
+  const { messages, removeToast, toast } = useToast();
   const [files, setFiles] = useState([]);
 
-  useEffect(() => {
-    fetchFiles();
-  }, []);
+  useEffect(() => { fetchFiles(); }, []);
 
   const fetchFiles = async () => {
     try {
       const res = await API.get("/admin/files");
       setFiles(res.data);
     } catch (err) {
-      console.error(err);
-      alert("Failed to fetch files");
+      toast.error("Failed to fetch files");
     }
   };
 
   const deleteFile = async (id) => {
     if (!window.confirm("Delete file?")) return;
-
     try {
       await API.delete(`/admin/file/${id}`);
       fetchFiles();
+      toast.success("File deleted");
     } catch (err) {
-      alert("Delete failed");
+      toast.error("Delete failed");
     }
   };
 
@@ -72,6 +71,7 @@ function AdminFiles() {
         </div>
 
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
+import Toast from "../../components/common/Toast";
+import { useToast } from "../../hooks/useToast";
 
 function AdminSettings() {
-
+  const { messages, removeToast, toast } = useToast();
   const [storageLimit, setStorageLimit] = useState("");
   const [allowSignup, setAllowSignup] = useState(true);
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
+  useEffect(() => { fetchSettings(); }, []);
 
   const fetchSettings = async () => {
     try {
@@ -17,23 +17,18 @@ function AdminSettings() {
       setStorageLimit(res.data.storageLimit || 0);
       setAllowSignup(res.data.allowSignup);
     } catch (err) {
-      alert("Failed to load settings");
+      toast.error("Failed to load settings");
     }
   };
 
   const saveSettings = async () => {
     try {
-      const res = await API.post("/admin/settings", {
-        storageLimit,
-        allowSignup
-      });
-
+      const res = await API.post("/admin/settings", { storageLimit, allowSignup });
       setStorageLimit(res.data.storageLimit || 0);
       setAllowSignup(res.data.allowSignup);
-
-      alert("Settings saved");
+      toast.success("Settings saved");
     } catch (err) {
-      alert(err.response?.data || "Failed to save");
+      toast.error(err.response?.data || "Failed to save");
     }
   };
 
@@ -49,13 +44,13 @@ function AdminSettings() {
 
             {/* STORAGE */}
             <div className="settings-group">
-              <label>Storage Limit (MB)</label>
+              <label>Storage Limit per User (MB) — 15360 = 15 GB</label>
               <input
                 type="number"
                 className="settings-input"
                 value={storageLimit}
                 onChange={(e) => setStorageLimit(e.target.value)}
-                placeholder="Enter max storage"
+                placeholder="e.g. 15360 for 15 GB"
               />
             </div>
 
@@ -83,6 +78,7 @@ function AdminSettings() {
         </div>
 
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

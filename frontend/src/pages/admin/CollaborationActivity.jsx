@@ -1,22 +1,22 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
+import Toast from "../../components/common/Toast";
+import { useToast } from "../../hooks/useToast";
 
 function CollaborationActivity() {
-
+  const { messages, removeToast, toast } = useToast();
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    fetchActivities();
-  }, []);
+  useEffect(() => { fetchActivities(); }, []);
 
   const fetchActivities = async () => {
     try {
       const res = await API.get("/admin/collaboration");
       setActivities(res.data);
     } catch (err) {
-      alert("Failed to fetch activity");
+      toast.error("Failed to fetch activity");
     }
   };
 
@@ -71,6 +71,7 @@ function CollaborationActivity() {
         </div>
 
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

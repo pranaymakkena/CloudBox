@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import API from "../api/axiosConfig";
-
 import Layout from "../components/layout/Layout";
+import Toast from "../components/common/Toast";
+import { useToast } from "../hooks/useToast";
 import "../styles/style.css";
 
 function Profile() {
-
+  const { messages, removeToast, toast } = useToast();
   const [user, setUser] = useState({});
   const [edit, setEdit] = useState(false);
 
@@ -32,11 +33,11 @@ function Profile() {
   const updateProfile = async () => {
     try {
       await API.put("/user/profile", user);
-      alert("Profile updated!");
+      toast.success("Profile updated!");
       setEdit(false);
     } catch (err) {
       console.error(err);
-      alert("Update failed");
+      toast.error("Update failed");
     }
   };
 
@@ -143,6 +144,7 @@ function Profile() {
 
       </div>
 
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

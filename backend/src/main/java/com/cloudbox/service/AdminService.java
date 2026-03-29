@@ -165,7 +165,7 @@ public class AdminService {
     private AdminSetting createDefaultSettings() {
         AdminSetting settings = new AdminSetting();
         settings.setId(1L);
-        settings.setStorageLimit(0L);
+        settings.setStorageLimit(15360L); // 15 GB in MB
         settings.setAllowSignup(true);
         settings.setUpdatedAt(LocalDateTime.now());
         return adminSettingRepository.save(settings);

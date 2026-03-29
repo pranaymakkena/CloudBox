@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
+import Toast from "../components/common/Toast";
+import { useToast } from "../hooks/useToast";
 import "../styles/folders.css";
 
 function Folders() {
-
+  const { messages, removeToast, toast } = useToast();
   const [folders, setFolders] = useState([]);
   const [newFolder, setNewFolder] = useState("");
+  const [confirmDeleteFolder, setConfirmDeleteFolder] = useState(null);
 
   useEffect(() => {
     fetchFolders();
@@ -25,7 +28,7 @@ function Folders() {
       setNewFolder("");
       fetchFolders();
     } catch (err) {
-      alert(err.response?.data || "Failed");
+      toast.error(err.response?.data || "Failed");
     }
   };
 
@@ -39,10 +42,19 @@ function Folders() {
 
   const deleteFolder = async (name) => {
     if (name === "root") return;
-    if (!window.confirm(`Delete "${name}"?`)) return;
+    setConfirmDeleteFolder(name);
+  };
 
-    await API.delete(`/files/folders/${encodeURIComponent(name)}`);
-    fetchFolders();
+  const confirmDeleteFolderAction = async (name) => {
+    try {
+      await API.delete(`/files/folders/${encodeURIComponent(name)}`);
+      fetchFolders();
+      toast.success(`Folder "${name}" deleted`);
+    } catch (err) {
+      toast.error(err.response?.data || "Failed to delete folder");
+    } finally {
+      setConfirmDeleteFolder(null);
+    }
   };
 
   return (
@@ -85,6 +97,22 @@ function Folders() {
         </div>
 
       </div>
+
+      {confirmDeleteFolder && (
+        <div className="viewer-modal" onClick={() => setConfirmDeleteFolder(null)}>
+          <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
+            <i className="fa-solid fa-triangle-exclamation confirm-icon"></i>
+            <h3>Delete Folder?</h3>
+            <p>Delete "{confirmDeleteFolder}" and all its files?</p>
+            <div className="confirm-actions">
+              <button className="btn btn-danger" onClick={() => confirmDeleteFolderAction(confirmDeleteFolder)}>Delete</button>
+              <button className="btn btn-secondary" onClick={() => setConfirmDeleteFolder(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

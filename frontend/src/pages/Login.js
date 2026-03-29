@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { loginUser } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
+import Toast from "../components/common/Toast";
+import { useToast } from "../hooks/useToast";
 import "../styles/login.css";
 
 function Login() {
@@ -8,10 +10,11 @@ function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { messages, removeToast, toast } = useToast();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert("Please enter email and password");
+      toast.warning("Please enter email and password");
       return;
     }
     setLoading(true);
@@ -25,7 +28,7 @@ function Login() {
       }
     } catch (err) {
       console.error("Login error:", err);
-      alert(err.response?.data?.error || "Invalid Credentials");
+      toast.error(err.response?.data?.error || "Invalid Credentials");
     } finally {
       setLoading(false);
     }
@@ -149,6 +152,7 @@ function Login() {
         </svg>
         <span>English</span>
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </div>
   );
 }

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
+import Toast from "../components/common/Toast";
+import { useToast } from "../hooks/useToast";
 import "../components/common/card.css";
 
 function Notifications() {
-
+  const { messages, removeToast, toast } = useToast();
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
@@ -16,7 +18,7 @@ function Notifications() {
       const res = await API.get("/user/notifications");
       setNotifications(res.data);
     } catch (err) {
-      alert("Failed to load notifications");
+      toast.error("Failed to load notifications");
     }
   };
 
@@ -24,8 +26,9 @@ function Notifications() {
     try {
       await API.put("/user/notifications/read-all");
       fetchNotifications();
+      toast.success("All notifications marked as read");
     } catch (err) {
-      alert("Failed to update notifications");
+      toast.error("Failed to update notifications");
     }
   };
 
@@ -74,6 +77,7 @@ function Notifications() {
           )}
         </div>
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
+import Toast from "../../components/common/Toast";
+import { useToast } from "../../hooks/useToast";
 
 function AdminNotifications() {
-
+  const { messages, removeToast, toast } = useToast();
   const [notifications, setNotifications] = useState([]);
 
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
+  useEffect(() => { fetchNotifications(); }, []);
 
   const fetchNotifications = async () => {
     try {
       const res = await API.get("/admin/notifications");
       setNotifications(res.data);
     } catch (err) {
-      alert("Failed to load notifications");
+      toast.error("Failed to load notifications");
     }
   };
 
@@ -42,6 +42,7 @@ function AdminNotifications() {
         </div>
 
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }

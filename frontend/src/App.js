@@ -33,12 +33,14 @@ import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminSettings from "./pages/admin/AdminSettings";
 
 import ProtectedRoute from "./auth/ProtectedRoute";
+import { SearchProvider } from "./context/SearchContext";
 
 import "./index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 function App() {
   return (
+    <SearchProvider>
     <BrowserRouter>
       <Routes>
 
@@ -246,6 +248,7 @@ function App() {
 
       </Routes>
     </BrowserRouter>
+    </SearchProvider>
   );
 }
 

@@ -1,23 +1,22 @@
 import { useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
+import Toast from "../../components/common/Toast";
+import { useToast } from "../../hooks/useToast";
 
 function AdminLogs() {
-
+  const { messages, removeToast, toast } = useToast();
   const [logs, setLogs] = useState([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    fetchLogs();
-  }, []);
+  useEffect(() => { fetchLogs(); }, []);
 
   const fetchLogs = async () => {
     try {
       const res = await API.get("/admin/logs");
       setLogs(res.data);
     } catch (err) {
-      console.error(err);
-      alert("Failed to fetch logs");
+      toast.error("Failed to fetch logs");
     }
   };
 
@@ -86,6 +85,7 @@ function AdminLogs() {
         </div>
 
       </div>
+      <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
 }
