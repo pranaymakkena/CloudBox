@@ -46,7 +46,7 @@ function Sidebar({ type, isOpen, onClose }) {
   const menu = type === "admin" ? adminMenu : userMenu;
 
   return (
-    <div className={`sidebar${isOpen ? " sidebar-open" : ""}`}>
+    <div className={`sidebar${type === "admin" ? " sidebar-admin" : ""}${isOpen ? " sidebar-open" : ""}`}>
       {/* Logo */}
       <div className="sidebar-logo">
         <CloudBoxLogo size={30} textSize={17} variant="white" />

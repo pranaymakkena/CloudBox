@@ -24,6 +24,12 @@
   overflow-x: hidden;
 }
 
+/* Admin sidebar — deep purple/indigo to distinguish from user blue */
+.sidebar.sidebar-admin {
+  background: linear-gradient(180deg, #0a0f1e 0%, #1e1b4b 55%, #312e81 100%);
+  border-right: 1px solid rgba(139,92,246,0.15);
+}
+
 /* Logo area */
 .sidebar-logo {
   display: flex;
@@ -607,4 +613,13 @@
 @media (max-width: 480px) {
   .header-user-chip { gap: 6px; }
   .header-icon-group { margin-left: 8px; margin-right: 8px; }
+}
+
+/* Admin sidebar active item uses purple accent */
+.sidebar.sidebar-admin li.active {
+  background: rgba(139,92,246,0.22);
+  border-left-color: #8b5cf6;
+}
+.sidebar.sidebar-admin li:hover {
+  background: rgba(139,92,246,0.12);
 }

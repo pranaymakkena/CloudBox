@@ -210,23 +210,13 @@ function Upload() {
             <select
               value={selectedFolder}
               onChange={(e) => setSelectedFolder(e.target.value)}
-              style={{
-                width: "100%",
-                marginTop: "16px",
-                marginBottom: "16px",
-                padding: "12px 14px",
-                borderRadius: "8px",
-                border: "1px solid #d1d5db",
-                background: "#fafafa"
-              }}
+              className="upload-folder-select"
             >
-
               {folders.map((folder) => (
                 <option key={folder} value={folder}>
                   {folder}
                 </option>
               ))}
-
             </select>
 
 
