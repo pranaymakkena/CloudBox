@@ -18,3 +18,11 @@ border-radius:6px;
 cursor:pointer;
 font-weight:600;
 }
+
+/* =============================================
+   RESPONSIVE — global.css
+   ============================================= */
+
+@media (max-width: 768px) {
+  .container { width: 100%; padding: 0 16px; }
+}

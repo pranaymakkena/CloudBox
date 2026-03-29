@@ -47,3 +47,19 @@
 }
 .file-card:hover .file-actions { opacity:1; }
 .file-actions button { font-size:12px; padding:6px 12px; border-radius:20px; }
+
+/* =============================================
+   RESPONSIVE — fileGrid.css
+   ============================================= */
+
+@media (max-width: 768px) {
+  .file-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .file-thumb-wrapper { height: 90px; }
+  .file-icon { font-size: 36px; margin: 16px 0 6px; }
+}
+
+@media (max-width: 480px) {
+  .file-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .file-card { padding: 12px 8px 8px; }
+  .file-name { font-size: 11px; }
+}

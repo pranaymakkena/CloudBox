@@ -366,3 +366,55 @@
   .cb-sidebar { max-height: 280px; }
   .cb-main    { min-height: 500px; }
 }
+
+/* =============================================
+   RESPONSIVE — collaboration.css (additions)
+   ============================================= */
+
+@media (max-width: 640px) {
+  .cb-page-header { flex-direction: column; }
+  .cb-header-pills { flex-wrap: wrap; }
+
+  .cb-info-bar { flex-wrap: wrap; gap: 10px; }
+  .cb-info-name { font-size: 13px; }
+
+  .cb-bubble { font-size: 13px; padding: 8px 11px; }
+  .cb-group { max-width: 85%; }
+
+  .cb-composer { padding: 10px 12px 10px; }
+  .cb-composer-box { padding: 8px 10px; }
+
+  .cb-sidebar-head { padding: 14px 14px 10px; font-size: 14px; }
+  .cb-file-item { padding: 9px 12px; }
+}
+
+@media (max-width: 480px) {
+  .cb-layout { gap: 12px; }
+  .cb-sidebar { max-height: 220px; }
+  .cb-messages { padding: 12px 14px; }
+  .cb-hint { display: none; }
+}
+
+/* ── view file button ── */
+.cb-view-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+}
+
+.cb-view-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}

@@ -46,7 +46,7 @@ function formatSize(bytes) {
 
 function MyFiles() {
   const { messages, removeToast, toast } = useToast();
-  const { query } = useSearch();
+  const { setQuery } = useSearch();
 
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState(["root"]);
@@ -60,10 +60,9 @@ function MyFiles() {
   const [docxEditMode, setDocxEditMode] = useState(false);
   const [docxEditText, setDocxEditText] = useState("");
   const [docxSaving, setDocxSaving] = useState(false);
-  const docxContainerRef = useRef(null);
 
-  // merge header global search with local search
-  const search = query || localSearch;
+  // use only local search — global header search is for navigation, not filtering
+  const search = localSearch;
 
   const fetchFiles = async () => {
     try {
@@ -82,6 +81,7 @@ function MyFiles() {
   };
 
   useEffect(() => {
+    setQuery(""); // clear any leftover global search
     fetchFiles();
     fetchFolders();
   }, []);
@@ -144,9 +144,11 @@ function MyFiles() {
 
   const startDocxEdit = async () => {
     if (!viewer?.fileId) return;
+    // if text already loaded, just switch mode
+    if (docxEditText) { setDocxEditMode(true); return; }
     try {
       const res = await API.get(`/files/docx-text/${viewer.fileId}`);
-      setDocxEditText(res.data.text);
+      setDocxEditText(res.data.text || "");
       setDocxEditMode(true);
     } catch {
       toast.error("Failed to load document text");
@@ -159,10 +161,11 @@ function MyFiles() {
     try {
       await API.put(`/files/docx-text/${viewer.fileId}`, { text: docxEditText });
       toast.success("Document saved");
-      // Refresh the preview
+      // refresh preview with updated content
       const res = await API.get(`/files/preview/${viewer.fileId}`, { responseType: "arraybuffer" });
-      setViewer((prev) => ({ ...prev, arrayBuffer: res.data }));
+      setDocxEditText(""); // clear so next edit re-fetches
       setDocxEditMode(false);
+      setViewer((prev) => ({ ...prev, arrayBuffer: res.data }));
     } catch (err) {
       toast.error(err.response?.data || "Failed to save document");
     } finally {
@@ -170,15 +173,27 @@ function MyFiles() {
     }
   };
 
-  // Render docx once viewer is set and ref is ready
+  // Render docx when switching back to view mode or when viewer first opens
+  const docxContainerRef = useRef(null);
+
+  const setDocxContainerRef = (node) => {
+    docxContainerRef.current = node;
+    if (node && viewer?.type === "docx" && viewer.arrayBuffer) {
+      node.innerHTML = "";
+      renderAsync(viewer.arrayBuffer, node).catch(() =>
+        toast.error("Failed to render document")
+      );
+    }
+  };
+
   useEffect(() => {
-    if (viewer?.type === "docx" && viewer.arrayBuffer && docxContainerRef.current) {
+    if (viewer?.type === "docx" && viewer.arrayBuffer && docxContainerRef.current && !docxEditMode) {
       docxContainerRef.current.innerHTML = "";
       renderAsync(viewer.arrayBuffer, docxContainerRef.current).catch(() =>
         toast.error("Failed to render document")
       );
     }
-  }, [viewer]);
+  }, [viewer, docxEditMode]);
 
   const shareFile = async (fileId) => {
     const email = shareEmail[fileId]?.trim();
@@ -270,7 +285,7 @@ function MyFiles() {
                   <option value="VIEW">View</option>
                   <option value="DOWNLOAD">Download</option>
                 </select>
-                <button className="btn btn-primary btn-sm" onClick={() => shareFile(file.id)}>Share</button>
+                <button className="btn btn-share btn-sm" onClick={() => shareFile(file.id)}>Share</button>
 
                 <select
                   value={moveFolder[file.id] || file.folder || "root"}
@@ -308,11 +323,11 @@ function MyFiles() {
 
         {/* Viewer Modal */}
         {viewer && (
-          <div className="viewer-modal" onClick={() => { setViewer(null); setDocxEditMode(false); }}>
+          <div className="viewer-modal" onClick={() => { setViewer(null); setDocxEditMode(false); setDocxEditText(""); }}>
             <div className="viewer-content" onClick={(e) => e.stopPropagation()}>
               <div className="viewer-header">
                 <span>{viewer.name}</span>
-                <button className="close-btn" onClick={() => { setViewer(null); setDocxEditMode(false); }}>✕</button>
+                <button className="close-btn" onClick={() => { setViewer(null); setDocxEditMode(false); setDocxEditText(""); }}>✕</button>
               </div>
 
               {viewer.type === "docx" && (
@@ -324,14 +339,12 @@ function MyFiles() {
                     >
                       <i className="fa-solid fa-eye"></i> View
                     </button>
-                    {viewer.isOwner && (
-                      <button
+                    <button
                         className={`docx-tab-btn${docxEditMode ? " active" : ""}`}
                         onClick={startDocxEdit}
                       >
                         <i className="fa-solid fa-pen"></i> Edit
                       </button>
-                    )}
                     {docxEditMode && (
                       <button
                         className="docx-save-btn"
@@ -353,7 +366,7 @@ function MyFiles() {
                       spellCheck
                     />
                   ) : (
-                    <div ref={docxContainerRef} className="docx-render-container" />
+                    <div ref={setDocxContainerRef} className="docx-render-container" />
                   )}
                 </>
               )}

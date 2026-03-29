@@ -256,3 +256,21 @@
     padding: 32px 24px 28px;
   }
 }
+
+/* =============================================
+   RESPONSIVE — login.css (additions)
+   ============================================= */
+
+@media (max-width: 768px) {
+  .yc-page { padding: 16px; align-items: flex-start; padding-top: 40px; }
+  .yc-card { padding: 28px 20px 24px; max-width: 100%; }
+  .yc-card-register { max-width: 100%; }
+  .yc-lang { position: relative; bottom: auto; left: auto; transform: none; margin-top: 24px; justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .yc-card { padding: 24px 16px 20px; border-radius: 16px; }
+  .yc-logo-text { font-size: 18px; }
+  .yc-btn-primary, .yc-btn-sso { padding: 12px; font-size: 14px; }
+  .yc-input, .yc-input-full { padding: 11px 12px; font-size: 14px; }
+}

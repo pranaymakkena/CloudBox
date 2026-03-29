@@ -212,3 +212,26 @@ tr:hover{
   }
 
 }
+
+/* =============================================
+   RESPONSIVE — AdminDashboard.css (additions)
+   ============================================= */
+
+@media (max-width: 1024px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .stat-card { flex-direction: column; text-align: center; gap: 10px; }
+  .dashboard-title { font-size: 22px; }
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+  .card { padding: 16px; }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container { padding: 12px; }
+  .dashboard-title { font-size: 18px; }
+  .stat-value { font-size: 18px; }
+  .btn { padding: 6px 10px; font-size: 12px; }
+}

@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from "react";
+import { renderAsync } from "docx-preview";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import "../styles/collaboration.css";
+import "../styles/style.css";
 
 const currentUser = localStorage.getItem("email") || "";
 
@@ -45,7 +47,9 @@ export default function Collaboration() {
   const [message,        setMessage]        = useState("");
   const [search,         setSearch]         = useState("");
   const [sending,        setSending]        = useState(false);
-  const bottomRef = useRef(null);
+  const [viewer,         setViewer]         = useState(null);
+  const bottomRef    = useRef(null);
+  const docxRef      = useRef(null);
 
   useEffect(() => { fetchFiles(); }, []);
 
@@ -98,6 +102,30 @@ export default function Collaboration() {
   function onKey(e) {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendComment(); }
   }
+
+  async function viewFile(file) {
+    const isDocx = /\.(doc|docx)$/i.test(file.fileName);
+    try {
+      if (isDocx) {
+        const res = await API.get(`/files/preview/${file.fileId}`, { responseType: "arraybuffer" });
+        setViewer({ type: "docx", name: file.fileName, arrayBuffer: res.data });
+      } else {
+        const res = await API.get(`/files/preview/${file.fileId}`, { responseType: "blob" });
+        const blob = new Blob([res.data], { type: res.headers["content-type"] });
+        setViewer({ type: blob.type, name: file.fileName, url: URL.createObjectURL(blob) });
+      }
+    } catch {
+      toast.error("Failed to open file");
+    }
+  }
+
+  // render docx when viewer opens
+  useEffect(() => {
+    if (viewer?.type === "docx" && viewer.arrayBuffer && docxRef.current) {
+      docxRef.current.innerHTML = "";
+      renderAsync(viewer.arrayBuffer, docxRef.current).catch(() => toast.error("Failed to render document"));
+    }
+  }, [viewer]);
 
   const visibleFiles  = files.filter(f => f.fileName.toLowerCase().includes(search.toLowerCase()));
   const selectedFile  = files.find(f => String(f.fileId) === selectedFileId);
@@ -191,10 +219,13 @@ export default function Collaboration() {
                       Permission: <strong>{selectedFile.permission}</strong>
                     </div>
                   </div>
-                  <span className={`cb-perm ${selectedFile.permission === "DOWNLOAD" ? "perm-dl" : "perm-view"}`}>
-                    <i className={`fa-solid ${selectedFile.permission === "DOWNLOAD" ? "fa-unlock" : "fa-eye"}`}></i>
-                    {selectedFile.permission}
-                  </span>
+                  <button
+                    className="cb-view-btn"
+                    onClick={() => viewFile(selectedFile)}
+                    title="View file"
+                  >
+                    <i className="fa-solid fa-eye" /> View File
+                  </button>
                 </div>
               )}
 
@@ -270,6 +301,37 @@ export default function Collaboration() {
         )}
 
         <Toast messages={messages} removeToast={removeToast} />
+
+        {/* ── File Viewer Modal ── */}
+        {viewer && (
+          <div className="viewer-modal" onClick={() => setViewer(null)}>
+            <div className="viewer-content" onClick={e => e.stopPropagation()}>
+              <div className="viewer-header">
+                <span>{viewer.name}</span>
+                <button className="close-btn" onClick={() => setViewer(null)}>✕</button>
+              </div>
+              {viewer.type === "docx" && (
+                <div ref={docxRef} className="docx-render-container" />
+              )}
+              {viewer.type?.startsWith("image/") && (
+                <img src={viewer.url} alt="preview" className="viewer-media" />
+              )}
+              {viewer.type === "application/pdf" && (
+                <iframe src={viewer.url} className="viewer-frame" title={viewer.name} />
+              )}
+              {viewer.type?.startsWith("video/") && (
+                <video controls className="viewer-media">
+                  <source src={viewer.url} type={viewer.type} />
+                </video>
+              )}
+              {viewer.type?.startsWith("audio/") && (
+                <audio controls style={{ width: "100%", marginTop: 20 }}>
+                  <source src={viewer.url} type={viewer.type} />
+                </audio>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

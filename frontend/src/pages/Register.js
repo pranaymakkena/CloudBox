@@ -3,6 +3,7 @@ import { registerUser } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
+import CloudBoxLogo from "../components/CloudBoxLogo";
 import "../styles/login.css";
 
 function Register() {
@@ -94,11 +95,7 @@ function Register() {
         </button>
 
         <div className="yc-logo">
-          <span className="yc-logo-text">CloudBox</span>
-          <svg className="yc-logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <path d="M22 17a5 5 0 00-4.9-6H16a7 7 0 10-7 7.9" stroke="#4285f4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 18l3 3 3-3M15 21v-8" stroke="#4285f4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <CloudBoxLogo size={32} textSize={20} variant="dark" />
         </div>
 
         <p className="yc-subtitle">Create your management console account</p>

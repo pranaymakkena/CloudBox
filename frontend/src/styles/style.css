@@ -640,3 +640,79 @@ tr:hover td { background:#f5f8ff; }
   box-shadow: 0 0 0 3px rgba(66,133,244,0.10);
   background: #fff;
 }
+
+/* =============================================
+   RESPONSIVE — style.css
+   ============================================= */
+
+@media (max-width: 1024px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .admin-grid { grid-template-columns: repeat(2, 1fr); }
+  .system-grid { grid-template-columns: repeat(2, 1fr); }
+  .panel-grid { grid-template-columns: 1fr; }
+  .container { width: 100%; padding: 0 16px; }
+}
+
+@media (max-width: 768px) {
+  .stats-row { flex-direction: column; }
+  .stat-card { padding: 16px 16px 16px 64px; }
+
+  .admin-grid { grid-template-columns: 1fr; }
+  .system-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .files-toolbar { flex-direction: column; align-items: stretch; }
+  .search-box { max-width: 100%; }
+  .category-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+
+  .file-row { padding: 12px 14px; }
+  .file-row-actions {
+    flex-wrap: wrap;
+    padding-left: 0;
+    gap: 6px;
+  }
+  .inline-input { min-width: 140px; flex: 1; }
+
+  .profile-wrapper { padding: 0 8px; }
+  .profile-card { padding: 20px 16px; }
+  .profile-row { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .profile-row input, .profile-row select { width: 100%; }
+
+  .upload-wrapper { padding: 0 8px; }
+  .upload-card { padding: 20px 16px; }
+
+  .settings-card { width: 100%; padding: 20px 16px; }
+  .settings-input { width: 100%; }
+
+  .welcome-box { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  table { display: block; overflow-x: auto; white-space: nowrap; }
+
+  .viewer-content { width: 96%; height: 92%; }
+  .confirm-dialog { padding: 24px 20px; }
+}
+
+@media (max-width: 480px) {
+  .page-heading { font-size: 18px; }
+  .system-grid { grid-template-columns: 1fr; }
+  .stat-text h2 { font-size: 20px; }
+  .content { padding: 12px; }
+  .card { padding: 14px; }
+  .btn { padding: 8px 14px; font-size: 13px; }
+  .btn-sm { padding: 6px 10px; font-size: 12px; }
+}
+
+/* Share button — outlined blue, no glow */
+.btn-share {
+  background: transparent;
+  color: #2563eb;
+  border: 1.5px solid #2563eb;
+  box-shadow: none;
+}
+
+.btn-share:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #1d4ed8;
+  color: #1d4ed8;
+  transform: none;
+  box-shadow: none;
+}

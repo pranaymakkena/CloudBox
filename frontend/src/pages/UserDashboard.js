@@ -143,7 +143,7 @@ function UserDashboard() {
                         background: "#fff",
                         borderRadius: "4px",
                         height: "6px",
-                        width: Math.min((totalSize / (storageLimit * 1024 * 1024)) * 100, 100) + "%"
+                        width: Math.min(storageLimit > 0 ? (totalSize / (storageLimit * 1024 * 1024)) * 100 : 0, 100) + "%"
                       }} />
                     </div>                  </div>
                 </div>
@@ -157,7 +157,7 @@ function UserDashboard() {
                 <div
                   key={file.id}
                   className="list-item user-icon-file clickable"
-                  onClick={() => navigate(`/file/${file.id}`)} // 🔥 open file page
+                  onClick={() => navigate("/files")} // open files page
                 >
                   <i className="fa-solid fa-file"></i> {file.fileName}
                 </div>

@@ -1,35 +1,23 @@
 import "../styles/Landing.css";
 import {
-    Hero,
-    Features,
-    Navbar,
-    Footer,
-    HowItWorks,
-    WhyChoose,
-    CTA,
-    Pricing
+  Navbar, Hero, TrustBar, Features,
+  HowItWorks, WhyChoose, Testimonials,
+  Pricing, CTA, Footer,
 } from "../components/LandingComponents";
 
 export default function Landing() {
-    return (
-        <div>
-            <Navbar />
-
-            <Hero />
-
-            <Features />
-
-            <HowItWorks />
-
-            <WhyChoose />
-
-            <Pricing />
-
-            <CTA />
-
-            <Footer />
-
-        </div>
-
-    )
+  return (
+    <div>
+      <Navbar />
+      <Hero />
+      <TrustBar />
+      <Features />
+      <HowItWorks />
+      <WhyChoose />
+      <Testimonials />
+      <Pricing />
+      <CTA />
+      <Footer />
+    </div>
+  );
 }

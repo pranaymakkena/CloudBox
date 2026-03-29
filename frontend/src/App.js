@@ -32,6 +32,7 @@ import CollaborationActivity from "./pages/admin/CollaborationActivity";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminSettings from "./pages/admin/AdminSettings";
 
+import StorageUsed from "./pages/StorageUsed";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { SearchProvider } from "./context/SearchContext";
 
@@ -239,6 +240,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminSettings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/storage"
+          element={
+            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+              <StorageUsed />
             </ProtectedRoute>
           }
         />

@@ -1,149 +1,120 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import "../styles/style.css";
+import "../styles/Profile.css";
 
 function Profile() {
   const { messages, removeToast, toast } = useToast();
-  const [user, setUser] = useState({});
-  const [edit, setEdit] = useState(false);
+  const navigate = useNavigate();
+  const [user, setUser]   = useState({});
+  const [edit, setEdit]   = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  const name = localStorage.getItem("name") || "User";
+  const role = localStorage.getItem("role") || "USER";
+  const initials = name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+
+  useEffect(() => { fetchProfile(); }, []);
 
   const fetchProfile = async () => {
     try {
       const res = await API.get("/user/profile");
       setUser(res.data);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
-  const handleChange = (e) => {
-    setUser({
-      ...user,
-      [e.target.name]: e.target.value
-    });
-  };
+  const handleChange = (e) => setUser({ ...user, [e.target.name]: e.target.value });
 
   const updateProfile = async () => {
     try {
       await API.put("/user/profile", user);
       toast.success("Profile updated!");
       setEdit(false);
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Update failed");
     }
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
+  const fields = [
+    { label: "First Name", name: "firstName", type: "text" },
+    { label: "Last Name",  name: "lastName",  type: "text" },
+    { label: "Email",      name: "email",     type: "text",   readOnly: true },
+    { label: "Gender",     name: "gender",    type: "select", options: ["MALE","FEMALE","OTHER"] },
+    { label: "Age",        name: "age",       type: "number" },
+    { label: "Location",   name: "location",  type: "text" },
+  ];
+
   return (
     <Layout type="user">
-
       <div className="content">
+        <div className="prf-page">
 
-        <h2 className="page-title">Profile</h2>
-
-        <div className="profile-wrapper">
-
-          <div className="profile-card">
-
-            {/* FIRST NAME */}
-            <div className="profile-row">
-              <span>First Name</span>
-              {edit ? (
-                <input name="firstName" value={user.firstName || ""} onChange={handleChange} />
-              ) : (
-                <strong>{user.firstName}</strong>
-              )}
+          {/* ── LEFT: avatar card ── */}
+          <div className="prf-sidebar">
+            <div className="prf-avatar-wrap">
+              <div className="prf-avatar">{initials}</div>
+              <div className="prf-avatar-ring" />
             </div>
+            <h3 className="prf-name">{user.firstName} {user.lastName}</h3>
+            <span className="prf-role-badge">{role === "ADMIN" ? "Administrator" : "Member"}</span>
+            <p className="prf-email">{user.email}</p>
 
-            {/* LAST NAME */}
-            <div className="profile-row">
-              <span>Last Name</span>
-              {edit ? (
-                <input name="lastName" value={user.lastName || ""} onChange={handleChange} />
-              ) : (
-                <strong>{user.lastName}</strong>
-              )}
-            </div>
-
-            {/* EMAIL */}
-            <div className="profile-row">
-              <span>Email</span>
-              <strong>{user.email}</strong>
-            </div>
-
-            {/* GENDER */}
-            <div className="profile-row">
-              <span>Gender</span>
-              {edit ? (
-                <select name="gender" value={user.gender || ""} onChange={handleChange}>
-                  <option value="">Select</option>
-                  <option value="MALE">Male</option>
-                  <option value="FEMALE">Female</option>
-                  <option value="OTHER">Other</option>
-                </select>
-              ) : (
-                <strong>{user.gender}</strong>
-              )}
-            </div>
-
-            {/* AGE */}
-            <div className="profile-row">
-              <span>Age</span>
-              {edit ? (
-                <input type="number" name="age" value={user.age || ""} onChange={handleChange} />
-              ) : (
-                <strong>{user.age}</strong>
-              )}
-            </div>
-
-            {/* LOCATION */}
-            <div className="profile-row">
-              <span>Location</span>
-              {edit ? (
-                <input name="location" value={user.location || ""} onChange={handleChange} />
-              ) : (
-                <strong>{user.location}</strong>
-              )}
-            </div>
-
-            {/* BUTTONS */}
-            <div style={{ marginTop: "20px", textAlign: "center" }}>
-
-              {edit ? (
-                <>
-                  <button className="btn btn-success" onClick={updateProfile}>
-                    Save
-                  </button>
-
-                  <button
-                    className="btn btn-danger"
-                    style={{ marginLeft: "10px" }}
-                    onClick={() => setEdit(false)}
-                  >
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <button className="btn btn-primary" onClick={() => setEdit(true)}>
-                  Edit Profile
+            <div className="prf-sidebar-actions">
+              {!edit && (
+                <button className="btn btn-primary prf-btn" onClick={() => setEdit(true)}>
+                  <i className="fa-solid fa-pen" /> Edit Profile
                 </button>
               )}
+              <button className="prf-logout-btn" onClick={handleLogout}>
+                <i className="fa-solid fa-right-from-bracket" />
+                Sign Out
+              </button>
+            </div>
+          </div>
 
+          {/* ── RIGHT: details card ── */}
+          <div className="prf-card">
+            <div className="prf-card-header">
+              <h2 className="prf-card-title">Profile Details</h2>
+              {edit && (
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button className="btn btn-success btn-sm" onClick={updateProfile}>Save</button>
+                  <button className="btn btn-secondary btn-sm" onClick={() => setEdit(false)}>Cancel</button>
+                </div>
+              )}
             </div>
 
+            <div className="prf-fields">
+              {fields.map(f => (
+                <div className="prf-field" key={f.name}>
+                  <label className="prf-label">{f.label}</label>
+                  {edit && !f.readOnly ? (
+                    f.type === "select" ? (
+                      <select className="prf-input" name={f.name} value={user[f.name] || ""} onChange={handleChange}>
+                        <option value="">Select</option>
+                        {f.options.map(o => <option key={o} value={o}>{o.charAt(0) + o.slice(1).toLowerCase()}</option>)}
+                      </select>
+                    ) : (
+                      <input className="prf-input" type={f.type} name={f.name} value={user[f.name] || ""} onChange={handleChange} />
+                    )
+                  ) : (
+                    <span className="prf-value">{user[f.name] || <span style={{ color: "#94a3b8" }}>—</span>}</span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
         </div>
-
       </div>
-
       <Toast messages={messages} removeToast={removeToast} />
     </Layout>
   );
