@@ -20,14 +20,19 @@
 }
 
 .su-spinner {
-  width: 22px; height: 22px;
+  width: 22px;
+  height: 22px;
   border: 3px solid #e2e8f0;
   border-top-color: #2563eb;
   border-radius: 50%;
   animation: su-spin 0.7s linear infinite;
 }
 
-@keyframes su-spin { to { transform: rotate(360deg); } }
+@keyframes su-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 
 /* =============================================
    HERO BANNER
@@ -48,18 +53,25 @@
 .su-hero::before {
   content: '';
   position: absolute;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(99,102,241,0.35), transparent 65%);
-  top: -120px; right: 80px;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.35), transparent 65%);
+  top: -120px;
+  right: 80px;
   pointer-events: none;
 }
 
-.su-hero-left { flex: 1; min-width: 0; position: relative; z-index: 1; }
+.su-hero-left {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
 
 .su-hero-label {
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   margin-bottom: 8px;
@@ -76,17 +88,19 @@
 
 .su-hero-sub {
   font-size: 14px;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   margin: 0 0 24px;
   font-weight: 400;
 }
 
 /* overall bar */
-.su-hero-bar-wrap { margin-bottom: 28px; }
+.su-hero-bar-wrap {
+  margin-bottom: 28px;
+}
 
 .su-hero-bar-track {
   height: 8px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
   overflow: hidden;
   margin-bottom: 8px;
@@ -96,16 +110,16 @@
   height: 100%;
   background: linear-gradient(90deg, #60a5fa, #a78bfa);
   border-radius: 10px;
-  transition: width 1s cubic-bezier(.4,0,.2,1);
+  transition: width 1s cubic-bezier(.4, 0, .2, 1);
   min-width: 4px;
-  box-shadow: 0 0 10px rgba(96,165,250,0.6);
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.6);
 }
 
 .su-hero-bar-labels {
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   font-weight: 500;
 }
 
@@ -120,8 +134,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
   padding: 10px 16px;
   backdrop-filter: blur(8px);
@@ -130,7 +144,7 @@
 
 .su-chip i {
   font-size: 16px;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   flex-shrink: 0;
 }
 
@@ -143,7 +157,7 @@
 
 .su-chip-lbl {
   font-size: 11px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   margin-top: 2px;
   font-weight: 500;
 }
@@ -181,7 +195,7 @@
 
 .su-donut-sub {
   font-size: 12px;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255, 255, 255, 0.65);
   margin-top: 6px;
   font-weight: 500;
 }
@@ -200,7 +214,7 @@
   background: #ffffff;
   border-radius: 18px;
   border: 1px solid #e8eef8;
-  box-shadow: 0 2px 16px rgba(37,99,235,0.06);
+  box-shadow: 0 2px 16px rgba(37, 99, 235, 0.06);
   padding: 24px;
 }
 
@@ -236,10 +250,13 @@
   margin-bottom: 18px;
 }
 
-.su-cat-row:last-child { margin-bottom: 0; }
+.su-cat-row:last-child {
+  margin-bottom: 0;
+}
 
 .su-cat-icon {
-  width: 42px; height: 42px;
+  width: 42px;
+  height: 42px;
   border-radius: 11px;
   display: flex;
   align-items: center;
@@ -248,7 +265,10 @@
   flex-shrink: 0;
 }
 
-.su-cat-body { flex: 1; min-width: 0; }
+.su-cat-body {
+  flex: 1;
+  min-width: 0;
+}
 
 .su-cat-top {
   display: flex;
@@ -257,9 +277,22 @@
   margin-bottom: 7px;
 }
 
-.su-cat-name { font-size: 13.5px; font-weight: 600; color: #1e293b; }
-.su-cat-meta { font-size: 12.5px; font-weight: 600; color: #64748b; }
-.su-cat-pct  { color: #94a3b8; font-weight: 500; }
+.su-cat-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.su-cat-meta {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.su-cat-pct {
+  color: #94a3b8;
+  font-weight: 500;
+}
 
 /* ── file rows ── */
 .su-file-row {
@@ -270,7 +303,9 @@
   border-bottom: 1px solid #f8fafc;
 }
 
-.su-file-row:last-child { border-bottom: none; }
+.su-file-row:last-child {
+  border-bottom: none;
+}
 
 .su-file-rank {
   font-size: 11px;
@@ -282,7 +317,8 @@
 }
 
 .su-file-icon {
-  width: 36px; height: 36px;
+  width: 36px;
+  height: 36px;
   border-radius: 9px;
   display: flex;
   align-items: center;
@@ -291,7 +327,10 @@
   flex-shrink: 0;
 }
 
-.su-file-body { flex: 1; min-width: 0; }
+.su-file-body {
+  flex: 1;
+  min-width: 0;
+}
 
 .su-file-top {
   display: flex;
@@ -328,7 +367,7 @@
 .su-bar-fill {
   height: 100%;
   border-radius: 10px;
-  transition: width 0.8s cubic-bezier(.4,0,.2,1);
+  transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
   min-width: 4px;
 }
 
@@ -336,24 +375,64 @@
    RESPONSIVE
    ============================================= */
 @media (max-width: 900px) {
-  .su-bottom-grid { grid-template-columns: 1fr; }
-  .su-hero { flex-direction: column; padding: 28px 24px; }
-  .su-hero-right { align-self: center; }
+  .su-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .su-hero {
+    flex-direction: column;
+    padding: 28px 24px;
+  }
+
+  .su-hero-right {
+    align-self: center;
+  }
 }
 
 @media (max-width: 600px) {
-  .su-hero-title { font-size: 22px; }
-  .su-chips { gap: 8px; }
-  .su-chip { min-width: 90px; padding: 8px 12px; }
-  .su-panel { padding: 18px 16px; }
+  .su-hero-title {
+    font-size: 22px;
+  }
+
+  .su-chips {
+    gap: 8px;
+  }
+
+  .su-chip {
+    min-width: 90px;
+    padding: 8px 12px;
+  }
+
+  .su-panel {
+    padding: 18px 16px;
+  }
 }
 
 /* ── additional mobile fixes ── */
 @media (max-width: 480px) {
-  .su-hero { padding: 20px 16px; }
-  .su-hero-title { font-size: 20px; }
-  .su-chips { flex-direction: column; }
-  .su-chip { min-width: unset; width: 100%; }
-  .su-donut-outer { width: 140px; height: 140px; }
-  .su-panel { padding: 16px 14px; }
+  .su-hero {
+    padding: 20px 16px;
+  }
+
+  .su-hero-title {
+    font-size: 20px;
+  }
+
+  .su-chips {
+    flex-direction: column;
+  }
+
+  .su-chip {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .su-donut-outer {
+    width: 140px;
+    height: 140px;
+  }
+
+  .su-panel {
+    padding: 16px 14px;
+  }
 }

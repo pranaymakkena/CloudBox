@@ -28,8 +28,7 @@ public class CollaborationService {
             FileRepository fileRepository,
             FileShareRepository fileShareRepository,
             CollaborationCommentRepository collaborationCommentRepository,
-            SystemEventService systemEventService
-    ) {
+            SystemEventService systemEventService) {
         this.fileRepository = fileRepository;
         this.fileShareRepository = fileShareRepository;
         this.collaborationCommentRepository = collaborationCommentRepository;
@@ -40,13 +39,13 @@ public class CollaborationService {
         Map<Long, CollaborationFileDTO> files = new LinkedHashMap<>();
 
         fileShareRepository.findByOwnerEmailOrderByCreatedAtDesc(userEmail)
-                .forEach(share -> files.putIfAbsent(share.getFile().getId(), mapFile(share.getFile(), "OWNER", "FULL")));
+                .forEach(
+                        share -> files.putIfAbsent(share.getFile().getId(), mapFile(share.getFile(), "OWNER", "FULL")));
 
         fileShareRepository.findBySharedWithOrderByCreatedAtDesc(userEmail)
                 .forEach(share -> files.putIfAbsent(
                         share.getFile().getId(),
-                        mapFile(share.getFile(), "SHARED_WITH_ME", share.getPermission())
-                ));
+                        mapFile(share.getFile(), "SHARED_WITH_ME", share.getPermission())));
 
         files.values().forEach(file -> file.setComments(getCommentsForFile(file.getFileId(), userEmail)));
 
@@ -88,8 +87,7 @@ public class CollaborationService {
             systemEventService.notifyUser(
                     file.getOwnerEmail(),
                     "New Collaboration Comment",
-                    userEmail + " commented on " + file.getFileName()
-            );
+                    userEmail + " commented on " + file.getFileName());
         }
 
         fileShareRepository.findByFileId(file.getId()).stream()
@@ -99,8 +97,7 @@ public class CollaborationService {
                 .forEach(sharedWith -> systemEventService.notifyUser(
                         sharedWith,
                         "New Collaboration Comment",
-                        userEmail + " added a comment on " + file.getFileName()
-                ));
+                        userEmail + " added a comment on " + file.getFileName()));
 
         return mapComment(savedComment);
     }
@@ -123,6 +120,9 @@ public class CollaborationService {
         CollaborationFileDTO dto = new CollaborationFileDTO();
         dto.setFileId(file.getId());
         dto.setFileName(file.getFileName());
+        dto.setFileUrl(file.getFileUrl());
+        dto.setFileType(file.getFileType());
+        dto.setFileSize(file.getFileSize());
         dto.setOwnerEmail(file.getOwnerEmail());
         dto.setAccessType(accessType);
         dto.setPermission(permission);

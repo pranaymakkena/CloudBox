@@ -25,8 +25,7 @@ public class FileShareService {
             FileRepository fileRepository,
             FileShareRepository fileShareRepository,
             UserRepository userRepository,
-            SystemEventService systemEventService
-    ) {
+            SystemEventService systemEventService) {
         this.fileRepository = fileRepository;
         this.fileShareRepository = fileShareRepository;
         this.userRepository = userRepository;
@@ -84,8 +83,7 @@ public class FileShareService {
         systemEventService.notifyUser(
                 recipient.getEmail(),
                 "File Shared With You",
-                ownerEmail + " shared " + file.getFileName() + " with permission " + permission
-        );
+                ownerEmail + " shared " + file.getFileName() + " with permission " + permission);
 
         return mapToDto(savedShare);
     }
@@ -125,8 +123,7 @@ public class FileShareService {
         systemEventService.notifyUser(
                 share.getSharedWith(),
                 "Share Revoked",
-                ownerEmail + " revoked your access to " + share.getFile().getFileName()
-        );
+                ownerEmail + " revoked your access to " + share.getFile().getFileName());
     }
 
     public void revokeShareAsAdmin(Long shareId, String adminEmail) {
@@ -146,19 +143,16 @@ public class FileShareService {
         systemEventService.notifyUser(
                 sharedWith,
                 "Share Revoked by Admin",
-                "Your access to " + fileName + " was revoked by an administrator"
-        );
+                "Your access to " + fileName + " was revoked by an administrator");
     }
-    
+
     public boolean canViewFile(Long fileId, String userEmail) {
-    return fileShareRepository
-            .findByFileIdAndSharedWith(fileId, userEmail)
-            .map(share ->
-                    share.getPermission().equals("VIEW") ||
-                    share.getPermission().equals("DOWNLOAD")
-            )
-            .orElse(false);
-}
+        return fileShareRepository
+                .findByFileIdAndSharedWith(fileId, userEmail)
+                .map(share -> share.getPermission().equals("VIEW") ||
+                        share.getPermission().equals("DOWNLOAD"))
+                .orElse(false);
+    }
 
     public boolean canDownloadFile(Long fileId, String userEmail) {
         return fileShareRepository.findByFileIdAndSharedWith(fileId, userEmail)
@@ -191,18 +185,19 @@ public class FileShareService {
         dto.setId(share.getId());
         dto.setFileId(share.getFile().getId());
         dto.setFileName(share.getFile().getFileName());
+        dto.setFileType(share.getFile().getFileType());
+        dto.setFileSize(share.getFile().getFileSize());
+        dto.setFileUrl(share.getFile().getFileUrl());
         dto.setOwnerEmail(share.getOwnerEmail());
         dto.setSharedWith(share.getSharedWith());
         dto.setPermission(share.getPermission());
         dto.setCreatedAt(share.getCreatedAt());
         dto.setCanView(
-    "VIEW".equalsIgnoreCase(share.getPermission()) ||
-    "DOWNLOAD".equalsIgnoreCase(share.getPermission())
-);
+                "VIEW".equalsIgnoreCase(share.getPermission()) ||
+                        "DOWNLOAD".equalsIgnoreCase(share.getPermission()));
 
         dto.setCanDownload(
-    "DOWNLOAD".equalsIgnoreCase(share.getPermission())
-);
+                "DOWNLOAD".equalsIgnoreCase(share.getPermission()));
         return dto;
     }
 }

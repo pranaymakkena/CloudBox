@@ -4,47 +4,48 @@ import com.cloudbox.model.FileEntity;
 import com.cloudbox.model.AdminSetting;
 import com.cloudbox.model.Role;
 import com.cloudbox.model.User;
-import com.cloudbox.repository.UserRepository;
 import com.cloudbox.repository.AdminSettingRepository;
 import com.cloudbox.repository.CollaborationCommentRepository;
 import com.cloudbox.repository.FileRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cloudbox.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class FileService {
 
-    private final String uploadDir = "uploads/";
+    private final FileRepository fileRepository;
+    private final UserRepository userRepository;
+    private final CollaborationCommentRepository collaborationCommentRepository;
+    private final AdminSettingRepository adminSettingRepository;
+    private final SystemEventService systemEventService;
+    private final FileShareService fileShareService;
+    private final FolderService folderService;
+    private final MinioStorageService minioStorageService;
 
-    @Autowired
-    private FileRepository fileRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private CollaborationCommentRepository collaborationCommentRepository;
-
-    @Autowired
-    private AdminSettingRepository adminSettingRepository;
-
-    @Autowired
-    private SystemEventService systemEventService;
-
-    @Autowired
-    private FileShareService fileShareService;
-
-    @Autowired
-    private FolderService folderService;
+    public FileService(
+            FileRepository fileRepository,
+            UserRepository userRepository,
+            CollaborationCommentRepository collaborationCommentRepository,
+            AdminSettingRepository adminSettingRepository,
+            SystemEventService systemEventService,
+            FileShareService fileShareService,
+            FolderService folderService,
+            MinioStorageService minioStorageService) {
+        this.fileRepository = fileRepository;
+        this.userRepository = userRepository;
+        this.collaborationCommentRepository = collaborationCommentRepository;
+        this.adminSettingRepository = adminSettingRepository;
+        this.systemEventService = systemEventService;
+        this.fileShareService = fileShareService;
+        this.folderService = folderService;
+        this.minioStorageService = minioStorageService;
+    }
 
     // =========================
     // 📤 UPLOAD FILE
@@ -74,24 +75,17 @@ public class FileService {
                     (currentUsage / (1024 * 1024)) + " MB of your " + limitMb + " MB limit.");
         }
 
-        File directory = new File(uploadDir + userEmail + "/" + folder);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-
-        String uniqueName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path filePath = Paths.get(directory.getAbsolutePath(), uniqueName);
-
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        MinioStorageService.StoredFile storedFile = minioStorageService.uploadFile(file);
 
         FileEntity entity = new FileEntity();
         entity.setFileName(file.getOriginalFilename());
-        entity.setFileType(file.getContentType());
-        entity.setFilePath(filePath.toString());
-        entity.setFileSize(file.getSize());
+        entity.setFileUrl(storedFile.fileUrl());
+        entity.setStorageKey(storedFile.fileName());
+        entity.setContentType(file.getContentType());
+        entity.setSize(file.getSize());
         entity.setOwnerEmail(userEmail);
         entity.setFolder(folder);
-        entity.setUploadedAt(LocalDateTime.now());
+        entity.setUploadDate(LocalDateTime.now());
 
         FileEntity savedFile = fileRepository.save(entity);
 
@@ -107,7 +101,11 @@ public class FileService {
     // =========================
     // 📥 DOWNLOAD FILE
     // =========================
-    public byte[] downloadFile(Long fileId, String userEmail) throws IOException {
+    public String getDownloadUrl(Long fileId, String userEmail) {
+        return getFileForDownload(fileId, userEmail).getFileUrl();
+    }
+
+    public FileEntity getFileForDownload(Long fileId, String userEmail) {
 
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
@@ -130,11 +128,10 @@ public class FileService {
             systemEventService.notifyUser(
                     file.getOwnerEmail(),
                     "Shared File Downloaded",
-                    userEmail + " downloaded your file " + file.getFileName()
-            );
+                    userEmail + " downloaded your file " + file.getFileName());
         }
 
-        return Files.readAllBytes(Paths.get(file.getFilePath()));
+        return file;
     }
 
     // =========================
@@ -156,7 +153,7 @@ public class FileService {
         fileShareService.deleteSharesForFile(fileId);
         collaborationCommentRepository.deleteByFileId(fileId);
 
-        Files.deleteIfExists(Paths.get(file.getFilePath()));
+        minioStorageService.deleteFile(resolveStorageKey(file));
         fileRepository.delete(file);
 
         systemEventService.log(userEmail, "DELETE_FILE",
@@ -187,7 +184,7 @@ public class FileService {
     public long getUserStorage(String email) {
         return fileRepository.findByOwnerEmail(email)
                 .stream()
-                .mapToLong(FileEntity::getFileSize)
+                .mapToLong(file -> file.getFileSize() != null ? file.getFileSize() : 0L)
                 .sum();
     }
 
@@ -201,14 +198,14 @@ public class FileService {
     public long getTotalStorage() {
         return fileRepository.findAll()
                 .stream()
-                .mapToLong(FileEntity::getFileSize)
+                .mapToLong(file -> file.getFileSize() != null ? file.getFileSize() : 0L)
                 .sum();
     }
 
     public List<FileEntity> getAllFiles() {
         return fileRepository.findAll()
                 .stream()
-                .sorted((a, b) -> b.getUploadedAt().compareTo(a.getUploadedAt()))
+                .sorted((a, b) -> compareUploadDates(b, a))
                 .toList();
     }
 
@@ -221,7 +218,7 @@ public class FileService {
         fileShareService.deleteSharesForFile(fileId);
         collaborationCommentRepository.deleteByFileId(fileId);
 
-        Files.deleteIfExists(Paths.get(file.getFilePath()));
+        minioStorageService.deleteFile(resolveStorageKey(file));
         fileRepository.delete(file);
 
         systemEventService.log(adminEmail, "ADMIN_DELETE_FILE",
@@ -242,8 +239,7 @@ public class FileService {
         boolean isOwner = file.getOwnerEmail().equals(userEmail);
 
         // ✅ FIX: allow VIEW OR DOWNLOAD
-        boolean hasAccess =
-                fileShareService.canViewFile(fileId, userEmail) ||
+        boolean hasAccess = fileShareService.canViewFile(fileId, userEmail) ||
                 fileShareService.canDownloadFile(fileId, userEmail);
 
         if (!isOwner && !hasAccess) {
@@ -251,5 +247,47 @@ public class FileService {
         }
 
         return file;
+    }
+
+    public byte[] getFileContent(Long fileId, String userEmail) {
+        FileEntity file = getFileIfAccessible(fileId, userEmail);
+        return minioStorageService.getFileBytes(resolveStorageKey(file));
+    }
+
+    public void replaceFileContent(Long fileId, String userEmail, byte[] content, String contentType) {
+        FileEntity file = getFileIfAccessible(fileId, userEmail);
+
+        if (!file.getOwnerEmail().equals(userEmail)) {
+            throw new RuntimeException("Only the owner can edit this file");
+        }
+
+        minioStorageService.replaceFile(resolveStorageKey(file), content,
+                contentType != null ? contentType : file.getContentType());
+        file.setSize((long) content.length);
+        file.setUploadDate(LocalDateTime.now());
+        fileRepository.save(file);
+    }
+
+    private String resolveStorageKey(FileEntity file) {
+        if (file.getStorageKey() != null && !file.getStorageKey().isBlank()) {
+            return file.getStorageKey();
+        }
+        return file.getFileName();
+    }
+
+    private int compareUploadDates(FileEntity left, FileEntity right) {
+        LocalDateTime leftDate = left.getUploadDate();
+        LocalDateTime rightDate = right.getUploadDate();
+
+        if (leftDate == null && rightDate == null) {
+            return 0;
+        }
+        if (leftDate == null) {
+            return -1;
+        }
+        if (rightDate == null) {
+            return 1;
+        }
+        return leftDate.compareTo(rightDate);
     }
 }

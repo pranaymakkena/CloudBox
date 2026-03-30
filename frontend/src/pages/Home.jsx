@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <div className="container" style={{ paddingTop: "40px" }}>
-      
+
       {/* HEADER */}
       <div style={{
         display: "flex",
@@ -59,7 +59,7 @@ export default function Home() {
 
         {/* ACTIONS */}
         <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
-          
+
           {/* 👤 Profile */}
           <button
             className="btn btn-primary"

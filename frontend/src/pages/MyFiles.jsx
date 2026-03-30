@@ -5,6 +5,7 @@ import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import { useSearch } from "../context/SearchContext";
+import { getDirectFileUrl, triggerDownload } from "../utils/fileAccess";
 import "../styles/style.css";
 import "../components/layout/layout.css";
 import "../components/common/card.css";
@@ -18,7 +19,7 @@ function getCategory(file) {
   if (type.startsWith("video/") || /\.(mp4|mkv|avi|mov|webm)$/.test(name)) return "Videos";
   if (type.startsWith("audio/") || /\.(mp3|wav|ogg|flac)$/.test(name)) return "Audio";
   if (type.includes("pdf") || type.includes("word") || type.includes("document") ||
-      /\.(pdf|doc|docx|txt|xls|xlsx|ppt|pptx|csv)$/.test(name)) return "Documents";
+    /\.(pdf|doc|docx|txt|xls|xlsx|ppt|pptx|csv)$/.test(name)) return "Documents";
   return "Other";
 }
 
@@ -77,7 +78,7 @@ function MyFiles() {
     try {
       const res = await API.get("/files/folders");
       setFolders(res.data);
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -106,14 +107,13 @@ function MyFiles() {
     }
   };
 
-  const downloadFile = async (id, name) => {
+  const downloadFile = async (file) => {
     try {
-      const res = await API.get(`/files/download/${id}`, { responseType: "blob" });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", name);
-      link.click();
+      const directUrl = getDirectFileUrl(file);
+      if (!directUrl) {
+        throw new Error("Missing file URL");
+      }
+      triggerDownload(directUrl, file.fileName);
     } catch {
       toast.error("Download failed");
     }
@@ -127,18 +127,21 @@ function MyFiles() {
         setDocxEditMode(false);
         setDocxEditText("");
         setViewer({ type: "docx", name: file.fileName, fileId: file.id, arrayBuffer: res.data, isOwner: true });
-      } catch {
-        toast.error("Failed to open document");
+      } catch (e) {
+
+        toast.error(e + "Failed to open document");
       }
       return;
     }
     try {
-      const res = await API.get(`/files/preview/${file.id}`, { responseType: "blob" });
-      const blob = new Blob([res.data], { type: res.headers["content-type"] });
-      const url = URL.createObjectURL(blob);
-      setViewer({ url, type: blob.type, name: file.fileName });
-    } catch {
-      toast.error("Failed to open file");
+      const directUrl = getDirectFileUrl(file);
+      console.log(file);
+      if (!directUrl) {
+        throw new Error("Missing file URL");
+      }
+      setViewer({ url: directUrl, type: file.fileType || "application/octet-stream", name: file.fileName });
+    } catch (e) {
+      toast.error(e + "Failed to open file");
     }
   };
 
@@ -299,7 +302,7 @@ function MyFiles() {
                 <button className="btn btn-warning btn-sm" onClick={() => moveFile(file.id)}>Move</button>
 
                 <button className="btn btn-info btn-sm" onClick={() => viewFile(file)}>View</button>
-                <button className="btn btn-success btn-sm" onClick={() => downloadFile(file.id, file.fileName)}>Download</button>
+                <button className="btn btn-success btn-sm" onClick={() => downloadFile(file)}>Download</button>
                 <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(file.id)}>Delete</button>
               </div>
             </div>
@@ -340,11 +343,11 @@ function MyFiles() {
                       <i className="fa-solid fa-eye"></i> View
                     </button>
                     <button
-                        className={`docx-tab-btn${docxEditMode ? " active" : ""}`}
-                        onClick={startDocxEdit}
-                      >
-                        <i className="fa-solid fa-pen"></i> Edit
-                      </button>
+                      className={`docx-tab-btn${docxEditMode ? " active" : ""}`}
+                      onClick={startDocxEdit}
+                    >
+                      <i className="fa-solid fa-pen"></i> Edit
+                    </button>
                     {docxEditMode && (
                       <button
                         className="docx-save-btn"

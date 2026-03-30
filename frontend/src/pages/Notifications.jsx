@@ -37,11 +37,11 @@ function Notifications() {
 
   const getIcon = (title = "") => {
     const t = title.toLowerCase();
-    if (t.includes("upload"))   return { icon: "fa-cloud-arrow-up",  bg: "#eff6ff", color: "#2563eb" };
-    if (t.includes("share"))    return { icon: "fa-share-nodes",      bg: "#f5f3ff", color: "#7c3aed" };
+    if (t.includes("upload")) return { icon: "fa-cloud-arrow-up", bg: "#eff6ff", color: "#2563eb" };
+    if (t.includes("share")) return { icon: "fa-share-nodes", bg: "#f5f3ff", color: "#7c3aed" };
     if (t.includes("download")) return { icon: "fa-cloud-arrow-down", bg: "#ecfdf5", color: "#059669" };
-    if (t.includes("delete"))   return { icon: "fa-trash",            bg: "#fff5f5", color: "#dc2626" };
-    if (t.includes("setting"))  return { icon: "fa-gear",             bg: "#fefce8", color: "#d97706" };
+    if (t.includes("delete")) return { icon: "fa-trash", bg: "#fff5f5", color: "#dc2626" };
+    if (t.includes("setting")) return { icon: "fa-gear", bg: "#fefce8", color: "#d97706" };
     return { icon: "fa-bell", bg: "#f0f4fb", color: "#2563eb" };
   };
 

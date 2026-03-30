@@ -16,8 +16,8 @@ export function useToast() {
 
   const toast = {
     success: (text) => addToast(text, "success"),
-    error:   (text) => addToast(text, "error"),
-    info:    (text) => addToast(text, "info"),
+    error: (text) => addToast(text, "error"),
+    info: (text) => addToast(text, "info"),
     warning: (text) => addToast(text, "warning"),
   };
 

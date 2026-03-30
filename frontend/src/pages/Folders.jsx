@@ -11,13 +11,13 @@ function Folders() {
   const { messages, removeToast, toast } = useToast();
   const navigate = useNavigate();
 
-  const [folders, setFolders]           = useState([]);
-  const [folderFiles, setFolderFiles]   = useState({});
-  const [expandedFolder, setExpanded]   = useState(null);
-  const [newFolder, setNewFolder]       = useState("");
-  const [creating, setCreating]         = useState(false);
+  const [folders, setFolders] = useState([]);
+  const [folderFiles, setFolderFiles] = useState({});
+  const [expandedFolder, setExpanded] = useState(null);
+  const [newFolder, setNewFolder] = useState("");
+  const [creating, setCreating] = useState(false);
   const [renameTarget, setRenameTarget] = useState(null);
-  const [renameName, setRenameName]     = useState("");
+  const [renameName, setRenameName] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => { fetchFolders(); }, []);
@@ -80,11 +80,11 @@ function Folders() {
   const getFileIcon = (fileName) => {
     const n = fileName?.toLowerCase() || "";
     if (/\.(jpg|jpeg|png|gif|webp|svg)$/.test(n)) return "fa-image";
-    if (/\.(mp4|mkv|avi|mov|webm)$/.test(n))      return "fa-film";
-    if (/\.(mp3|wav|ogg|flac)$/.test(n))           return "fa-music";
-    if (/\.(pdf)$/.test(n))                        return "fa-file-pdf";
-    if (/\.(doc|docx)$/.test(n))                   return "fa-file-word";
-    if (/\.(xls|xlsx)$/.test(n))                   return "fa-file-excel";
+    if (/\.(mp4|mkv|avi|mov|webm)$/.test(n)) return "fa-film";
+    if (/\.(mp3|wav|ogg|flac)$/.test(n)) return "fa-music";
+    if (/\.(pdf)$/.test(n)) return "fa-file-pdf";
+    if (/\.(doc|docx)$/.test(n)) return "fa-file-word";
+    if (/\.(xls|xlsx)$/.test(n)) return "fa-file-excel";
     return "fa-file-lines";
   };
 
@@ -123,71 +123,71 @@ function Folders() {
         {folders.length === 0
           ? <div className="fld-empty"><i className="fa-solid fa-folder-open" /><p>No folders yet. Create one above.</p></div>
           : (
-          <div className="fld-grid">
-            {folders.map(folder => (
-              <div
-                key={folder}
-                className={`fld-card${expandedFolder === folder ? " fld-card-open" : ""}`}
-              >
-                {/* card top */}
-                <div className="fld-card-top" onClick={() => handleFolderClick(folder)}>
-                  <div className="fld-card-icon">
-                    <i className={`fa-solid ${expandedFolder === folder ? "fa-folder-open" : "fa-folder"}`} />
+            <div className="fld-grid">
+              {folders.map(folder => (
+                <div
+                  key={folder}
+                  className={`fld-card${expandedFolder === folder ? " fld-card-open" : ""}`}
+                >
+                  {/* card top */}
+                  <div className="fld-card-top" onClick={() => handleFolderClick(folder)}>
+                    <div className="fld-card-icon">
+                      <i className={`fa-solid ${expandedFolder === folder ? "fa-folder-open" : "fa-folder"}`} />
+                    </div>
+                    <div className="fld-card-info">
+                      <span className="fld-card-name">{folder}</span>
+                      <span className="fld-card-count">
+                        {folderFiles[folder] !== undefined
+                          ? `${folderFiles[folder].length} file${folderFiles[folder].length !== 1 ? "s" : ""}`
+                          : "Click to view"}
+                      </span>
+                    </div>
+                    <i className={`fa-solid fa-chevron-${expandedFolder === folder ? "up" : "down"} fld-chevron`} />
                   </div>
-                  <div className="fld-card-info">
-                    <span className="fld-card-name">{folder}</span>
-                    <span className="fld-card-count">
-                      {folderFiles[folder] !== undefined
-                        ? `${folderFiles[folder].length} file${folderFiles[folder].length !== 1 ? "s" : ""}`
-                        : "Click to view"}
-                    </span>
-                  </div>
-                  <i className={`fa-solid fa-chevron-${expandedFolder === folder ? "up" : "down"} fld-chevron`} />
-                </div>
 
-                {/* action buttons */}
-                {folder !== "root" && (
-                  <div className="fld-card-actions">
-                    <button
-                      className="fld-action-btn fld-rename"
-                      title="Rename"
-                      onClick={e => { e.stopPropagation(); setRenameTarget(folder); setRenameName(folder); }}
-                    >
-                      <i className="fa-solid fa-pen" />
-                    </button>
-                    <button
-                      className="fld-action-btn fld-delete"
-                      title="Delete"
-                      onClick={e => { e.stopPropagation(); setConfirmDelete(folder); }}
-                    >
-                      <i className="fa-solid fa-trash" />
-                    </button>
-                  </div>
-                )}
+                  {/* action buttons */}
+                  {folder !== "root" && (
+                    <div className="fld-card-actions">
+                      <button
+                        className="fld-action-btn fld-rename"
+                        title="Rename"
+                        onClick={e => { e.stopPropagation(); setRenameTarget(folder); setRenameName(folder); }}
+                      >
+                        <i className="fa-solid fa-pen" />
+                      </button>
+                      <button
+                        className="fld-action-btn fld-delete"
+                        title="Delete"
+                        onClick={e => { e.stopPropagation(); setConfirmDelete(folder); }}
+                      >
+                        <i className="fa-solid fa-trash" />
+                      </button>
+                    </div>
+                  )}
 
-                {/* expanded file list */}
-                {expandedFolder === folder && (
-                  <div className="fld-files">
-                    {!folderFiles[folder]
-                      ? <p className="fld-files-loading"><i className="fa-solid fa-spinner fa-spin" /> Loading…</p>
-                      : folderFiles[folder].length === 0
-                        ? <p className="fld-files-empty">No files in this folder</p>
-                        : folderFiles[folder].map(f => (
+                  {/* expanded file list */}
+                  {expandedFolder === folder && (
+                    <div className="fld-files">
+                      {!folderFiles[folder]
+                        ? <p className="fld-files-loading"><i className="fa-solid fa-spinner fa-spin" /> Loading…</p>
+                        : folderFiles[folder].length === 0
+                          ? <p className="fld-files-empty">No files in this folder</p>
+                          : folderFiles[folder].map(f => (
                             <div key={f.id} className="fld-file-row">
                               <i className={`fa-solid ${getFileIcon(f.fileName)} fld-file-icon`} />
                               <span className="fld-file-name">{f.fileName}</span>
                             </div>
                           ))
-                    }
-                    <button className="fld-view-all" onClick={() => navigate("/files")}>
-                      Open My Files <i className="fa-solid fa-arrow-right" />
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+                      }
+                      <button className="fld-view-all" onClick={() => navigate("/files")}>
+                        Open My Files <i className="fa-solid fa-arrow-right" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
       </div>
 
       {/* ── RENAME MODAL ── */}

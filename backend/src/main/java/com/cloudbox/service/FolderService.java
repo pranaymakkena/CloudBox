@@ -7,7 +7,6 @@ import com.cloudbox.repository.FolderRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -19,7 +18,6 @@ import java.util.Set;
 public class FolderService {
 
     private static final String ROOT_FOLDER = "root";
-    private static final String UPLOAD_DIR = "uploads/";
 
     private final FolderRepository folderRepository;
     private final FileRepository fileRepository;
@@ -28,8 +26,7 @@ public class FolderService {
     public FolderService(
             FolderRepository folderRepository,
             FileRepository fileRepository,
-            SystemEventService systemEventService
-    ) {
+            SystemEventService systemEventService) {
         this.folderRepository = folderRepository;
         this.fileRepository = fileRepository;
         this.systemEventService = systemEventService;
@@ -65,8 +62,6 @@ public class FolderService {
             throw new RuntimeException("Folder already exists");
         }
 
-        createDirectory(userEmail, normalizedFolder);
-
         FolderEntity folder = new FolderEntity();
         folder.setName(normalizedFolder);
         folder.setOwnerEmail(userEmail);
@@ -93,21 +88,8 @@ public class FolderService {
         }
 
         List<FileEntity> files = fileRepository.findByFolderAndOwnerEmail(sourceFolder, userEmail);
-        Path sourcePath = getFolderPath(userEmail, sourceFolder);
-        Path targetPath = getFolderPath(userEmail, targetFolder);
-
-        if (Files.exists(sourcePath)) {
-            Files.createDirectories(targetPath);
-        } else {
-            createDirectory(userEmail, targetFolder);
-        }
-
         for (FileEntity file : files) {
-            Path currentFilePath = Paths.get(file.getFilePath());
-            Path newFilePath = targetPath.resolve(currentFilePath.getFileName());
-            Files.move(currentFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
             file.setFolder(targetFolder);
-            file.setFilePath(newFilePath.toString());
             fileRepository.save(file);
         }
 
@@ -122,10 +104,6 @@ public class FolderService {
             folder.setOwnerEmail(userEmail);
             folder.setCreatedAt(LocalDateTime.now());
             folderRepository.save(folder);
-        }
-
-        if (Files.exists(sourcePath)) {
-            Files.deleteIfExists(sourcePath);
         }
 
         systemEventService.log(userEmail, "RENAME_FOLDER",
@@ -147,7 +125,6 @@ public class FolderService {
         folderRepository.findByOwnerEmailAndName(userEmail, normalizedFolder)
                 .ifPresent(folderRepository::delete);
 
-        Files.deleteIfExists(getFolderPath(userEmail, normalizedFolder));
         systemEventService.log(userEmail, "DELETE_FOLDER", "Deleted folder " + normalizedFolder);
     }
 
@@ -167,16 +144,8 @@ public class FolderService {
 
         ensureFolderExists(userEmail, normalizedFolder);
 
-        Path destinationFolder = getFolderPath(userEmail, normalizedFolder);
-        Files.createDirectories(destinationFolder);
-
-        Path currentFilePath = Paths.get(file.getFilePath());
-        Path newFilePath = destinationFolder.resolve(currentFilePath.getFileName());
-        Files.move(currentFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
-
         String previousFolder = file.getFolder();
         file.setFolder(normalizedFolder);
-        file.setFilePath(newFilePath.toString());
         FileEntity savedFile = fileRepository.save(file);
 
         systemEventService.log(userEmail, "MOVE_FILE",
@@ -188,7 +157,6 @@ public class FolderService {
     public void ensureFolderExists(String userEmail, String folderName) throws IOException {
         String normalizedFolder = normalizeFolderName(folderName);
         if (ROOT_FOLDER.equals(normalizedFolder)) {
-            createDirectory(userEmail, ROOT_FOLDER);
             return;
         }
 
@@ -200,15 +168,6 @@ public class FolderService {
             folderRepository.save(folder);
         }
 
-        createDirectory(userEmail, normalizedFolder);
-    }
-
-    private void createDirectory(String userEmail, String folderName) throws IOException {
-        Files.createDirectories(getFolderPath(userEmail, folderName));
-    }
-
-    private Path getFolderPath(String userEmail, String folderName) {
-        return Paths.get(UPLOAD_DIR, userEmail, folderName);
     }
 
     private String normalizeFolderName(String folderName) {

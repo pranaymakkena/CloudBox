@@ -24,5 +24,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findBySuspendedTrue();
 
     List<User> findByRole(Role role);
+
     long countByRole(Role role);
 }

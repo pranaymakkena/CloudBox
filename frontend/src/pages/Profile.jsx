@@ -10,8 +10,8 @@ import "../styles/Profile.css";
 function Profile() {
   const { messages, removeToast, toast } = useToast();
   const navigate = useNavigate();
-  const [user, setUser]   = useState({});
-  const [edit, setEdit]   = useState(false);
+  const [user, setUser] = useState({});
+  const [edit, setEdit] = useState(false);
 
   const name = localStorage.getItem("name") || "User";
   const role = localStorage.getItem("role") || "USER";
@@ -45,11 +45,11 @@ function Profile() {
 
   const fields = [
     { label: "First Name", name: "firstName", type: "text" },
-    { label: "Last Name",  name: "lastName",  type: "text" },
-    { label: "Email",      name: "email",     type: "text",   readOnly: true },
-    { label: "Gender",     name: "gender",    type: "select", options: ["MALE","FEMALE","OTHER"] },
-    { label: "Age",        name: "age",       type: "number" },
-    { label: "Location",   name: "location",  type: "text" },
+    { label: "Last Name", name: "lastName", type: "text" },
+    { label: "Email", name: "email", type: "text", readOnly: true },
+    { label: "Gender", name: "gender", type: "select", options: ["MALE", "FEMALE", "OTHER"] },
+    { label: "Age", name: "age", type: "number" },
+    { label: "Location", name: "location", type: "text" },
   ];
 
   return (

@@ -35,8 +35,7 @@ public class AdminService {
             AdminNotificationRepository adminNotificationRepository,
             AdminSettingRepository adminSettingRepository,
             SystemEventService systemEventService,
-            FileShareService fileShareService
-    ) {
+            FileShareService fileShareService) {
         this.userRepository = userRepository;
         this.fileRepository = fileRepository;
         this.fileService = fileService;
@@ -98,7 +97,18 @@ public class AdminService {
     public List<AdminFileDTO> getAllFiles() {
         return fileRepository.findAll()
                 .stream()
-                .sorted((a, b) -> b.getUploadedAt().compareTo(a.getUploadedAt()))
+                .sorted((a, b) -> {
+                    if (b.getUploadDate() == null && a.getUploadDate() == null) {
+                        return 0;
+                    }
+                    if (b.getUploadDate() == null) {
+                        return -1;
+                    }
+                    if (a.getUploadDate() == null) {
+                        return 1;
+                    }
+                    return b.getUploadDate().compareTo(a.getUploadDate());
+                })
                 .map(this::mapFileToDto)
                 .toList();
     }
@@ -176,8 +186,8 @@ public class AdminService {
         dto.setId(file.getId());
         dto.setFileName(file.getFileName());
         dto.setUserEmail(file.getOwnerEmail());
-        dto.setSize(file.getFileSize());
-        dto.setCreatedAt(file.getUploadedAt());
+        dto.setSize(file.getSize());
+        dto.setCreatedAt(file.getUploadDate());
         return dto;
     }
 }

@@ -11,6 +11,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
 .container {
   width: 350px;
   margin: 80px auto;
@@ -56,6 +57,7 @@ code {
   text-decoration: none;
   color: #2563eb;
 }
+
 .profile-container {
   display: flex;
   gap: 30px;
@@ -87,6 +89,7 @@ code {
 .profile-right input {
   padding: 8px;
 }
+
 /* 🔥 Small top-right logout */
 .logout-btn {
   position: fixed;

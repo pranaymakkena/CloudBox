@@ -22,36 +22,32 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-            // Disable CSRF
-            .csrf(csrf -> csrf.disable())
+                // Disable CSRF
+                .csrf(csrf -> csrf.disable())
 
-            // Stateless session
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+                // Stateless session
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // Authorization rules
-            .authorizeHttpRequests(auth -> auth
+                // Authorization rules
+                .authorizeHttpRequests(auth -> auth
 
-                // Public
-                .requestMatchers("/api/auth/**").permitAll()
+                        // Public
+                        .requestMatchers("/api/auth/**").permitAll()
 
-                // Admin
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // Admin
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // User + Admin
-                .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
+                        // User + Admin
+                        .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
 
-                // Files
-                    .requestMatchers("/api/files/preview/**").permitAll()
-                    .requestMatchers("/api/files/**").hasAnyRole("USER", "ADMIN")
+                        // Files
+                        .requestMatchers("/api/files/**").hasAnyRole("USER", "ADMIN")
 
-                // Everything else
-                .anyRequest().authenticated()
-            )
+                        // Everything else
+                        .anyRequest().authenticated())
 
-            // JWT filter
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                // JWT filter
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

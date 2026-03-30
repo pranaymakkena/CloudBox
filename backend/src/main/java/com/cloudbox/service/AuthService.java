@@ -28,8 +28,7 @@ public class AuthService {
             UserRepository userRepository,
             JwtUtil jwtUtil,
             AdminSettingRepository adminSettingRepository,
-            SystemEventService systemEventService
-    ) {
+            SystemEventService systemEventService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.adminSettingRepository = adminSettingRepository;

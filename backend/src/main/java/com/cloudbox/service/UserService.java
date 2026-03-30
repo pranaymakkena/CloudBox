@@ -30,8 +30,7 @@ public class UserService {
             UserNotificationRepository userNotificationRepository,
             SystemEventService systemEventService,
             FileService fileService,
-            AdminSettingRepository adminSettingRepository
-    ) {
+            AdminSettingRepository adminSettingRepository) {
         this.userRepository = userRepository;
         this.systemLogRepository = systemLogRepository;
         this.userNotificationRepository = userNotificationRepository;
@@ -88,7 +87,8 @@ public class UserService {
     }
 
     public void markAllNotificationsRead(String email) {
-        List<UserNotification> notifications = userNotificationRepository.findTop20ByUserEmailOrderByCreatedAtDesc(email);
+        List<UserNotification> notifications = userNotificationRepository
+                .findTop20ByUserEmailOrderByCreatedAtDesc(email);
         notifications.forEach(notification -> notification.setRead(true));
         userNotificationRepository.saveAll(notifications);
     }

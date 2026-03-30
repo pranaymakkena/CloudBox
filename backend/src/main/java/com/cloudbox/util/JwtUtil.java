@@ -14,8 +14,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final Key SECRET_KEY =
-            Keys.hmacShaKeyFor("cloudboxsecretkeycloudboxsecretkey12345".getBytes());
+    private final Key SECRET_KEY = Keys.hmacShaKeyFor("cloudboxsecretkeycloudboxsecretkey12345".getBytes());
 
     public String generateToken(String email, String role) {
 

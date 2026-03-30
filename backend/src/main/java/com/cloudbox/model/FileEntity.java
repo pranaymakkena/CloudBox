@@ -1,5 +1,6 @@
 package com.cloudbox.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -12,14 +13,28 @@ public class FileEntity {
     private Long id;
 
     private String fileName;
-    private String fileType;
-    private String filePath;
-    private Long fileSize;
+
+    @Column(name = "file_url")
+    private String fileUrl;
+
+    @Column(name = "file_size")
+    private Long size;
+
+    @Column(name = "file_type")
+    private String contentType;
+
+    @JsonIgnore
+    @Column(name = "storage_key")
+    private String storageKey;
+
     private String ownerEmail;
     private String folder;
-    private LocalDateTime uploadedAt;
 
-    public FileEntity() {}
+    @Column(name = "uploaded_at")
+    private LocalDateTime uploadDate;
+
+    public FileEntity() {
+    }
 
     // ✅ GETTERS & SETTERS
 
@@ -35,28 +50,36 @@ public class FileEntity {
         this.fileName = fileName;
     }
 
-    public String getFileType() {
-        return fileType;
+    public String getFileUrl() {
+        return fileUrl;
     }
 
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
-    public String getFilePath() {
-        return filePath;
+    public Long getSize() {
+        return size;
     }
 
-    public void setFilePath(String filePath) {
-        this.filePath = filePath;
+    public void setSize(Long size) {
+        this.size = size;
     }
 
-    public Long getFileSize() {
-        return fileSize;
+    public String getContentType() {
+        return contentType;
     }
 
-    public void setFileSize(Long fileSize) {
-        this.fileSize = fileSize;
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getStorageKey() {
+        return storageKey;
+    }
+
+    public void setStorageKey(String storageKey) {
+        this.storageKey = storageKey;
     }
 
     public String getOwnerEmail() {
@@ -75,11 +98,35 @@ public class FileEntity {
         this.folder = folder;
     }
 
+    public LocalDateTime getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(LocalDateTime uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+
+    public Long getFileSize() {
+        return size;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.size = fileSize;
+    }
+
+    public String getFileType() {
+        return contentType;
+    }
+
+    public void setFileType(String fileType) {
+        this.contentType = fileType;
+    }
+
     public LocalDateTime getUploadedAt() {
-        return uploadedAt;
+        return uploadDate;
     }
 
     public void setUploadedAt(LocalDateTime uploadedAt) {
-        this.uploadedAt = uploadedAt;
+        this.uploadDate = uploadedAt;
     }
 }

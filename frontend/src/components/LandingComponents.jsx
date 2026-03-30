@@ -15,8 +15,17 @@ export function Navbar() {
           <li><a href="#pricing">Pricing</a></li>
         </ul>
         <div className="nav-buttons">
-          <Link to="/login"><button className="login">Sign in</button></Link>
-          <Link to="/register"><button className="register">Get started</button></Link>
+
+          {/* if user is logged in, show dashboard button, else show sign in and get started buttons */}
+
+          {localStorage.getItem("token") ? (
+            <Link to="/dashboard"><button className="login">Dashboard</button></Link>
+          ) : (
+            <>
+              <Link to="/login"><button className="login">Sign in</button></Link>
+              <Link to="/register"><button className="register">Get started</button></Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

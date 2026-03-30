@@ -1,6 +1,8 @@
 package com.cloudbox.controller;
 
 import com.cloudbox.dto.FileShareDTO;
+import com.cloudbox.dto.FileUploadResponse;
+import com.cloudbox.dto.FileViewInfoDTO;
 import com.cloudbox.dto.FolderRequest;
 import com.cloudbox.dto.MoveFileRequest;
 import com.cloudbox.dto.RenameFolderRequest;
@@ -9,7 +11,6 @@ import com.cloudbox.dto.CollaborationCommentDTO;
 import com.cloudbox.dto.CollaborationCommentRequest;
 import com.cloudbox.dto.CollaborationFileDTO;
 import com.cloudbox.model.FileEntity;
-import com.cloudbox.repository.FileRepository;
 import com.cloudbox.service.CollaborationService;
 import com.cloudbox.service.FolderService;
 import com.cloudbox.service.FileShareService;
@@ -17,19 +18,14 @@ import com.cloudbox.service.FileService;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -37,30 +33,31 @@ import java.util.Map;
 @RequestMapping("/api/files")
 public class FileController {
 
-    @Autowired
-    private FileService fileService;
+    private final FileService fileService;
+    private final FileShareService fileShareService;
+    private final FolderService folderService;
+    private final CollaborationService collaborationService;
 
-    @Autowired
-    private FileShareService fileShareService;
-
-    @Autowired
-    private FolderService folderService;
-
-    @Autowired
-    private CollaborationService collaborationService;
-
-    @Autowired
-    private FileRepository fileRepository;
+    public FileController(
+            FileService fileService,
+            FileShareService fileShareService,
+            FolderService folderService,
+            CollaborationService collaborationService) {
+        this.fileService = fileService;
+        this.fileShareService = fileShareService;
+        this.folderService = folderService;
+        this.collaborationService = collaborationService;
+    }
 
     @PostMapping("/upload")
-    public ResponseEntity<FileEntity> upload(
+    public ResponseEntity<FileUploadResponse> upload(
             @RequestParam("file") MultipartFile file,
             @RequestParam(defaultValue = "root") String folder,
-            Authentication auth
-    ) throws Exception {
+            Authentication auth) throws Exception {
 
         String email = auth.getName();
-        return ResponseEntity.ok(fileService.uploadFile(file, email, folder));
+        FileEntity savedFile = fileService.uploadFile(file, email, folder);
+        return ResponseEntity.ok(new FileUploadResponse(savedFile.getFileName(), savedFile.getFileUrl()));
     }
 
     @GetMapping
@@ -71,22 +68,34 @@ public class FileController {
     @GetMapping("/download/{id}")
     public ResponseEntity<ByteArrayResource> download(
             @PathVariable Long id,
-            Authentication auth
-    ) throws Exception {
+            Authentication auth) throws Exception {
+        FileEntity file = fileService.getFileForDownload(id, auth.getName());
+        byte[] content = fileService.getFileContent(id, auth.getName());
+        String contentType = file.getContentType();
 
-        byte[] data = fileService.downloadFile(id, auth.getName());
+        if (contentType == null || contentType.isBlank()) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=file")
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new ByteArrayResource(data));
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment().filename(file.getFileName()).build().toString())
+                .contentLength(content.length)
+                .body(new ByteArrayResource(content));
+    }
+
+    @GetMapping("/download-url/{id}")
+    public ResponseEntity<FileViewInfoDTO> downloadUrl(
+            @PathVariable Long id,
+            Authentication auth) {
+        return ResponseEntity.ok(new FileViewInfoDTO(fileService.getDownloadUrl(id, auth.getName())));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(
             @PathVariable Long id,
-            Authentication auth
-    ) throws Exception {
+            Authentication auth) throws Exception {
 
         fileService.deleteFile(id, auth.getName());
         return ResponseEntity.ok("File deleted");
@@ -95,8 +104,7 @@ public class FileController {
     @PostMapping("/share")
     public ResponseEntity<FileShareDTO> shareFile(
             @RequestBody ShareFileRequest request,
-            Authentication auth
-    ) {
+            Authentication auth) {
         return ResponseEntity.ok(fileShareService.shareFile(request, auth.getName()));
     }
 
@@ -122,7 +130,8 @@ public class FileController {
     }
 
     @PostMapping("/folders")
-    public ResponseEntity<String> createFolder(@RequestBody FolderRequest request, Authentication auth) throws Exception {
+    public ResponseEntity<String> createFolder(@RequestBody FolderRequest request, Authentication auth)
+            throws Exception {
         folderService.createFolder(auth.getName(), request.getName());
         return ResponseEntity.ok("Folder created");
     }
@@ -130,8 +139,7 @@ public class FileController {
     @PutMapping("/folders/rename")
     public ResponseEntity<String> renameFolder(
             @RequestBody RenameFolderRequest request,
-            Authentication auth
-    ) throws Exception {
+            Authentication auth) throws Exception {
         folderService.renameFolder(auth.getName(), request.getOldName(), request.getNewName());
         return ResponseEntity.ok("Folder renamed");
     }
@@ -143,8 +151,10 @@ public class FileController {
     }
 
     @PutMapping("/move")
-    public ResponseEntity<FileEntity> moveFile(@RequestBody MoveFileRequest request, Authentication auth) throws Exception {
-        return ResponseEntity.ok(folderService.moveFile(auth.getName(), request.getFileId(), request.getTargetFolder()));
+    public ResponseEntity<FileEntity> moveFile(@RequestBody MoveFileRequest request, Authentication auth)
+            throws Exception {
+        return ResponseEntity
+                .ok(folderService.moveFile(auth.getName(), request.getFileId(), request.getTargetFolder()));
     }
 
     @GetMapping("/collaboration")
@@ -155,46 +165,52 @@ public class FileController {
     @GetMapping("/collaboration/{fileId}/comments")
     public ResponseEntity<List<CollaborationCommentDTO>> getComments(
             @PathVariable Long fileId,
-            Authentication auth
-    ) {
+            Authentication auth) {
         return ResponseEntity.ok(collaborationService.getCommentsForFile(fileId, auth.getName()));
     }
 
     @PostMapping("/collaboration/comment")
     public ResponseEntity<CollaborationCommentDTO> addComment(
             @RequestBody CollaborationCommentRequest request,
-            Authentication auth
-    ) {
+            Authentication auth) {
         return ResponseEntity.ok(collaborationService.addComment(request, auth.getName()));
     }
+
     @GetMapping("/preview/{id}")
-    public ResponseEntity<Resource> previewFile(
+    public ResponseEntity<ByteArrayResource> previewFile(
             @PathVariable Long id,
-            Authentication auth
-    ) throws Exception {
+            Authentication auth) throws Exception {
 
         String email = auth.getName();
         FileEntity file = fileService.getFileIfAccessible(id, email);
+        byte[] content = fileService.getFileContent(id, email);
+        String contentType = file.getContentType();
 
-        Path path = Paths.get(file.getFilePath());
-        Resource resource = new UrlResource(path.toUri());
-
-        String contentType = file.getFileType();
-        if (contentType == null) contentType = "application/octet-stream";
+        if (contentType == null || contentType.isBlank()) {
+            contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        }
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "inline; filename=\"" + file.getFileName() + "\"")
-                .body(resource);
+                        ContentDisposition.inline().filename(file.getFileName()).build().toString())
+                .contentLength(content.length)
+                .body(new ByteArrayResource(content));
+    }
+
+    @GetMapping("/preview-url/{id}")
+    public ResponseEntity<FileViewInfoDTO> previewUrl(
+            @PathVariable Long id,
+            Authentication auth) {
+        FileEntity file = fileService.getFileIfAccessible(id, auth.getName());
+        return ResponseEntity.ok(new FileViewInfoDTO(file.getFileUrl()));
     }
 
     // ── Extract plain text from a DOCX for editing ──
     @GetMapping("/docx-text/{id}")
     public ResponseEntity<Map<String, String>> getDocxText(
             @PathVariable Long id,
-            Authentication auth
-    ) throws Exception {
+            Authentication auth) throws Exception {
         FileEntity file = fileService.getFileIfAccessible(id, auth.getName());
 
         if (!file.getFileName().toLowerCase().matches(".*\\.docx?$")) {
@@ -202,7 +218,8 @@ public class FileController {
         }
 
         StringBuilder sb = new StringBuilder();
-        try (XWPFDocument doc = new XWPFDocument(new FileInputStream(file.getFilePath()))) {
+        byte[] fileBytes = fileService.getFileContent(id, auth.getName());
+        try (XWPFDocument doc = new XWPFDocument(new ByteArrayInputStream(fileBytes))) {
             for (XWPFParagraph p : doc.getParagraphs()) {
                 sb.append(p.getText()).append("\n");
             }
@@ -215,8 +232,7 @@ public class FileController {
     public ResponseEntity<String> saveDocxText(
             @PathVariable Long id,
             @RequestBody Map<String, String> body,
-            Authentication auth
-    ) throws Exception {
+            Authentication auth) throws Exception {
         FileEntity file = fileService.getFileIfAccessible(id, auth.getName());
 
         if (!file.getOwnerEmail().equals(auth.getName())) {
@@ -226,7 +242,8 @@ public class FileController {
         String newText = body.getOrDefault("text", "");
         String[] lines = newText.split("\n", -1);
 
-        try (XWPFDocument doc = new XWPFDocument(new FileInputStream(file.getFilePath()))) {
+        byte[] fileBytes = fileService.getFileContent(id, auth.getName());
+        try (XWPFDocument doc = new XWPFDocument(new ByteArrayInputStream(fileBytes))) {
             // Clear existing paragraphs
             int size = doc.getParagraphs().size();
             for (int i = size - 1; i >= 0; i--) {
@@ -238,8 +255,9 @@ public class FileController {
                 XWPFRun run = para.createRun();
                 run.setText(line);
             }
-            try (FileOutputStream out = new FileOutputStream(file.getFilePath())) {
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 doc.write(out);
+                fileService.replaceFileContent(id, auth.getName(), out.toByteArray(), file.getContentType());
             }
         }
         return ResponseEntity.ok("Saved");

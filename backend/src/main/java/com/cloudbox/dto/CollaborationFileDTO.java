@@ -6,6 +6,9 @@ public class CollaborationFileDTO {
 
     private Long fileId;
     private String fileName;
+    private String fileUrl;
+    private String fileType;
+    private Long fileSize;
     private String ownerEmail;
     private String accessType;
     private String permission;
@@ -25,6 +28,30 @@ public class CollaborationFileDTO {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public Long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(Long fileSize) {
+        this.fileSize = fileSize;
     }
 
     public String getOwnerEmail() {
