@@ -50,6 +50,7 @@ public class FileService {
     // =========================
     // 📤 UPLOAD FILE
     // =========================
+    @Transactional
     public FileEntity uploadFile(MultipartFile file, String userEmail, String folder) throws IOException {
 
         if (file.isEmpty()) {
@@ -62,10 +63,19 @@ public class FileService {
 
         folderService.ensureFolderExists(userEmail, folder);
 
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         AdminSetting settings = adminSettingRepository.findById(1L).orElse(null);
-        long limitMb = (settings != null && settings.getStorageLimit() != null && settings.getStorageLimit() > 0)
-                ? settings.getStorageLimit()
-                : 15360L; // default 15 GB
+
+        long limitMb;
+        if (user.getStorageLimitMb() != null && user.getStorageLimitMb() > 0) {
+            limitMb = user.getStorageLimitMb();
+        } else if (settings != null && settings.getStorageLimit() != null && settings.getStorageLimit() > 0) {
+            limitMb = settings.getStorageLimit();
+        } else {
+            limitMb = 15360L; // default 15 GB
+        }
 
         long maxBytes = limitMb * 1024 * 1024;
         long currentUsage = getUserStorage(userEmail);
@@ -103,6 +113,11 @@ public class FileService {
     // =========================
     public String getDownloadUrl(Long fileId, String userEmail) {
         return getFileForDownload(fileId, userEmail).getFileUrl();
+    }
+
+    public FileEntity getFileById(Long fileId) {
+        return fileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
     }
 
     public FileEntity getFileForDownload(Long fileId, String userEmail) {

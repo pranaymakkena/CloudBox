@@ -10,7 +10,11 @@ function Login() {
 
   //check if user is already logged in
   if (localStorage.getItem("token")) {
-    window.location.href = "/dashboard";
+    if (localStorage.getItem("role") === "ADMIN") {
+      window.location.href = "/admin";
+    } else {
+      window.location.href = "/dashboard";
+    }
   }
 
   const [email, setEmail] = useState("");

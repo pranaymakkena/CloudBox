@@ -42,8 +42,10 @@ export default function UserDashboard() {
   const [totalSize, setTotalSize] = useState(0);
   const [storageLimit, setStorageLimit] = useState(15360);
   const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true);
     Promise.all([
       API.get("/files"),
       API.get("/user/notifications"),
@@ -53,7 +55,12 @@ export default function UserDashboard() {
       setNotifications((nRes.data || []).slice(0, 4));
       setTotalSize(Number(sRes.data.usedBytes) || 0);
       setStorageLimit(Number(sRes.data.limitMb) || 15360);
-    }).catch(console.error);
+    }).catch(console.error)
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const limitBytes = storageLimit * 1024 * 1024;
@@ -101,8 +108,8 @@ export default function UserDashboard() {
         </div>
 
         {/* STORAGE BAR */}
-        <div className="ud-storage-bar-card" onClick={() => navigate("/storage")}>
-          <div className="ud-storage-bar-left">
+        <div className="ud-storage-bar-card">
+          <div className="ud-storage-bar-left" onClick={() => navigate("/storage")} style={{ cursor: "pointer" }}>
             <i className="fa-solid fa-hard-drive ud-storage-icon" />
             <div>
               <div className="ud-storage-label">Storage</div>
@@ -110,6 +117,14 @@ export default function UserDashboard() {
             </div>
           </div>
           <div className="ud-storage-bar-right">
+            <button
+              className="btn btn-sm btn-outline"
+              onClick={fetchData}
+              disabled={loading}
+              style={{ marginRight: "10px" }}
+            >
+              <i className="fa-solid fa-refresh" /> {loading ? "Loading..." : "Refresh"}
+            </button>
             <div className="ud-storage-track">
               <div className="ud-storage-fill" style={{ width: `${Math.max(usedPct, totalSize > 0 ? 0.5 : 0)}%` }} />
             </div>

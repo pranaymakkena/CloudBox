@@ -65,6 +65,8 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         user.setRole(Role.USER);
+        // Set default upload/storage limit for new users: 15 GB (15360 MB)
+        user.setStorageLimitMb(15360L);
 
         userRepository.save(user);
         systemEventService.log(user.getEmail(), "REGISTER", "New user registered");
@@ -85,7 +87,8 @@ public class AuthService {
 
         // Account lockout check
         if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(java.time.LocalDateTime.now())) {
-            long minutesLeft = java.time.Duration.between(java.time.LocalDateTime.now(), user.getLockedUntil()).toMinutes() + 1;
+            long minutesLeft = java.time.Duration.between(java.time.LocalDateTime.now(), user.getLockedUntil())
+                    .toMinutes() + 1;
             throw new RuntimeException("Account locked. Try again in " + minutesLeft + " minute(s)");
         }
 
@@ -96,7 +99,8 @@ public class AuthService {
                 user.setLockedUntil(java.time.LocalDateTime.now().plusMinutes(15));
                 user.setLoginAttempts(0);
                 userRepository.save(user);
-                systemEventService.log(user.getEmail(), "ACCOUNT_LOCKED", "Account locked after 5 failed login attempts");
+                systemEventService.log(user.getEmail(), "ACCOUNT_LOCKED",
+                        "Account locked after 5 failed login attempts");
                 throw new RuntimeException("Too many failed attempts. Account locked for 15 minutes");
             }
             userRepository.save(user);

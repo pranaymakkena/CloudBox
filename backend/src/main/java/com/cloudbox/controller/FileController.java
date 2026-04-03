@@ -10,11 +10,13 @@ import com.cloudbox.dto.ShareFileRequest;
 import com.cloudbox.dto.CollaborationCommentDTO;
 import com.cloudbox.dto.CollaborationCommentRequest;
 import com.cloudbox.dto.CollaborationFileDTO;
+import com.cloudbox.dto.PermissionFileMetadataDTO;
 import com.cloudbox.model.FileEntity;
 import com.cloudbox.service.CollaborationService;
 import com.cloudbox.service.FolderService;
 import com.cloudbox.service.FileShareService;
 import com.cloudbox.service.FileService;
+import com.cloudbox.service.PermissionValidatorService;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
@@ -37,16 +39,19 @@ public class FileController {
     private final FileShareService fileShareService;
     private final FolderService folderService;
     private final CollaborationService collaborationService;
+    private final PermissionValidatorService permissionValidatorService;
 
     public FileController(
             FileService fileService,
             FileShareService fileShareService,
             FolderService folderService,
-            CollaborationService collaborationService) {
+            CollaborationService collaborationService,
+            PermissionValidatorService permissionValidatorService) {
         this.fileService = fileService;
         this.fileShareService = fileShareService;
         this.folderService = folderService;
         this.collaborationService = collaborationService;
+        this.permissionValidatorService = permissionValidatorService;
     }
 
     @PostMapping("/upload")
@@ -101,6 +106,27 @@ public class FileController {
         return ResponseEntity.ok("File deleted");
     }
 
+    @GetMapping("/{fileId}/available-permissions")
+    public ResponseEntity<PermissionFileMetadataDTO> getAvailablePermissions(
+            @PathVariable Long fileId,
+            Authentication auth) {
+        FileEntity file = fileService.getFileById(fileId);
+
+        if (!file.getOwnerEmail().equals(auth.getName())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<String> availablePermissions = permissionValidatorService.getAllowedPermissions(file.getFileName());
+        PermissionFileMetadataDTO response = new PermissionFileMetadataDTO(
+                file.getId(),
+                file.getFileName(),
+                file.getContentType(),
+                file.getSize(),
+                availablePermissions);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/share")
     public ResponseEntity<FileShareDTO> shareFile(
             @RequestBody ShareFileRequest request,
@@ -111,8 +137,7 @@ public class FileController {
     @PostMapping("/share/bulk")
     public ResponseEntity<List<FileShareDTO>> shareFileBulk(
             @RequestBody ShareFileRequest request,
-            Authentication auth
-    ) {
+            Authentication auth) {
         return ResponseEntity.ok(fileShareService.shareFileWithMany(request, auth.getName()));
     }
 
@@ -130,6 +155,18 @@ public class FileController {
     public ResponseEntity<String> revokeShare(@PathVariable Long id, Authentication auth) {
         fileShareService.revokeShareByOwner(id, auth.getName());
         return ResponseEntity.ok("Share revoked");
+    }
+
+    @PutMapping("/shares/{id}")
+    public ResponseEntity<FileShareDTO> updateSharePermission(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> payload,
+            Authentication auth) {
+        String newPermission = payload.get("permission");
+        if (newPermission == null || newPermission.isBlank()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        return ResponseEntity.ok(fileShareService.updateSharePermission(id, newPermission, auth.getName()));
     }
 
     @GetMapping("/folders")

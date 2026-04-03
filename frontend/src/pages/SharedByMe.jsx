@@ -25,6 +25,9 @@ function SharedByMe() {
   const [localSearch, setLocalSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [confirmRevoke, setConfirmRevoke] = useState(null);
+  const [editModal, setEditModal] = useState(null); // { shareId, fileName, currentPermission, fileId, availablePermissions }
+  const [newPermission, setNewPermission] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const search = query || localSearch;
 
@@ -58,6 +61,42 @@ function SharedByMe() {
       toast.error(err.response?.data || "Failed to revoke share");
     } finally {
       setConfirmRevoke(null);
+    }
+  };
+
+  const openEditModal = async (share) => {
+    try {
+      const res = await API.get(`/files/${share.fileId}/available-permissions`);
+      setEditModal({
+        shareId: share.id,
+        fileName: share.fileName,
+        currentPermission: share.permission,
+        fileId: share.fileId,
+        sharedWith: share.sharedWith,
+        availablePermissions: res.data.availablePermissions || []
+      });
+      setNewPermission(share.permission);
+    } catch (err) {
+      toast.error("Failed to load available permissions");
+    }
+  };
+
+  const updatePermission = async () => {
+    if (!newPermission || newPermission === editModal.currentPermission) {
+      toast.warning("Select a different permission");
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      await API.put(`/files/shares/${editModal.shareId}`, { permission: newPermission });
+      fetchShares();
+      toast.success(`Permission updated to ${newPermission}`);
+      setEditModal(null);
+    } catch (err) {
+      toast.error(err.response?.data || "Failed to update permission");
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -105,12 +144,25 @@ function SharedByMe() {
                   Shared with: {share.sharedWith}
                 </div>
                 <div style={{ fontSize: "12px", color: "#9ca3af" }}>
-                  Permission: {share.permission}
+                  Permission: <span className="permission-badge">{share.permission}</span>
                 </div>
               </div>
-              <button className="btn btn-danger" onClick={() => setConfirmRevoke(share.id)}>
-                Revoke
-              </button>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  className="btn btn-info btn-sm"
+                  onClick={() => openEditModal(share)}
+                  title="Change permission"
+                >
+                  <i className="fa-solid fa-edit"></i> Edit Permission
+                </button>
+                <button
+                  className="btn btn-danger btn-sm"
+                  onClick={() => setConfirmRevoke(share.id)}
+                  title="Revoke access"
+                >
+                  <i className="fa-solid fa-trash"></i> Revoke
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -124,6 +176,76 @@ function SharedByMe() {
               <div className="confirm-actions">
                 <button className="btn btn-danger" onClick={() => revokeShare(confirmRevoke)}>Revoke</button>
                 <button className="btn btn-secondary" onClick={() => setConfirmRevoke(null)}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {editModal && (
+          <div className="viewer-modal" onClick={() => setEditModal(null)}>
+            <div className="edit-permission-dialog" onClick={(e) => e.stopPropagation()}>
+              <div className="edit-permission-header">
+                <h3>Change Permission</h3>
+                <button
+                  className="close-btn"
+                  onClick={() => setEditModal(null)}
+                  style={{ background: "none", border: "none", fontSize: "24px", cursor: "pointer" }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="edit-permission-body">
+                <div className="permission-info">
+                  <p><strong>File:</strong> {editModal.fileName}</p>
+                  <p><strong>Shared with:</strong> {editModal.sharedWith}</p>
+                </div>
+
+                <div className="permission-selection">
+                  <label>Select New Permission:</label>
+                  <div className="permission-options">
+                    {editModal.availablePermissions.map((perm) => (
+                      <label key={perm} className="permission-option">
+                        <input
+                          type="radio"
+                          name="permission"
+                          value={perm}
+                          checked={newPermission === perm}
+                          onChange={(e) => setNewPermission(e.target.value)}
+                          disabled={isUpdating}
+                        />
+                        <span>
+                          {perm === "VIEW" && "👁️ View Only"}
+                          {perm === "DOWNLOAD" && "⬇️ Download"}
+                          {perm === "EDIT" && "✏️ Edit"}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {editModal.currentPermission && (
+                  <p className="permission-hint">
+                    Current permission: <strong>{editModal.currentPermission}</strong>
+                  </p>
+                )}
+              </div>
+
+              <div className="edit-permission-footer">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setEditModal(null)}
+                  disabled={isUpdating}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={updatePermission}
+                  disabled={isUpdating || newPermission === editModal.currentPermission}
+                >
+                  {isUpdating ? "Updating..." : "Update Permission"}
+                </button>
               </div>
             </div>
           </div>

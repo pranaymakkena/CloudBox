@@ -73,7 +73,8 @@ export default function StorageUsed() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true);
     Promise.all([API.get("/user/storage"), API.get("/files")])
       .then(([s, f]) => {
         setUsedBytes(Number(s.data.usedBytes) || 0);
@@ -82,6 +83,10 @@ export default function StorageUsed() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
   const limitBytes = limitMb * 1024 * 1024;
@@ -124,6 +129,15 @@ export default function StorageUsed() {
             <p className="su-hero-sub">
               {files.length} file{files.length !== 1 ? "s" : ""} stored &nbsp;·&nbsp; {pctLabel} used
             </p>
+
+            <button
+              className="btn btn-sm btn-outline"
+              onClick={fetchData}
+              disabled={loading}
+              style={{ marginBottom: "16px" }}
+            >
+              <i className="fa-solid fa-refresh" /> {loading ? "Loading..." : "Refresh"}
+            </button>
 
             {/* overall bar */}
             <div className="su-hero-bar-wrap">

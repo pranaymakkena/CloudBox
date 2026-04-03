@@ -1494,6 +1494,245 @@ tr:hover td {
   background: #fff;
 }
 
+/* Permission Badge */
+.permission-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* Edit Permission Dialog */
+.edit-permission-dialog {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+.edit-permission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.edit-permission-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  color: #6b7280;
+}
+
+.close-btn:hover {
+  background-color: #f3f4f6;
+  color: #1f2937;
+}
+
+.edit-permission-body {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.permission-info {
+  margin-bottom: 24px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.permission-info p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.permission-info strong {
+  color: #1f2937;
+}
+
+.permission-selection label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.permission-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.permission-option {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: white;
+}
+
+.permission-option:hover {
+  border-color: #4f46e5;
+  background-color: #f3f4f6;
+}
+
+.permission-option input[type="radio"] {
+  margin-right: 12px;
+  cursor: pointer;
+  accent-color: #4f46e5;
+}
+
+.permission-option input[type="radio"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.permission-option span {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+}
+
+.permission-option input[type="radio"]:checked+span {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.permission-hint {
+  font-size: 13px;
+  color: #6b7280;
+  padding: 12px;
+  background-color: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.edit-permission-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  justify-content: flex-end;
+}
+
+/* User management UI improvements */
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.user-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-card-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.status-pill {
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-suspended {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.user-card-body p {
+  font-size: 14px;
+  color: #334155;
+  margin: 6px 0;
+}
+
+.storage-limit-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.limit-input {
+  width: 100%;
+  max-width: 160px;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  border: 1px dashed #cbd5e1;
+  padding: 24px;
+  border-radius: 10px;
+  text-align: center;
+  color: #64748b;
+}
+
 /* =============================================
    RESPONSIVE — style.css
    ============================================= */
@@ -1685,7 +1924,7 @@ tr:hover td {
   max-width: 95vw;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
   animation: yc-card-in 0.25s ease both;
   display: flex;
   flex-direction: column;

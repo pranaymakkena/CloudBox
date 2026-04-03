@@ -158,4 +158,14 @@ public class AdminController {
         adminService.revokeShare(id, auth.getName());
         return ResponseEntity.ok("Share revoked successfully");
     }
+
+    @PutMapping("/users/{id}/storage-limit")
+    public ResponseEntity<User> setUserStorageLimit(
+            @PathVariable Long id,
+            @RequestBody com.cloudbox.dto.UserStorageLimitRequest payload,
+            Authentication auth) {
+        Long storageLimitMb = payload.getStorageLimitMb();
+        User updated = adminService.updateUserStorageLimit(id, storageLimitMb, auth.getName());
+        return ResponseEntity.ok(updated);
+    }
 }

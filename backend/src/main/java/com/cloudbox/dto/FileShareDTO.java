@@ -1,6 +1,7 @@
 package com.cloudbox.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class FileShareDTO {
 
@@ -18,6 +19,7 @@ public class FileShareDTO {
     private boolean canView;
     private boolean canDownload;
     private boolean canEdit;
+    private List<String> availablePermissions;
 
     // =========================
     // GETTERS & SETTERS
@@ -127,5 +129,13 @@ public class FileShareDTO {
 
     public void setCanEdit(boolean canEdit) {
         this.canEdit = canEdit;
+    }
+
+    public List<String> getAvailablePermissions() {
+        return availablePermissions;
+    }
+
+    public void setAvailablePermissions(List<String> availablePermissions) {
+        this.availablePermissions = availablePermissions;
     }
 }

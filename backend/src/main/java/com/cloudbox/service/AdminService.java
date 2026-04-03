@@ -10,6 +10,7 @@ import com.cloudbox.repository.FileRepository;
 import com.cloudbox.repository.SystemLogRepository;
 import com.cloudbox.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -52,6 +53,7 @@ public class AdminService {
     }
 
     // ✅ Suspend user
+    @Transactional
     public User suspendUser(Long id) {
         User user = userRepository.findById(id).orElseThrow();
         user.setSuspended(true);
@@ -62,6 +64,7 @@ public class AdminService {
     }
 
     // ✅ Unsuspend user (NEW)
+    @Transactional
     public User unsuspendUser(Long id) {
         User user = userRepository.findById(id).orElseThrow();
         user.setSuspended(false);
@@ -159,6 +162,31 @@ public class AdminService {
 
     public void revokeShare(Long shareId, String adminEmail) {
         fileShareService.revokeShareAsAdmin(shareId, adminEmail);
+    }
+
+    @Transactional
+    public User updateUserStorageLimit(Long userId, Long storageLimitMb, String adminEmail) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (storageLimitMb == null || storageLimitMb <= 0) {
+            throw new RuntimeException("Storage limit must be a positive number");
+        }
+
+        System.out.println("Admin " + adminEmail + " updating storage limit for user " + user.getEmail() + " (ID: "
+                + userId + ") to " + storageLimitMb + " MB");
+        System.out.println("User's current storageLimitMb: " + user.getStorageLimitMb());
+
+        user.setStorageLimitMb(storageLimitMb);
+        User savedUser = userRepository.save(user);
+
+        System.out.println("User's new storageLimitMb after save: " + savedUser.getStorageLimitMb());
+
+        systemEventService.log(adminEmail, "UPDATE_USER_STORAGE_LIMIT",
+                "Updated storage limit for " + user.getEmail() + " to " + storageLimitMb + " MB");
+        systemEventService.notifyAdmins("User Storage Updated",
+                adminEmail + " changed storage limit for " + user.getEmail() + " to " + storageLimitMb + " MB");
+
+        return savedUser;
     }
 
     private boolean isCollaborationAction(String action) {

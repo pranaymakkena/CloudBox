@@ -2,6 +2,7 @@ package com.cloudbox.service;
 
 import com.cloudbox.dto.FileShareDTO;
 import com.cloudbox.dto.ShareFileRequest;
+import com.cloudbox.dto.ShareRecipientDTO;
 import com.cloudbox.model.FileEntity;
 import com.cloudbox.model.FileShare;
 import com.cloudbox.model.User;
@@ -20,22 +21,30 @@ public class FileShareService {
     private final FileShareRepository fileShareRepository;
     private final UserRepository userRepository;
     private final SystemEventService systemEventService;
+    private final PermissionValidatorService permissionValidatorService;
 
     public FileShareService(
             FileRepository fileRepository,
             FileShareRepository fileShareRepository,
             UserRepository userRepository,
-            SystemEventService systemEventService) {
+            SystemEventService systemEventService,
+            PermissionValidatorService permissionValidatorService) {
         this.fileRepository = fileRepository;
         this.fileShareRepository = fileShareRepository;
         this.userRepository = userRepository;
         this.systemEventService = systemEventService;
+        this.permissionValidatorService = permissionValidatorService;
     }
 
     public FileShareDTO shareFile(ShareFileRequest request, String ownerEmail) {
 
         if (request.getFileId() == null) {
             throw new RuntimeException("File is required");
+        }
+
+        // Check if new recipients format is being used
+        if (request.getRecipients() != null && !request.getRecipients().isEmpty()) {
+            return shareFileWithGranularPermissions(request, ownerEmail);
         }
 
         // resolve single recipient from either field
@@ -53,8 +62,34 @@ public class FileShareService {
         return shareSingle(request.getFileId(), recipient.trim(), request.getPermission(), ownerEmail);
     }
 
+    /**
+     * Share file with granular permissions for each recipient (new format)
+     */
+    public FileShareDTO shareFileWithGranularPermissions(ShareFileRequest request, String ownerEmail) {
+        if (request.getFileId() == null)
+            throw new RuntimeException("File is required");
+        if (request.getRecipients() == null || request.getRecipients().isEmpty())
+            throw new RuntimeException("At least one recipient is required");
+
+        FileEntity file = fileRepository.findById(request.getFileId())
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        // Share with first recipient and return that response
+        ShareRecipientDTO firstRecipient = request.getRecipients().get(0);
+
+        // Share with all recipients
+        for (ShareRecipientDTO recipient : request.getRecipients()) {
+            shareSingle(request.getFileId(), recipient.getEmail().trim(), recipient.getPermission(), ownerEmail);
+        }
+
+        // Return DTO with available permissions
+        return shareSingle(request.getFileId(), firstRecipient.getEmail().trim(), firstRecipient.getPermission(),
+                ownerEmail);
+    }
+
     public List<FileShareDTO> shareFileWithMany(ShareFileRequest request, String ownerEmail) {
-        if (request.getFileId() == null) throw new RuntimeException("File is required");
+        if (request.getFileId() == null)
+            throw new RuntimeException("File is required");
         if (request.getSharedWithList() == null || request.getSharedWithList().isEmpty())
             throw new RuntimeException("At least one recipient is required");
 
@@ -69,6 +104,13 @@ public class FileShareService {
 
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
+
+        // ✅ VALIDATE PERMISSION AGAINST FILE TYPE
+        if (!permissionValidatorService.isPermissionAllowed(file.getFileName(), perm)) {
+            List<String> allowed = permissionValidatorService.getAllowedPermissions(file.getFileName());
+            throw new RuntimeException(
+                    "Permission '" + perm + "' is not allowed for this file type. Allowed: " + allowed);
+        }
 
         if (!file.getOwnerEmail().equals(ownerEmail)) {
             throw new RuntimeException("You can only share your own files");
@@ -172,20 +214,51 @@ public class FileShareService {
                 "Your access to " + fileName + " was revoked by an administrator");
     }
 
+    public FileShareDTO updateSharePermission(Long shareId, String newPermission, String ownerEmail) {
+        FileShare share = fileShareRepository.findById(shareId)
+                .orElseThrow(() -> new RuntimeException("Share record not found"));
+
+        // Verify owner
+        if (!share.getOwnerEmail().equals(ownerEmail)) {
+            throw new RuntimeException("Unauthorized: Only the owner can update share permissions");
+        }
+
+        String normalizedPermission = normalizePermission(newPermission);
+
+        // Validate permission against file type
+        if (!permissionValidatorService.isPermissionAllowed(share.getFile().getFileName(), normalizedPermission)) {
+            List<String> allowed = permissionValidatorService.getAllowedPermissions(share.getFile().getFileName());
+            throw new RuntimeException(
+                    "Permission '" + normalizedPermission + "' is not allowed for this file type. Allowed: " + allowed);
+        }
+
+        share.setPermission(normalizedPermission);
+        FileShare updatedShare = fileShareRepository.save(share);
+
+        systemEventService.log(ownerEmail, "UPDATE_SHARE_PERMISSION",
+                "Updated permission for " + share.getFile().getFileName() + " shared with " + share.getSharedWith()
+                        + " to " + normalizedPermission);
+        systemEventService.notifyUser(
+                share.getSharedWith(),
+                "Share Permission Updated",
+                ownerEmail + " updated your permission for " + share.getFile().getFileName() + " to "
+                        + normalizedPermission);
+
+        return mapToDto(updatedShare);
+    }
+
     public boolean canViewFile(Long fileId, String userEmail) {
-    return fileShareRepository
-            .findByFileIdAndSharedWith(fileId, userEmail)
-            .map(share ->
-                    share.getPermission().equals("VIEW") ||
-                    share.getPermission().equals("DOWNLOAD")
-            )
-            .orElse(false);
-}
+        return fileShareRepository
+                .findByFileIdAndSharedWith(fileId, userEmail)
+                .map(share -> share.getPermission().equals("VIEW") ||
+                        share.getPermission().equals("DOWNLOAD"))
+                .orElse(false);
+    }
 
     public boolean canDownloadFile(Long fileId, String userEmail) {
         return fileShareRepository.findByFileIdAndSharedWith(fileId, userEmail)
                 .map(share -> "DOWNLOAD".equalsIgnoreCase(share.getPermission())
-                           || "EDIT".equalsIgnoreCase(share.getPermission()))
+                        || "EDIT".equalsIgnoreCase(share.getPermission()))
                 .orElse(false);
     }
 
@@ -225,14 +298,22 @@ public class FileShareService {
         dto.setSharedWith(share.getSharedWith());
         dto.setPermission(share.getPermission());
         dto.setCreatedAt(share.getCreatedAt());
+
+        // ✅ SET AVAILABLE PERMISSIONS BASED ON FILE TYPE
+        dto.setAvailablePermissions(
+                permissionValidatorService.getAllowedPermissions(share.getFile().getFileName()));
+
         dto.setCanView(
-    "VIEW".equalsIgnoreCase(share.getPermission()) ||
-    "DOWNLOAD".equalsIgnoreCase(share.getPermission())
-);
+                "VIEW".equalsIgnoreCase(share.getPermission()) ||
+                        "DOWNLOAD".equalsIgnoreCase(share.getPermission()));
 
         dto.setCanDownload(
-    "DOWNLOAD".equalsIgnoreCase(share.getPermission())
-);
+                "DOWNLOAD".equalsIgnoreCase(share.getPermission()) ||
+                        "EDIT".equalsIgnoreCase(share.getPermission()));
+
+        dto.setCanEdit(
+                "EDIT".equalsIgnoreCase(share.getPermission()));
+
         return dto;
     }
 }

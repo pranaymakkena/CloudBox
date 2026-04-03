@@ -28,10 +28,25 @@ public class User {
     private int loginAttempts = 0;
     private java.time.LocalDateTime lockedUntil;
 
-    public int getLoginAttempts() { return loginAttempts; }
-    public void setLoginAttempts(int loginAttempts) { this.loginAttempts = loginAttempts; }
-    public java.time.LocalDateTime getLockedUntil() { return lockedUntil; }
-    public void setLockedUntil(java.time.LocalDateTime lockedUntil) { this.lockedUntil = lockedUntil; }
+    // Storage limit in MB for this user; if null or zero, default system-wide limit
+    // is used.
+    private Long storageLimitMb;
+
+    public int getLoginAttempts() {
+        return loginAttempts;
+    }
+
+    public void setLoginAttempts(int loginAttempts) {
+        this.loginAttempts = loginAttempts;
+    }
+
+    public java.time.LocalDateTime getLockedUntil() {
+        return lockedUntil;
+    }
+
+    public void setLockedUntil(java.time.LocalDateTime lockedUntil) {
+        this.lockedUntil = lockedUntil;
+    }
 
     public User() {
     }
@@ -110,5 +125,13 @@ public class User {
 
     public void setSuspended(boolean suspended) {
         this.suspended = suspended;
+    }
+
+    public Long getStorageLimitMb() {
+        return storageLimitMb;
+    }
+
+    public void setStorageLimitMb(Long storageLimitMb) {
+        this.storageLimitMb = storageLimitMb;
     }
 }

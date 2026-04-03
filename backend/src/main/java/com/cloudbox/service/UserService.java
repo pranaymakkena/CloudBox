@@ -10,6 +10,7 @@ import com.cloudbox.repository.SystemLogRepository;
 import com.cloudbox.repository.UserNotificationRepository;
 import com.cloudbox.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -93,12 +94,25 @@ public class UserService {
         userNotificationRepository.saveAll(notifications);
     }
 
+    @Transactional
     public Map<String, Long> getStorageInfo(String email) {
         long used = fileService.getUserStorage(email);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         AdminSetting settings = adminSettingRepository.findById(1L).orElse(null);
-        long limitMb = (settings != null && settings.getStorageLimit() != null && settings.getStorageLimit() > 0)
-                ? settings.getStorageLimit()
-                : 15360L;
+
+        long limitMb;
+        if (user.getStorageLimitMb() != null && user.getStorageLimitMb() > 0) {
+            limitMb = user.getStorageLimitMb();
+            System.out.println("User " + email + " has per-user limit: " + limitMb + " MB");
+        } else if (settings != null && settings.getStorageLimit() != null && settings.getStorageLimit() > 0) {
+            limitMb = settings.getStorageLimit();
+            System.out.println("User " + email + " using global limit: " + limitMb + " MB");
+        } else {
+            limitMb = 15360L; // default 15 GB
+            System.out.println("User " + email + " using default limit: " + limitMb + " MB");
+        }
+
+        System.out.println("User " + email + " storage info - used: " + used + " bytes, limit: " + limitMb + " MB");
         return Map.of("usedBytes", used, "limitMb", limitMb);
     }
 

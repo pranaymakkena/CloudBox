@@ -6,6 +6,7 @@ import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import { useSearch } from "../context/SearchContext";
 import { getDirectFileUrl, triggerDownload } from "../utils/fileAccess";
+import ShareModal from "../components/ShareModal";
 import "../styles/style.css";
 import "../components/layout/layout.css";
 import "../components/common/card.css";
@@ -51,13 +52,13 @@ function MyFiles() {
 
   const [files, setFiles] = useState([]);
   const [folders, setFolders] = useState(["root"]);
-  const [shareEmails, setShareEmails] = useState({});   // { fileId: "email1, email2" }
-  const [sharePermission, setSharePermission] = useState({});
   const [moveFolder, setMoveFolder] = useState({});
   const [localSearch, setLocalSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [viewer, setViewer] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareModalFile, setShareModalFile] = useState(null);
   const [docxEditMode, setDocxEditMode] = useState(false);
   const [docxEditText, setDocxEditText] = useState("");
   const [docxSaving, setDocxSaving] = useState(false);
@@ -201,26 +202,6 @@ function MyFiles() {
     }
   }, [viewer, docxEditMode]);
 
-  const shareFile = async (fileId) => {
-    const raw = shareEmails[fileId] || "";
-    const emails = raw.split(/[,;\s]+/).map(e => e.trim()).filter(Boolean);
-    const permission = sharePermission[fileId] || "";
-    if (emails.length === 0) { toast.warning("Enter at least one recipient email"); return; }
-    if (!permission) { toast.warning("Select a permission level"); return; }
-    try {
-      if (emails.length === 1) {
-        await API.post("/files/share", { fileId, sharedWith: emails[0], permission });
-      } else {
-        await API.post("/files/share/bulk", { fileId, sharedWithList: emails, permission });
-      }
-      setShareEmails((prev) => ({ ...prev, [fileId]: "" }));
-      setSharePermission((prev) => ({ ...prev, [fileId]: "" }));
-      toast.success(`Shared with ${emails.length} recipient${emails.length > 1 ? "s" : ""}`);
-    } catch (err) {
-      toast.error(err.response?.data || "Failed to share file");
-    }
-  };
-
   const moveFile = async (fileId) => {
     const targetFolder = moveFolder[fileId];
     if (!targetFolder) { toast.warning("Select a target folder"); return; }
@@ -323,25 +304,15 @@ function MyFiles() {
               </div>
 
               <div className="file-row-actions">
-                <input
-                  type="text"
-                  placeholder="Recipient emails (comma separated)"
-                  value={shareEmails[file.id] || ""}
-                  onChange={(e) => setShareEmails((prev) => ({ ...prev, [file.id]: e.target.value }))}
-                  className="inline-input"
-                  title="Separate multiple emails with commas"
-                />
-                <select
-                  value={sharePermission[file.id] || ""}
-                  onChange={(e) => setSharePermission((prev) => ({ ...prev, [file.id]: e.target.value }))}
-                  className="inline-select"
+                <button
+                  className="btn btn-share btn-sm"
+                  onClick={() => {
+                    setShareModalFile(file);
+                    setShareModalOpen(true);
+                  }}
                 >
-                  <option value="" disabled>Permission</option>
-                  <option value="VIEW">View</option>
-                  <option value="DOWNLOAD">Download</option>
-                  <option value="EDIT">Edit</option>
-                </select>
-                <button className="btn btn-share btn-sm" onClick={() => shareFile(file.id)}>Share</button>
+                  <i className="fa-solid fa-share-alt"></i> Share
+                </button>
 
                 <select
                   value={moveFolder[file.id] || file.folder || "root"}
@@ -518,6 +489,20 @@ function MyFiles() {
         )}
 
         <Toast messages={messages} removeToast={removeToast} />
+
+        {shareModalFile && (
+          <ShareModal
+            file={shareModalFile}
+            isOpen={shareModalOpen}
+            onClose={() => {
+              setShareModalOpen(false);
+              setShareModalFile(null);
+            }}
+            onShareSuccess={() => {
+              fetchFiles();
+            }}
+          />
+        )}
       </div>
     </Layout>
   );
