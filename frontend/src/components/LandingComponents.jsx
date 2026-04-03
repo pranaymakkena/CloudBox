@@ -15,8 +15,17 @@ export function Navbar() {
           <li><a href="#pricing">Pricing</a></li>
         </ul>
         <div className="nav-buttons">
-          <Link to="/login"><button className="login">Sign in</button></Link>
-          <Link to="/register"><button className="register">Get started</button></Link>
+
+          {/* if user is logged in, show dashboard button, else show sign in and get started buttons */}
+
+          {localStorage.getItem("token") ? (
+            <Link to="/dashboard"><button className="login">Dashboard</button></Link>
+          ) : (
+            <>
+              <Link to="/login"><button className="login">Sign in</button></Link>
+              <Link to="/register"><button className="register">Get started</button></Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
@@ -32,12 +41,12 @@ export function Hero() {
       <div className="hero-content">
         <div className="hero-badge">
           <span className="hero-badge-dot" />
-          Trusted by 10,000+ teams worldwide
+          Now with real-time collaboration &amp; public link sharing
         </div>
-        <h1>The Secure Cloud<br /><span>Built for Teams</span></h1>
+        <h1>Your Files.<br /><span>Anywhere. Secure.</span></h1>
         <p>
-          CloudBox delivers enterprise-grade encrypted storage, seamless file sharing,
-          and real-time collaboration — without the complexity.
+          CloudBox gives you encrypted cloud storage, granular sharing permissions,
+          DOCX editing, and team collaboration — all in one place.
         </p>
         <div className="hero-actions">
           <Link to="/register">
@@ -49,20 +58,20 @@ export function Hero() {
         </div>
         <div className="hero-stats">
           <div className="stat">
-            <div className="stat-number">10K+</div>
-            <div className="stat-label">Active Users</div>
+            <div className="stat-number">15 GB</div>
+            <div className="stat-label">Free Storage</div>
           </div>
           <div className="stat">
-            <div className="stat-number">99.9%</div>
-            <div className="stat-label">Uptime SLA</div>
+            <div className="stat-number">3</div>
+            <div className="stat-label">Permission Levels</div>
           </div>
           <div className="stat">
             <div className="stat-number">256-bit</div>
             <div className="stat-label">Encryption</div>
           </div>
           <div className="stat">
-            <div className="stat-number">50M+</div>
-            <div className="stat-label">Files Stored</div>
+            <div className="stat-number">99.9%</div>
+            <div className="stat-label">Uptime SLA</div>
           </div>
         </div>
       </div>
@@ -85,12 +94,12 @@ export function TrustBar() {
 
 /* FEATURES */
 const featureData = [
-  { icon: "🔒", title: "End-to-End Encryption", desc: "AES-256 encryption at rest and in transit. Only you hold the keys." },
-  { icon: "⚡", title: "Lightning Fast Uploads", desc: "Optimized pipeline handles files of any size quickly and reliably." },
-  { icon: "🤝", title: "Real-Time Collaboration", desc: "Share folders, leave inline comments, and co-edit without friction." },
-  { icon: "📁", title: "Smart Organization", desc: "Nested folders, tags, and instant full-text search across all files." },
-  { icon: "🌍", title: "Access Anywhere", desc: "Any device, any browser. Your files are always one click away." },
-  { icon: "📊", title: "Full Audit Logs", desc: "Know exactly who accessed, modified, or shared every file and when." },
+  { icon: "🔒", title: "End-to-End Encryption", desc: "AES-256 encryption at rest and in transit. Your data stays private." },
+  { icon: "📤", title: "Smart File Sharing", desc: "Share with View, Download, or Edit permissions. Bulk share to multiple users at once." },
+  { icon: "🔗", title: "Public Link Sharing", desc: "Generate shareable links with optional expiry. Anyone with the link can access the file." },
+  { icon: "✏️", title: "In-Browser DOCX Editing", desc: "View and edit Word documents directly in the browser. No Office required." },
+  { icon: "💬", title: "Collaboration & Comments", desc: "Leave comments on shared files. Chat-style interface with real-time updates." },
+  { icon: "📊", title: "Full Admin Control", desc: "User management, storage limits, system logs, and file sharing oversight." },
 ];
 
 export function Features() {
@@ -125,17 +134,58 @@ export function HowItWorks() {
         <div className="step">
           <div className="circle">1</div>
           <h3>Create your account</h3>
-          <p>Sign up for free in seconds. No credit card required to get started.</p>
+          <p>Sign up for free in seconds. 15 GB of storage included, no credit card needed.</p>
         </div>
         <div className="step">
           <div className="circle">2</div>
           <h3>Upload your files</h3>
-          <p>Drag and drop files or entire folders. We handle encryption automatically.</p>
+          <p>Upload any file type — documents, images, videos, audio. Organize into folders.</p>
         </div>
         <div className="step">
           <div className="circle">3</div>
           <h3>Share &amp; collaborate</h3>
-          <p>Invite teammates, set granular permissions, and work together seamlessly.</p>
+          <p>Share with specific users or generate a public link. Set View, Download, or Edit permissions.</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* DEMO SHOWCASE */
+export function DemoShowcase() {
+  const items = [
+    { icon: "📁", label: "My Files", desc: "Upload, organize, search, and manage all your files with category filters and sort controls." },
+    { icon: "🔗", label: "Public Links", desc: "Generate shareable links with expiry dates. Anyone with the link can view or download." },
+    { icon: "👥", label: "Collaboration", desc: "Comment on shared files in a chat-style interface. Edit DOCX files together in real time." },
+    { icon: "🛡️", label: "Admin Dashboard", desc: "Full visibility into users, files, shares, and system logs. Configure storage limits." },
+  ];
+  return (
+    <section style={{ background: "#f0f5ff", padding: "80px 32px" }}>
+      <div style={{ maxWidth: 1100, margin: "auto", textAlign: "center" }}>
+        <div className="section-label">Platform Overview</div>
+        <h2 className="section-title">Built for real workflows</h2>
+        <p className="section-sub">Every feature is designed to make file management effortless.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, marginTop: 40 }}>
+          {items.map(item => (
+            <div key={item.label} style={{
+              background: "#fff", borderRadius: 16, padding: "28px 24px",
+              border: "1.5px solid #d0daea", textAlign: "left",
+              boxShadow: "0 4px 16px rgba(66,133,244,0.08)",
+              transition: "transform 0.2s, box-shadow 0.2s"
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(66,133,244,0.14)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 16px rgba(66,133,244,0.08)"; }}
+            >
+              <div style={{ fontSize: 36, marginBottom: 14 }}>{item.icon}</div>
+              <div style={{ fontWeight: 700, fontSize: 16, color: "#1a2236", marginBottom: 8 }}>{item.label}</div>
+              <div style={{ fontSize: 14, color: "#5b6b8a", lineHeight: 1.65 }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 40 }}>
+          <Link to="/register">
+            <button className="btn-primary">Try it free →</button>
+          </Link>
         </div>
       </div>
     </section>

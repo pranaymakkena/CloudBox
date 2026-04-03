@@ -28,8 +28,7 @@ public class AuthService {
             UserRepository userRepository,
             JwtUtil jwtUtil,
             AdminSettingRepository adminSettingRepository,
-            SystemEventService systemEventService
-    ) {
+            SystemEventService systemEventService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.adminSettingRepository = adminSettingRepository;
@@ -80,19 +79,36 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // ✅ check suspended
         if (user.isSuspended()) {
             throw new RuntimeException("Account suspended by admin");
         }
 
-        // ✅ CHECK HASHED PASSWORD
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+        // Account lockout check
+        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(java.time.LocalDateTime.now())) {
+            long minutesLeft = java.time.Duration.between(java.time.LocalDateTime.now(), user.getLockedUntil()).toMinutes() + 1;
+            throw new RuntimeException("Account locked. Try again in " + minutesLeft + " minute(s)");
         }
 
-        systemEventService.log(user.getEmail(), "LOGIN", "User logged in successfully");
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            int attempts = user.getLoginAttempts() + 1;
+            user.setLoginAttempts(attempts);
+            if (attempts >= 5) {
+                user.setLockedUntil(java.time.LocalDateTime.now().plusMinutes(15));
+                user.setLoginAttempts(0);
+                userRepository.save(user);
+                systemEventService.log(user.getEmail(), "ACCOUNT_LOCKED", "Account locked after 5 failed login attempts");
+                throw new RuntimeException("Too many failed attempts. Account locked for 15 minutes");
+            }
+            userRepository.save(user);
+            throw new RuntimeException("Invalid password. " + (5 - attempts) + " attempt(s) remaining");
+        }
 
-        // ✅ generate JWT (role included)
+        // Reset on successful login
+        user.setLoginAttempts(0);
+        user.setLockedUntil(null);
+        userRepository.save(user);
+
+        systemEventService.log(user.getEmail(), "LOGIN", "User logged in successfully");
         return jwtUtil.generateToken(user.getEmail(), user.getRole().name());
     }
 

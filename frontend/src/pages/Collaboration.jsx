@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+﻿import { useEffect, useState, useRef } from "react";
 import { renderAsync } from "docx-preview";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
+import { getDirectFileUrl } from "../utils/fileAccess";
 import "../styles/collaboration.css";
 import "../styles/style.css";
 
@@ -11,13 +12,13 @@ const currentUser = localStorage.getItem("email") || "";
 
 function getFileIcon(name) {
   const n = (name || "").toLowerCase();
-  if (/\.(jpg|jpeg|png|gif|webp)$/.test(n)) return { icon: "fa-image",       color: "#0ea5e9" };
-  if (/\.(mp4|mkv|avi|mov|webm)$/.test(n)) return { icon: "fa-film",        color: "#8b5cf6" };
-  if (/\.(mp3|wav|ogg|flac)$/.test(n))     return { icon: "fa-music",       color: "#ec4899" };
-  if (/\.(pdf)$/.test(n))                  return { icon: "fa-file-pdf",    color: "#ef4444" };
-  if (/\.(doc|docx)$/.test(n))             return { icon: "fa-file-word",   color: "#2563eb" };
-  if (/\.(xls|xlsx)$/.test(n))             return { icon: "fa-file-excel",  color: "#16a34a" };
-  return                                          { icon: "fa-file-lines",  color: "#6b7280" };
+  if (/\.(jpg|jpeg|png|gif|webp)$/.test(n)) return { icon: "fa-image", color: "#0ea5e9" };
+  if (/\.(mp4|mkv|avi|mov|webm)$/.test(n)) return { icon: "fa-film", color: "#8b5cf6" };
+  if (/\.(mp3|wav|ogg|flac)$/.test(n)) return { icon: "fa-music", color: "#ec4899" };
+  if (/\.(pdf)$/.test(n)) return { icon: "fa-file-pdf", color: "#ef4444" };
+  if (/\.(doc|docx)$/.test(n)) return { icon: "fa-file-word", color: "#2563eb" };
+  if (/\.(xls|xlsx)$/.test(n)) return { icon: "fa-file-excel", color: "#16a34a" };
+  return { icon: "fa-file-lines", color: "#6b7280" };
 }
 
 function getInitials(email) {
@@ -25,7 +26,7 @@ function getInitials(email) {
 }
 
 function getAvatarColor(email) {
-  const palette = ["#4285f4","#16a34a","#8b5cf6","#ec4899","#f59e0b","#0ea5e9","#ef4444"];
+  const palette = ["#4285f4", "#16a34a", "#8b5cf6", "#ec4899", "#f59e0b", "#0ea5e9", "#ef4444"];
   let h = 0;
   for (let i = 0; i < (email || "").length; i++) h = (email.charCodeAt(i) + ((h << 5) - h)) | 0;
   return palette[Math.abs(h) % palette.length];
@@ -33,15 +34,15 @@ function getAvatarColor(email) {
 
 function relTime(ts) {
   const diff = Date.now() - new Date(ts).getTime();
-  if (diff < 60000)    return "just now";
-  if (diff < 3600000)  return Math.floor(diff / 60000)   + "m ago";
+  if (diff < 60000) return "just now";
+  if (diff < 3600000) return Math.floor(diff / 60000) + "m ago";
   if (diff < 86400000) return Math.floor(diff / 3600000) + "h ago";
   return new Date(ts).toLocaleDateString();
 }
 
 export default function Collaboration() {
   const { messages, removeToast, toast } = useToast();
-  const [files,          setFiles]          = useState([]);
+  const [files, setFiles] = useState([]);
   const [selectedFileId, setSelectedFileId] = useState("");
   const [comments,       setComments]       = useState([]);
   const [message,        setMessage]        = useState("");
@@ -116,9 +117,11 @@ export default function Collaboration() {
         setDocxEditText("");
         setViewer({ type: "docx", name: file.fileName, fileId: file.fileId, arrayBuffer: res.data, canEdit });
       } else {
-        const res = await API.get(`/files/preview/${file.fileId}`, { responseType: "blob" });
-        const blob = new Blob([res.data], { type: res.headers["content-type"] });
-        setViewer({ type: blob.type, name: file.fileName, url: URL.createObjectURL(blob) });
+        const directUrl = getDirectFileUrl(file);
+        if (!directUrl) {
+          throw new Error("Missing file URL");
+        }
+        setViewer({ type: file.fileType || "application/octet-stream", name: file.fileName, url: directUrl });
       }
     } catch {
       toast.error("Failed to open file");
@@ -168,9 +171,9 @@ export default function Collaboration() {
     }
   }, [viewer, docxEditMode]);
 
-  const visibleFiles  = files.filter(f => f.fileName.toLowerCase().includes(search.toLowerCase()));
-  const selectedFile  = files.find(f => String(f.fileId) === selectedFileId);
-  const selFi         = selectedFile ? getFileIcon(selectedFile.fileName) : { icon: "fa-file", color: "#6b7280" };
+  const visibleFiles = files.filter(f => f.fileName.toLowerCase().includes(search.toLowerCase()));
+  const selectedFile = files.find(f => String(f.fileId) === selectedFileId);
+  const selFi = selectedFile ? getFileIcon(selectedFile.fileName) : { icon: "fa-file", color: "#6b7280" };
 
   return (
     <Layout type="user">
@@ -216,8 +219,8 @@ export default function Collaboration() {
 
               <div className="cb-file-list">
                 {visibleFiles.map(file => {
-                  const fi      = getFileIcon(file.fileName);
-                  const active  = String(file.fileId) === selectedFileId;
+                  const fi = getFileIcon(file.fileName);
+                  const active = String(file.fileId) === selectedFileId;
                   return (
                     <div
                       key={file.fileId}
@@ -280,9 +283,9 @@ export default function Collaboration() {
                   </div>
                 ) : (
                   comments.map((c, idx) => {
-                    const isMe       = c.userEmail === currentUser;
-                    const showHead   = idx === 0 || comments[idx - 1].userEmail !== c.userEmail;
-                    const avatarBg   = getAvatarColor(c.userEmail);
+                    const isMe = c.userEmail === currentUser;
+                    const showHead = idx === 0 || comments[idx - 1].userEmail !== c.userEmail;
+                    const avatarBg = getAvatarColor(c.userEmail);
                     return (
                       <div key={c.id} className={`cb-row${isMe ? " cb-row-me" : " cb-row-other"}`}>
                         {!isMe && (

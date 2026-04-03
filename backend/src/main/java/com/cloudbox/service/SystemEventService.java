@@ -20,8 +20,7 @@ public class SystemEventService {
     public SystemEventService(
             SystemLogRepository systemLogRepository,
             AdminNotificationRepository adminNotificationRepository,
-            UserNotificationRepository userNotificationRepository
-    ) {
+            UserNotificationRepository userNotificationRepository) {
         this.systemLogRepository = systemLogRepository;
         this.adminNotificationRepository = adminNotificationRepository;
         this.userNotificationRepository = userNotificationRepository;

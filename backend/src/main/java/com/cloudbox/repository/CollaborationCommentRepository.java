@@ -8,5 +8,6 @@ import java.util.List;
 public interface CollaborationCommentRepository extends JpaRepository<CollaborationComment, Long> {
 
     List<CollaborationComment> findByFileIdOrderByCreatedAtAsc(Long fileId);
+
     void deleteByFileId(Long fileId);
 }

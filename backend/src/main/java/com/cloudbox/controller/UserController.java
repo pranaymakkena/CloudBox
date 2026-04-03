@@ -31,7 +31,7 @@ public class UserController {
     // ================= UPDATE PROFILE =================
     @PutMapping("/profile")
     public UserProfileDTO updateProfile(@RequestBody UserProfileDTO dto,
-                                        Principal principal) {
+            Principal principal) {
         return userService.updateProfileDTO(principal.getName(), dto);
     }
 

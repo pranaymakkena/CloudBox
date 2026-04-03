@@ -7,12 +7,12 @@ import "../styles/UserDashboard.css";
 
 function getFileIcon(fileName = "") {
   const n = fileName.toLowerCase();
-  if (/\.(jpg|jpeg|png|gif|webp|svg)$/.test(n)) return { icon: "fa-image",      color: "#8b5cf6" };
-  if (/\.(mp4|mkv|avi|mov|webm)$/.test(n))      return { icon: "fa-film",       color: "#f59e0b" };
-  if (/\.(mp3|wav|ogg|flac)$/.test(n))           return { icon: "fa-music",      color: "#10b981" };
-  if (/\.(pdf)$/.test(n))                        return { icon: "fa-file-pdf",   color: "#ef4444" };
-  if (/\.(doc|docx)$/.test(n))                   return { icon: "fa-file-word",  color: "#2563eb" };
-  if (/\.(xls|xlsx)$/.test(n))                   return { icon: "fa-file-excel", color: "#16a34a" };
+  if (/\.(jpg|jpeg|png|gif|webp|svg)$/.test(n)) return { icon: "fa-image", color: "#8b5cf6" };
+  if (/\.(mp4|mkv|avi|mov|webm)$/.test(n)) return { icon: "fa-film", color: "#f59e0b" };
+  if (/\.(mp3|wav|ogg|flac)$/.test(n)) return { icon: "fa-music", color: "#10b981" };
+  if (/\.(pdf)$/.test(n)) return { icon: "fa-file-pdf", color: "#ef4444" };
+  if (/\.(doc|docx)$/.test(n)) return { icon: "fa-file-word", color: "#2563eb" };
+  if (/\.(xls|xlsx)$/.test(n)) return { icon: "fa-file-excel", color: "#16a34a" };
   return { icon: "fa-file-lines", color: "#64748b" };
 }
 
@@ -26,7 +26,7 @@ function formatSize(bytes) {
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const m = Math.floor(diff / 60000);
-  if (m < 1)  return "Just now";
+  if (m < 1) return "Just now";
   if (m < 60) return `${m}m ago`;
   const h = Math.floor(m / 60);
   if (h < 24) return `${h}h ago`;
@@ -35,12 +35,12 @@ function timeAgo(dateStr) {
 
 export default function UserDashboard() {
   const navigate = useNavigate();
-  const rawName  = localStorage.getItem("name") || "User";
-  const name     = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+  const rawName = localStorage.getItem("name") || "User";
+  const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
 
-  const [files,         setFiles]         = useState([]);
-  const [totalSize,     setTotalSize]     = useState(0);
-  const [storageLimit,  setStorageLimit]  = useState(15360);
+  const [files, setFiles] = useState([]);
+  const [totalSize, setTotalSize] = useState(0);
+  const [storageLimit, setStorageLimit] = useState(15360);
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
@@ -56,18 +56,18 @@ export default function UserDashboard() {
     }).catch(console.error);
   }, []);
 
-  const limitBytes  = storageLimit * 1024 * 1024;
-  const usedPct     = limitBytes > 0 ? Math.min((totalSize / limitBytes) * 100, 100) : 0;
+  const limitBytes = storageLimit * 1024 * 1024;
+  const usedPct = limitBytes > 0 ? Math.min((totalSize / limitBytes) * 100, 100) : 0;
   const recentFiles = [...files].sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)).slice(0, 5);
-  const unread      = notifications.filter(n => !n.read).length;
+  const unread = notifications.filter(n => !n.read).length;
 
   const quickLinks = [
-    { label: "My Files",    icon: "fa-folder-open",      path: "/files",       color: "#2563eb", bg: "#eff6ff" },
-    { label: "Upload",      icon: "fa-cloud-arrow-up",   path: "/upload",      color: "#7c3aed", bg: "#f5f3ff" },
-    { label: "Folders",     icon: "fa-folder",           path: "/folders",     color: "#d97706", bg: "#fffbeb" },
-    { label: "Shared",      icon: "fa-share-nodes",      path: "/shared-with", color: "#059669", bg: "#ecfdf5" },
-    { label: "Collab",      icon: "fa-users",            path: "/collab",      color: "#0891b2", bg: "#ecfeff" },
-    { label: "Activity",    icon: "fa-clock-rotate-left",path: "/activity",    color: "#64748b", bg: "#f8fafc" },
+    { label: "My Files", icon: "fa-folder-open", path: "/files", color: "#2563eb", bg: "#eff6ff" },
+    { label: "Upload", icon: "fa-cloud-arrow-up", path: "/upload", color: "#7c3aed", bg: "#f5f3ff" },
+    { label: "Folders", icon: "fa-folder", path: "/folders", color: "#d97706", bg: "#fffbeb" },
+    { label: "Shared", icon: "fa-share-nodes", path: "/shared-with", color: "#059669", bg: "#ecfdf5" },
+    { label: "Collab", icon: "fa-users", path: "/collab", color: "#0891b2", bg: "#ecfeff" },
+    { label: "Activity", icon: "fa-clock-rotate-left", path: "/activity", color: "#64748b", bg: "#f8fafc" },
   ];
 
   return (
@@ -141,19 +141,19 @@ export default function UserDashboard() {
             {recentFiles.length === 0
               ? <div className="ud-empty"><i className="fa-solid fa-folder-open" /><p>No files yet</p></div>
               : recentFiles.map(f => {
-                  const meta = getFileIcon(f.fileName);
-                  return (
-                    <div key={f.id} className="ud-file-row" onClick={() => navigate("/files")}>
-                      <div className="ud-file-icon" style={{ color: meta.color }}>
-                        <i className={`fa-solid ${meta.icon}`} />
-                      </div>
-                      <div className="ud-file-info">
-                        <span className="ud-file-name">{f.fileName}</span>
-                        <span className="ud-file-meta">{formatSize(f.fileSize)} · {timeAgo(f.uploadedAt)}</span>
-                      </div>
+                const meta = getFileIcon(f.fileName);
+                return (
+                  <div key={f.id} className="ud-file-row" onClick={() => navigate("/files")}>
+                    <div className="ud-file-icon" style={{ color: meta.color }}>
+                      <i className={`fa-solid ${meta.icon}`} />
                     </div>
-                  );
-                })
+                    <div className="ud-file-info">
+                      <span className="ud-file-name">{f.fileName}</span>
+                      <span className="ud-file-meta">{formatSize(f.fileSize)} · {timeAgo(f.uploadedAt)}</span>
+                    </div>
+                  </div>
+                );
+              })
             }
           </div>
 
@@ -169,15 +169,15 @@ export default function UserDashboard() {
             {notifications.length === 0
               ? <div className="ud-empty"><i className="fa-solid fa-bell-slash" /><p>No notifications</p></div>
               : notifications.map(n => (
-                  <div key={n.id} className={`ud-notif-row${n.read ? "" : " ud-notif-unread"}`} onClick={() => navigate("/notifications")}>
-                    <div className="ud-notif-dot" style={{ background: n.read ? "#e2e8f0" : "#2563eb" }} />
-                    <div className="ud-notif-body">
-                      <span className="ud-notif-title">{n.title}</span>
-                      <span className="ud-notif-msg">{n.message}</span>
-                    </div>
-                    <span className="ud-notif-time">{timeAgo(n.createdAt)}</span>
+                <div key={n.id} className={`ud-notif-row${n.read ? "" : " ud-notif-unread"}`} onClick={() => navigate("/notifications")}>
+                  <div className="ud-notif-dot" style={{ background: n.read ? "#e2e8f0" : "#2563eb" }} />
+                  <div className="ud-notif-body">
+                    <span className="ud-notif-title">{n.title}</span>
+                    <span className="ud-notif-msg">{n.message}</span>
                   </div>
-                ))
+                  <span className="ud-notif-time">{timeAgo(n.createdAt)}</span>
+                </div>
+              ))
             }
           </div>
 

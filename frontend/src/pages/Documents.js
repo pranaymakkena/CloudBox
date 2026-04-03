@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
+import { triggerDownload, openInNewTab } from "../utils/fileAccess";
 import "../styles/fileGrid.css";
 
 function Documents() {
   const [files, setFiles] = useState([]);
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     fetchFiles();
@@ -14,9 +14,7 @@ function Documents() {
   // 📥 Fetch and filter documents
   const fetchFiles = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/files", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await API.get("/files");
 
       const docs = res.data.filter(f =>
         f.fileName?.match(/\.(pdf|doc|docx|txt|xls|xlsx)$/i)
@@ -26,40 +24,6 @@ function Documents() {
 
     } catch (err) {
       console.error("Error fetching documents", err);
-    }
-  };
-
-  // 🔥 View / Download file (FIXED)
-  const openFile = async (url, isDownload = false, fileName = "file") => {
-    try {
-      const res = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        responseType: "blob"
-      });
-
-      const blob = new Blob([res.data], {
-        type: res.headers["content-type"]
-      });
-
-      const fileURL = window.URL.createObjectURL(blob);
-
-      if (isDownload) {
-        const a = document.createElement("a");
-        a.href = fileURL;
-        a.download = fileName;
-        a.click();
-      } else {
-        window.open(fileURL);
-      }
-
-      // cleanup
-      setTimeout(() => URL.revokeObjectURL(fileURL), 5000);
-
-    } catch (err) {
-      console.error(err);
-      alert("Access denied or error loading file");
     }
   };
 
@@ -103,24 +67,14 @@ function Documents() {
                 <div className="file-actions">
                   <button
                     className="btn btn-primary"
-                    onClick={() =>
-                      openFile(
-                        `http://localhost:8080/api/files/preview/${file.id}`
-                      )
-                    }
+                    onClick={() => file.fileUrl && openInNewTab(file.fileUrl)}
                   >
                     View
                   </button>
 
                   <button
                     className="btn btn-success"
-                    onClick={() =>
-                      openFile(
-                        `http://localhost:8080/api/files/download/${file.id}`,
-                        true,
-                        file.fileName
-                      )
-                    }
+                    onClick={() => file.fileUrl && triggerDownload(file.fileUrl, file.fileName)}
                   >
                     Download
                   </button>

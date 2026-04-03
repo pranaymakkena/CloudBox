@@ -30,8 +30,7 @@ public class AdminController {
             AdminService adminService,
             UserRepository userRepository,
             FileService fileService,
-            FileRepository fileRepository
-    ) {
+            FileRepository fileRepository) {
         this.adminService = adminService;
         this.userRepository = userRepository;
         this.fileService = fileService;
@@ -93,7 +92,18 @@ public class AdminController {
         // 📁 recent files
         List<FileEntity> recentFiles = fileRepository.findAll()
                 .stream()
-                .sorted((a, b) -> b.getUploadedAt().compareTo(a.getUploadedAt()))
+                .sorted((a, b) -> {
+                    if (b.getUploadDate() == null && a.getUploadDate() == null) {
+                        return 0;
+                    }
+                    if (b.getUploadDate() == null) {
+                        return -1;
+                    }
+                    if (a.getUploadDate() == null) {
+                        return 1;
+                    }
+                    return b.getUploadDate().compareTo(a.getUploadDate());
+                })
                 .limit(5)
                 .toList();
 

@@ -18,18 +18,42 @@
 }
 
 /* different positions + speeds */
-.icon1 { left: 10%; animation-duration: 18s; }
-.icon2 { left: 25%; animation-duration: 22s; }
-.icon3 { left: 40%; animation-duration: 20s; }
-.icon4 { left: 60%; animation-duration: 25s; }
-.icon5 { left: 75%; animation-duration: 19s; }
-.icon6 { left: 90%; animation-duration: 23s; }
+.icon1 {
+  left: 10%;
+  animation-duration: 18s;
+}
+
+.icon2 {
+  left: 25%;
+  animation-duration: 22s;
+}
+
+.icon3 {
+  left: 40%;
+  animation-duration: 20s;
+}
+
+.icon4 {
+  left: 60%;
+  animation-duration: 25s;
+}
+
+.icon5 {
+  left: 75%;
+  animation-duration: 19s;
+}
+
+.icon6 {
+  left: 90%;
+  animation-duration: 23s;
+}
 
 /* animation */
 @keyframes floatMove {
   0% {
     transform: translateY(100vh) rotate(0deg);
   }
+
   100% {
     transform: translateY(-10vh) rotate(360deg);
   }

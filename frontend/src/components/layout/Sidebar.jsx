@@ -20,27 +20,27 @@ function Sidebar({ type, isOpen, onClose }) {
   };
 
   const userMenu = [
-    { name: "Dashboard",       path: "/dashboard",   icon: <FaHome /> },
-    { name: "My Files",        path: "/files",        icon: <FaFolder /> },
-    { name: "Upload File",     path: "/upload",       icon: <FaUpload /> },
-    { name: "Notifications",   path: "/notifications",icon: <FaBell /> },
-    { name: "Shared With Me",  path: "/shared-with",  icon: <FaShareAlt /> },
-    { name: "Shared By Me",    path: "/shared-by",    icon: <FaShareAlt /> },
-    { name: "My Folders",      path: "/folders",      icon: <FaFolder /> },
-    { name: "Collaboration",   path: "/collab",       icon: <FaUsers /> },
-    { name: "Activity History",path: "/activity",     icon: <FaHistory /> },
-    { name: "Settings",        path: "/settings",     icon: <FaCog /> },
+    { name: "Dashboard", path: "/dashboard", icon: <FaHome /> },
+    { name: "My Files", path: "/files", icon: <FaFolder /> },
+    { name: "Upload File", path: "/upload", icon: <FaUpload /> },
+    { name: "Notifications", path: "/notifications", icon: <FaBell /> },
+    { name: "Shared With Me", path: "/shared-with", icon: <FaShareAlt /> },
+    { name: "Shared By Me", path: "/shared-by", icon: <FaShareAlt /> },
+    { name: "My Folders", path: "/folders", icon: <FaFolder /> },
+    { name: "Collaboration", path: "/collab", icon: <FaUsers /> },
+    { name: "Activity History", path: "/activity", icon: <FaHistory /> },
+    { name: "Settings", path: "/settings", icon: <FaCog /> },
   ];
 
   const adminMenu = [
-    { name: "Dashboard",             path: "/admin",              icon: <FaHome /> },
-    { name: "User Management",       path: "/admin/users",        icon: <FaUsers /> },
-    { name: "Authentication Logs",   path: "/admin/logs",         icon: <FaHistory /> },
-    { name: "File Management",       path: "/admin/files",        icon: <FaFolder /> },
-    { name: "File Sharing Control",  path: "/admin/sharing",      icon: <FaShareAlt /> },
-    { name: "Collaboration Activity",path: "/admin/activity",     icon: <FaUsers /> },
-    { name: "Notifications",         path: "/admin/notifications",icon: <FaBell /> },
-    { name: "System Settings",       path: "/admin/settings",     icon: <FaCog /> },
+    { name: "Dashboard", path: "/admin", icon: <FaHome /> },
+    { name: "User Management", path: "/admin/users", icon: <FaUsers /> },
+    { name: "Authentication Logs", path: "/admin/logs", icon: <FaHistory /> },
+    { name: "File Management", path: "/admin/files", icon: <FaFolder /> },
+    { name: "File Sharing Control", path: "/admin/sharing", icon: <FaShareAlt /> },
+    { name: "Collaboration Activity", path: "/admin/activity", icon: <FaUsers /> },
+    { name: "Notifications", path: "/admin/notifications", icon: <FaBell /> },
+    { name: "System Settings", path: "/admin/settings", icon: <FaCog /> },
   ];
 
   const menu = type === "admin" ? adminMenu : userMenu;

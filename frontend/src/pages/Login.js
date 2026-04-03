@@ -7,6 +7,12 @@ import CloudBoxLogo from "../components/CloudBoxLogo";
 import "../styles/login.css";
 
 function Login() {
+
+  //check if user is already logged in
+  if (localStorage.getItem("token")) {
+    window.location.href = "/dashboard";
+  }
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,44 +48,44 @@ function Login() {
         <defs>
           <pattern id="circuit" x="0" y="0" width="220" height="220" patternUnits="userSpaceOnUse">
             {/* horizontal lines */}
-            <line x1="0" y1="55" x2="220" y2="55" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <line x1="0" y1="165" x2="220" y2="165" stroke="#c5d4e8" strokeWidth="1.2"/>
+            <line x1="0" y1="55" x2="220" y2="55" stroke="#c5d4e8" strokeWidth="1.2" />
+            <line x1="0" y1="165" x2="220" y2="165" stroke="#c5d4e8" strokeWidth="1.2" />
             {/* vertical lines */}
-            <line x1="55" y1="0" x2="55" y2="220" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <line x1="165" y1="0" x2="165" y2="220" stroke="#c5d4e8" strokeWidth="1.2"/>
+            <line x1="55" y1="0" x2="55" y2="220" stroke="#c5d4e8" strokeWidth="1.2" />
+            <line x1="165" y1="0" x2="165" y2="220" stroke="#c5d4e8" strokeWidth="1.2" />
             {/* corner pads */}
-            <rect x="40" y="40" width="30" height="30" rx="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="46" cy="46" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="64" cy="46" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="46" cy="64" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="64" cy="64" r="4" fill="#c5d4e8"/>
+            <rect x="40" y="40" width="30" height="30" rx="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="46" cy="46" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="64" cy="46" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="46" cy="64" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="64" cy="64" r="4" fill="#c5d4e8" />
 
-            <rect x="150" y="40" width="30" height="30" rx="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="156" cy="46" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="174" cy="46" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="156" cy="64" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="174" cy="64" r="4" fill="#c5d4e8"/>
+            <rect x="150" y="40" width="30" height="30" rx="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="156" cy="46" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="174" cy="46" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="156" cy="64" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="174" cy="64" r="4" fill="#c5d4e8" />
 
-            <rect x="40" y="150" width="30" height="30" rx="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="46" cy="156" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="64" cy="156" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="46" cy="174" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="64" cy="174" r="4" fill="#c5d4e8"/>
+            <rect x="40" y="150" width="30" height="30" rx="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="46" cy="156" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="64" cy="156" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="46" cy="174" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="64" cy="174" r="4" fill="#c5d4e8" />
 
-            <rect x="150" y="150" width="30" height="30" rx="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="156" cy="156" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="174" cy="156" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="156" cy="174" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2"/>
-            <circle cx="174" cy="174" r="4" fill="#c5d4e8"/>
+            <rect x="150" y="150" width="30" height="30" rx="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="156" cy="156" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="174" cy="156" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="156" cy="174" r="4" fill="none" stroke="#c5d4e8" strokeWidth="1.2" />
+            <circle cx="174" cy="174" r="4" fill="#c5d4e8" />
 
             {/* small dots */}
-            <circle cx="110" cy="55" r="2.5" fill="#c5d4e8"/>
-            <circle cx="55" cy="110" r="2.5" fill="#c5d4e8"/>
-            <circle cx="165" cy="110" r="2.5" fill="#c5d4e8"/>
-            <circle cx="110" cy="165" r="2.5" fill="#c5d4e8"/>
+            <circle cx="110" cy="55" r="2.5" fill="#c5d4e8" />
+            <circle cx="55" cy="110" r="2.5" fill="#c5d4e8" />
+            <circle cx="165" cy="110" r="2.5" fill="#c5d4e8" />
+            <circle cx="110" cy="165" r="2.5" fill="#c5d4e8" />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#circuit)"/>
+        <rect width="100%" height="100%" fill="url(#circuit)" />
         {/* background text labels like the reference */}
         <text x="72%" y="18%" fill="#c5d4e8" fontSize="22" fontFamily="sans-serif" fontWeight="600" letterSpacing="3">ON-PREMISES</text>
         <text x="4%" y="56%" fill="#c5d4e8" fontSize="22" fontFamily="sans-serif" fontWeight="600" letterSpacing="3">CLOUD</text>
@@ -92,7 +98,7 @@ function Login() {
       <div className="yc-card">
         <button className="yc-back-btn" onClick={() => navigate(-1)}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 3L5 8L10 13" stroke="#5b6b8a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M10 3L5 8L10 13" stroke="#5b6b8a" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
 
@@ -113,7 +119,7 @@ function Login() {
           />
           <button className="yc-input-arrow" onClick={handleLogin} disabled={loading}>
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M3 9h12M10 4l5 5-5 5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 9h12M10 4l5 5-5 5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
@@ -144,8 +150,8 @@ function Login() {
 
       <div className="yc-lang">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="#5b6b8a" strokeWidth="1.2"/>
-          <path d="M8 1c-2 2-3 4.5-3 7s1 5 3 7M8 1c2 2 3 4.5 3 7s-1 5-3 7M1 8h14" stroke="#5b6b8a" strokeWidth="1.2"/>
+          <circle cx="8" cy="8" r="7" stroke="#5b6b8a" strokeWidth="1.2" />
+          <path d="M8 1c-2 2-3 4.5-3 7s1 5 3 7M8 1c2 2 3 4.5 3 7s-1 5-3 7M1 8h14" stroke="#5b6b8a" strokeWidth="1.2" />
         </svg>
         <span>English</span>
       </div>

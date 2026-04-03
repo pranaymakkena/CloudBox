@@ -15,15 +15,15 @@ export default function CloudBoxLogo({
   textSize = 20,
   className = "",
 }) {
-  const isDark  = variant === "dark";
+  const isDark = variant === "dark";
   const isWhite = variant === "white";
 
   /* icon colours */
-  const boxFill    = isWhite ? "rgba(255,255,255,0.15)" : isDark ? "#1e3a5f" : "url(#cb-grad)";
-  const cloudFill  = isWhite ? "#ffffff"                : isDark ? "#ffffff" : "url(#cb-cloud-grad)";
-  const arrowColor = isWhite ? "#ffffff"                : isDark ? "#60a5fa" : "#ffffff";
-  const textColor  = isWhite ? "#ffffff"                : isDark ? "#0f172a" : "#1e3a5f";
-  const accentColor= isWhite ? "rgba(255,255,255,0.6)"  : isDark ? "#2563eb" : "#2563eb";
+  const boxFill = isWhite ? "rgba(255,255,255,0.15)" : isDark ? "#1e3a5f" : "url(#cb-grad)";
+  const cloudFill = isWhite ? "#ffffff" : isDark ? "#ffffff" : "url(#cb-cloud-grad)";
+  const arrowColor = isWhite ? "#ffffff" : isDark ? "#60a5fa" : "#ffffff";
+  const textColor = isWhite ? "#ffffff" : isDark ? "#0f172a" : "#1e3a5f";
+  const accentColor = isWhite ? "rgba(255,255,255,0.6)" : isDark ? "#2563eb" : "#2563eb";
 
   return (
     <span
@@ -43,12 +43,12 @@ export default function CloudBoxLogo({
         <defs>
           {/* box background gradient */}
           <linearGradient id="cb-grad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stopColor="#2563eb" />
+            <stop offset="0%" stopColor="#2563eb" />
             <stop offset="100%" stopColor="#1d4ed8" />
           </linearGradient>
           {/* cloud gradient */}
           <linearGradient id="cb-cloud-grad" x1="6" y1="10" x2="34" y2="30" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stopColor="#ffffff" stopOpacity="1" />
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
             <stop offset="100%" stopColor="#bfdbfe" stopOpacity="1" />
           </linearGradient>
           {/* glow filter */}

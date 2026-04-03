@@ -32,7 +32,11 @@ import CollaborationActivity from "./pages/admin/CollaborationActivity";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminSettings from "./pages/admin/AdminSettings";
 
+// 🧪 Testing pages
+import Kanban from "./pages/Kanban";
+
 import StorageUsed from "./pages/StorageUsed";
+import SharedFile from "./pages/SharedFile";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { SearchProvider } from "./context/SearchContext";
 
@@ -42,224 +46,230 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 function App() {
   return (
     <SearchProvider>
-    <BrowserRouter>
-      <Routes>
+      <BrowserRouter>
+        <Routes>
 
-        {/* ================= PUBLIC ================= */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+          {/* ================= PUBLIC ================= */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
-        {/* ================= USER ================= */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <UserDashboard />
-            </ProtectedRoute>
-          }
-        />
+          {/* ================= USER ================= */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <UserDashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/files"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <MyFiles />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/files"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <MyFiles />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/upload"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <Upload />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/upload"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <Upload />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/notifications"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <Notifications />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/folders"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <Folders />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/folders"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <Folders />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/shared-with"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <SharedWithMe />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/shared-with"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <SharedWithMe />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/shared-by"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <SharedByMe />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/shared-by"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <SharedByMe />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/collab"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <Collaboration />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/collab"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <Collaboration />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/activity"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <ActivityHistory />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/activity"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <ActivityHistory />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-  path="/documents"
-  element={
-    <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-      <Documents />
-    </ProtectedRoute>
-  }
-/>
+          <Route
+            path="/documents"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <Documents />
+              </ProtectedRoute>
+            }
+          />
 
-<Route
-  path="/media"
-  element={
-    <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-      <Media />
-    </ProtectedRoute>
-  }
-/>
+          <Route
+            path="/media"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <Media />
+              </ProtectedRoute>
+            }
+          />
 
-<Route
-  path="/shortcuts"
-  element={
-    <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-      <Shortcuts />
-    </ProtectedRoute>
-  }
-/>
+          <Route
+            path="/shortcuts"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <Shortcuts />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* ================= ADMIN ================= */}
+          {/* ================= ADMIN ================= */}
 
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/users"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminUsers />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/logs"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminLogs />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin/logs"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <AdminLogs />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/files"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminFiles />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin/files"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <AdminFiles />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/sharing"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminFileSharingControl />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin/sharing"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <AdminFileSharingControl />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/activity"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <CollaborationActivity />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin/activity"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <CollaborationActivity />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/notifications"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminNotifications />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin/notifications"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <AdminNotifications />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/admin/settings"
-          element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
-              <AdminSettings />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute allowedRoles={["ADMIN"]}>
+                <AdminSettings />
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/storage"
-          element={
-            <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
-              <StorageUsed />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/storage"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <StorageUsed />
+              </ProtectedRoute>
+            }
+          />
 
-        {/* ================= FALLBACK ================= */}
-        <Route path="*" element={<h1>Page Not Found</h1>} />
+          {/* ================= TESTING ================= */}
+          <Route path="/kanban" element={<Kanban />} />
+
+          {/* ================= PUBLIC SHARED FILE ================= */}
+          <Route path="/shared/:token" element={<SharedFile />} />
+
+          {/* ================= FALLBACK ================= */}
+          <Route path="*" element={<h1>Page Not Found</h1>} />
 
 
 
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
     </SearchProvider>
   );
 }

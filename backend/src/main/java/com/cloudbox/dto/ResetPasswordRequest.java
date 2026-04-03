@@ -9,7 +9,8 @@ public class ResetPasswordRequest {
     private String email;
     private String newPassword;
 
-    public ResetPasswordRequest() {}
+    public ResetPasswordRequest() {
+    }
 
     public String getEmail() {
         return email;

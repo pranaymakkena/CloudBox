@@ -5,10 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(
-        name = "folders",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"ownerEmail", "name"})
-)
+@Table(name = "folders", uniqueConstraints = @UniqueConstraint(columnNames = { "ownerEmail", "name" }))
 public class FolderEntity {
 
     @Id

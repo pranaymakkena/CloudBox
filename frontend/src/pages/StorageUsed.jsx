@@ -8,10 +8,10 @@ function getCategory(file) {
   const name = file.fileName?.toLowerCase() || "";
   const type = file.fileType?.toLowerCase() || "";
   if (type.startsWith("image/") || /\.(jpg|jpeg|png|gif|webp|svg)$/.test(name)) return "Images";
-  if (type.startsWith("video/") || /\.(mp4|mkv|avi|mov|webm)$/.test(name))       return "Videos";
-  if (type.startsWith("audio/") || /\.(mp3|wav|ogg|flac)$/.test(name))           return "Audio";
+  if (type.startsWith("video/") || /\.(mp4|mkv|avi|mov|webm)$/.test(name)) return "Videos";
+  if (type.startsWith("audio/") || /\.(mp3|wav|ogg|flac)$/.test(name)) return "Audio";
   if (type.includes("pdf") || type.includes("word") ||
-      /\.(pdf|doc|docx|txt|xls|xlsx|ppt|pptx|csv)$/.test(name))                  return "Documents";
+    /\.(pdf|doc|docx|txt|xls|xlsx|ppt|pptx|csv)$/.test(name)) return "Documents";
   return "Other";
 }
 
@@ -23,11 +23,11 @@ function formatSize(bytes) {
 }
 
 const CAT = {
-  Documents: { color: "#3b82f6", grad: "linear-gradient(90deg,#3b82f6,#6366f1)", icon: "fa-file-lines",  bg: "#eff6ff" },
-  Images:    { color: "#8b5cf6", grad: "linear-gradient(90deg,#8b5cf6,#ec4899)", icon: "fa-image",       bg: "#f5f3ff" },
-  Videos:    { color: "#f59e0b", grad: "linear-gradient(90deg,#f59e0b,#ef4444)", icon: "fa-film",        bg: "#fffbeb" },
-  Audio:     { color: "#10b981", grad: "linear-gradient(90deg,#10b981,#06b6d4)", icon: "fa-music",       bg: "#ecfdf5" },
-  Other:     { color: "#64748b", grad: "linear-gradient(90deg,#64748b,#94a3b8)", icon: "fa-file",        bg: "#f8fafc" },
+  Documents: { color: "#3b82f6", grad: "linear-gradient(90deg,#3b82f6,#6366f1)", icon: "fa-file-lines", bg: "#eff6ff" },
+  Images: { color: "#8b5cf6", grad: "linear-gradient(90deg,#8b5cf6,#ec4899)", icon: "fa-image", bg: "#f5f3ff" },
+  Videos: { color: "#f59e0b", grad: "linear-gradient(90deg,#f59e0b,#ef4444)", icon: "fa-film", bg: "#fffbeb" },
+  Audio: { color: "#10b981", grad: "linear-gradient(90deg,#10b981,#06b6d4)", icon: "fa-music", bg: "#ecfdf5" },
+  Other: { color: "#64748b", grad: "linear-gradient(90deg,#64748b,#94a3b8)", icon: "fa-file", bg: "#f8fafc" },
 };
 
 /* ── animated donut ── */
@@ -35,7 +35,7 @@ function Donut({ pct, usedBytes, limitBytes }) {
   const R = 62, stroke = 14;
   const circ = 2 * Math.PI * R;
   const safe = isNaN(pct) ? 0 : Math.min(Math.max(pct, 0), 100);
-  const arc  = safe > 0 && safe < 3 ? 3 : safe;
+  const arc = safe > 0 && safe < 3 ? 3 : safe;
   const dash = (arc / 100) * circ;
   const pctDisplay = safe < 0.1 ? "< 0.1%" : safe.toFixed(1) + "%";
 
@@ -44,11 +44,11 @@ function Donut({ pct, usedBytes, limitBytes }) {
       <svg width="180" height="180" viewBox="0 0 180 180">
         <defs>
           <linearGradient id="su-dg" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stopColor="#60a5fa" />
+            <stop offset="0%" stopColor="#60a5fa" />
             <stop offset="100%" stopColor="#a78bfa" />
           </linearGradient>
         </defs>
-        <circle cx="90" cy="90" r={R} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={stroke}/>
+        <circle cx="90" cy="90" r={R} fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth={stroke} />
         {arc > 0 && (
           <circle cx="90" cy="90" r={R} fill="none"
             stroke="url(#su-dg)" strokeWidth={stroke}
@@ -61,7 +61,7 @@ function Donut({ pct, usedBytes, limitBytes }) {
       </svg>
       <div className="su-donut-inner">
         <span className="su-donut-val">{pctDisplay}</span>
-        <span className="su-donut-sub">of {formatSize(limitBytes)}<br/>used</span>
+        <span className="su-donut-sub">of {formatSize(limitBytes)}<br />used</span>
       </div>
     </div>
   );
@@ -69,15 +69,15 @@ function Donut({ pct, usedBytes, limitBytes }) {
 
 export default function StorageUsed() {
   const [usedBytes, setUsedBytes] = useState(0);
-  const [limitMb,   setLimitMb]   = useState(15360);
-  const [files,     setFiles]     = useState([]);
-  const [loading,   setLoading]   = useState(true);
+  const [limitMb, setLimitMb] = useState(15360);
+  const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([API.get("/user/storage"), API.get("/files")])
       .then(([s, f]) => {
         setUsedBytes(Number(s.data.usedBytes) || 0);
-        setLimitMb(Number(s.data.limitMb)     || 15360);
+        setLimitMb(Number(s.data.limitMb) || 15360);
         setFiles(Array.isArray(f.data) ? f.data : []);
       })
       .catch(console.error)
@@ -85,24 +85,24 @@ export default function StorageUsed() {
   }, []);
 
   const limitBytes = limitMb * 1024 * 1024;
-  const freeBytes  = Math.max(limitBytes - usedBytes, 0);
-  const usedPct    = limitBytes > 0 ? Math.min((usedBytes / limitBytes) * 100, 100) : 0;
-  const pctLabel   = usedPct < 0.1 ? "< 0.1%" : usedPct.toFixed(2) + "%";
+  const freeBytes = Math.max(limitBytes - usedBytes, 0);
+  const usedPct = limitBytes > 0 ? Math.min((usedBytes / limitBytes) * 100, 100) : 0;
+  const pctLabel = usedPct < 0.1 ? "< 0.1%" : usedPct.toFixed(2) + "%";
 
   const categories = useMemo(() => {
     const map = {};
-    files.forEach(f => { const c = getCategory(f); map[c] = (map[c]||0) + (f.fileSize||0); });
+    files.forEach(f => { const c = getCategory(f); map[c] = (map[c] || 0) + (f.fileSize || 0); });
     return Object.entries(map)
       .map(([name, bytes]) => ({
         name,
         bytes,
         pct: limitBytes > 0 ? Math.min((bytes / limitBytes) * 100, 100) : 0,
       }))
-      .sort((a,b) => b.bytes - a.bytes);
+      .sort((a, b) => b.bytes - a.bytes);
   }, [files, limitBytes]);
 
   const topFiles = useMemo(() =>
-    [...files].sort((a,b)=>(b.fileSize||0)-(a.fileSize||0)).slice(0,8), [files]);
+    [...files].sort((a, b) => (b.fileSize || 0) - (a.fileSize || 0)).slice(0, 8), [files]);
   if (loading) return (
     <Layout type="user">
       <div className="su-spinner-wrap">
@@ -186,24 +186,24 @@ export default function StorageUsed() {
             {categories.length === 0
               ? <p className="su-empty">No files uploaded yet.</p>
               : categories.map(({ name, bytes, pct }) => {
-                  const m = CAT[name] || CAT.Other;
-                  return (
-                    <div className="su-cat-row" key={name}>
-                      <div className="su-cat-icon" style={{ background: m.bg, color: m.color }}>
-                        <i className={`fa-solid ${m.icon}`} />
+                const m = CAT[name] || CAT.Other;
+                return (
+                  <div className="su-cat-row" key={name}>
+                    <div className="su-cat-icon" style={{ background: m.bg, color: m.color }}>
+                      <i className={`fa-solid ${m.icon}`} />
+                    </div>
+                    <div className="su-cat-body">
+                      <div className="su-cat-top">
+                        <span className="su-cat-name">{name}</span>
+                        <span className="su-cat-meta">{formatSize(bytes)}</span>
                       </div>
-                      <div className="su-cat-body">
-                        <div className="su-cat-top">
-                          <span className="su-cat-name">{name}</span>
-                          <span className="su-cat-meta">{formatSize(bytes)}</span>
-                        </div>
-                        <div className="su-bar-track">
-                          <div className="su-bar-fill" style={{ width: `${Math.max(pct, 0.5)}%`, background: m.grad }} />
-                        </div>
+                      <div className="su-bar-track">
+                        <div className="su-bar-fill" style={{ width: `${Math.max(pct, 0.5)}%`, background: m.grad }} />
                       </div>
                     </div>
-                  );
-                })
+                  </div>
+                );
+              })
             }
           </div>
 

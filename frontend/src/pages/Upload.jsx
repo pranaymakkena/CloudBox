@@ -31,65 +31,65 @@ function Upload() {
 
   const handleFileChange = async (e) => {
 
-  const selectedFile = e.target.files[0];
-  if (!selectedFile) return;
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
 
-  setFile(selectedFile);
+    setFile(selectedFile);
 
-  const ext = selectedFile.name.split(".").pop().toLowerCase();
-  const url = URL.createObjectURL(selectedFile);
-  setPreview(url);
+    const ext = selectedFile.name.split(".").pop().toLowerCase();
+    const url = URL.createObjectURL(selectedFile);
+    setPreview(url);
 
-  if (["png","jpg","jpeg","gif","webp"].includes(ext)) {
-    setFileType("image");
-  }
+    if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
+      setFileType("image");
+    }
 
-  else if (ext === "pdf") {
-    setFileType("pdf");
-  }
+    else if (ext === "pdf") {
+      setFileType("pdf");
+    }
 
-  else if (["mp4","webm","ogg"].includes(ext)) {
-    setFileType("video");
-  }
+    else if (["mp4", "webm", "ogg"].includes(ext)) {
+      setFileType("video");
+    }
 
-  else if (["doc","docx"].includes(ext)) {
+    else if (["doc", "docx"].includes(ext)) {
 
-    setFileType("docx");
+      setFileType("docx");
 
-    const arrayBuffer = await selectedFile.arrayBuffer();
+      const arrayBuffer = await selectedFile.arrayBuffer();
 
-    const container = document.getElementById("docx-preview");
+      const container = document.getElementById("docx-preview");
 
-    container.innerHTML = "";
+      container.innerHTML = "";
 
-    renderAsync(arrayBuffer, container);
-  }
+      renderAsync(arrayBuffer, container);
+    }
 
-  else if (["xls","xlsx"].includes(ext)) {
+    else if (["xls", "xlsx"].includes(ext)) {
 
-    setFileType("excel");
+      setFileType("excel");
 
-    const data = await selectedFile.arrayBuffer();
+      const data = await selectedFile.arrayBuffer();
 
-    const workbook = XLSX.read(data);
+      const workbook = XLSX.read(data);
 
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    const html = XLSX.utils.sheet_to_html(sheet);
+      const html = XLSX.utils.sheet_to_html(sheet);
 
-    document.getElementById("excel-preview").innerHTML = html;
-  }
+      document.getElementById("excel-preview").innerHTML = html;
+    }
 
-  else if (["ppt","pptx"].includes(ext)) {
+    else if (["ppt", "pptx"].includes(ext)) {
 
-    setFileType("ppt");
-  }
+      setFileType("ppt");
+    }
 
-  else {
-    setFileType("other");
-  }
+    else {
+      setFileType("other");
+    }
 
-};
+  };
 
   const handleUpload = async () => {
 
@@ -154,10 +154,10 @@ function Upload() {
 
             {preview && (
 
-              <div style={{marginTop:"20px"}}>
+              <div style={{ marginTop: "20px" }}>
 
                 {fileType === "image" && (
-                  <img src={preview} style={{maxWidth:"100%"}} />
+                  <img src={preview} style={{ maxWidth: "100%" }} />
                 )}
 
                 {fileType === "pdf" && (
@@ -166,7 +166,7 @@ function Upload() {
 
                 {fileType === "video" && (
                   <video controls width="100%">
-                    <source src={preview}/>
+                    <source src={preview} />
                   </video>
                 )}
 
@@ -174,11 +174,11 @@ function Upload() {
                   <div
                     id="docx-preview"
                     style={{
-                      background:"#fff",
-                      padding:"20px",
-                      borderRadius:"8px",
-                      maxHeight:"400px",
-                      overflow:"auto"
+                      background: "#fff",
+                      padding: "20px",
+                      borderRadius: "8px",
+                      maxHeight: "400px",
+                      overflow: "auto"
                     }}
                   />
                 )}
@@ -187,10 +187,10 @@ function Upload() {
                   <div
                     id="excel-preview"
                     style={{
-                      background:"#fff",
-                      padding:"20px",
-                      maxHeight:"400px",
-                      overflow:"auto"
+                      background: "#fff",
+                      padding: "20px",
+                      maxHeight: "400px",
+                      overflow: "auto"
                     }}
                   />
                 )}

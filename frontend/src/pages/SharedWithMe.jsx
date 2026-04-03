@@ -5,6 +5,7 @@ import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import { useSearch } from "../context/SearchContext";
+import { getDirectFileUrl, triggerDownload } from "../utils/fileAccess";
 import "../styles/fileGrid.css";
 import "../styles/style.css";
 
@@ -53,14 +54,13 @@ function SharedWithMe() {
     });
   }, [shares, search, category]);
 
-  const downloadFile = async (id, name) => {
+  const downloadFile = async (share) => {
     try {
-      const res = await API.get(`/files/download/${id}`, { responseType: "blob" });
-      const url = URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = name;
-      link.click();
+      const directUrl = getDirectFileUrl(share);
+      if (!directUrl) {
+        throw new Error("Missing file URL");
+      }
+      triggerDownload(directUrl, share.fileName);
     } catch {
       toast.error("Download failed");
     }
@@ -80,9 +80,11 @@ function SharedWithMe() {
       return;
     }
     try {
-      const res = await API.get(`/files/preview/${share.fileId}`, { responseType: "blob" });
-      const blob = new Blob([res.data], { type: res.headers["content-type"] });
-      setViewer({ url: URL.createObjectURL(blob), type: blob.type, name: share.fileName });
+      const directUrl = getDirectFileUrl(share);
+      if (!directUrl) {
+        throw new Error("Missing file URL");
+      }
+      setViewer({ url: directUrl, type: share.fileType || "application/octet-stream", name: share.fileName });
     } catch {
       toast.error("Failed to open file");
     }
@@ -183,7 +185,7 @@ function SharedWithMe() {
                 <button
                   className="btn btn-success"
                   disabled={!share.canDownload}
-                  onClick={() => downloadFile(share.fileId, share.fileName)}
+                  onClick={() => downloadFile(share)}
                 >
                   Download
                 </button>
