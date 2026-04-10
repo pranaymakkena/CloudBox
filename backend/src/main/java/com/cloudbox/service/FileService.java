@@ -27,6 +27,7 @@ public class FileService {
     private final FileShareService fileShareService;
     private final FolderService folderService;
     private final LocalStorageService storageService;
+    private final EmailService emailService;
 
     public FileService(
             FileRepository fileRepository,
@@ -36,7 +37,8 @@ public class FileService {
             SystemEventService systemEventService,
             FileShareService fileShareService,
             FolderService folderService,
-            LocalStorageService storageService) {
+            LocalStorageService storageService,
+            EmailService emailService) {
         this.fileRepository = fileRepository;
         this.userRepository = userRepository;
         this.collaborationCommentRepository = collaborationCommentRepository;
@@ -45,6 +47,7 @@ public class FileService {
         this.fileShareService = fileShareService;
         this.folderService = folderService;
         this.storageService = storageService;
+        this.emailService = emailService;
     }
 
     // ── Upload ──
@@ -89,6 +92,11 @@ public class FileService {
         FileEntity saved = fileRepository.save(entity);
         systemEventService.log(userEmail, "UPLOAD_FILE", "Uploaded " + saved.getFileName());
         systemEventService.notifyAdmins("File Uploaded", userEmail + " uploaded " + saved.getFileName());
+
+        // Send upload confirmation email
+        String sizeLabel = formatSize(file.getSize());
+        emailService.sendFileUploaded(userEmail, user.getFirstName(), saved.getFileName(), sizeLabel, folder);
+
         return saved;
     }
 
@@ -263,6 +271,13 @@ public class FileService {
         file.setFileName(newName.trim());
         fileRepository.save(file);
         systemEventService.log(userEmail, "RENAME_FILE", "Renamed to " + newName);
+    }
+
+    private String formatSize(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
+        if (bytes < 1024 * 1024 * 1024) return String.format("%.1f MB", bytes / (1024.0 * 1024));
+        return String.format("%.1f GB", bytes / (1024.0 * 1024 * 1024));
     }
 
     // ── Helpers ──
