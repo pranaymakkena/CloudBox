@@ -46,7 +46,7 @@ function Header({ onMenuToggle, sidebarOpen }) {
 
   return (
     <div className="header">
-      {/* Hamburger */}
+      {/* Hamburger — mobile only, sidebar toggle handles desktop */}
       <button
         className={`hamburger-btn${sidebarOpen ? " is-open" : ""}`}
         onClick={onMenuToggle}

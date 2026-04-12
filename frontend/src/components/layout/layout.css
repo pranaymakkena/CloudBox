@@ -34,10 +34,11 @@
 .sidebar-logo {
   display: flex;
   align-items: center;
-  padding: 22px 20px 18px;
+  padding: 18px 16px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   margin-bottom: 8px;
   flex-shrink: 0;
+  gap: 8px;
 }
 
 /* Legacy logo class kept for safety */
@@ -79,8 +80,8 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 11px;
-  font-size: 15px;
+  gap: 12px;
+  font-size: 13.5px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.62);
   transition: background 0.15s, color 0.15s, padding-left 0.15s;
@@ -94,20 +95,20 @@
 }
 
 .sidebar li.active {
-  background: linear-gradient(90deg, rgba(66, 133, 244, 0.22), rgba(66, 133, 244, 0.08));
+  background: #1e3a8a;
   color: #fff;
   font-weight: 600;
+  border-radius: 14px;
+  border-left: 4px solid #4285f4;
 }
 
 .sidebar li.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 20%;
-  height: 60%;
-  width: 3px;
-  background: #4285f4;
-  border-radius: 0 3px 3px 0;
+  display: none;
+}
+
+.sidebar li.active .sidebar-item-icon {
+  opacity: 1;
+  color: #fff;
 }
 
 .sidebar li .icon {
@@ -118,6 +119,29 @@
   justify-content: center;
   flex-shrink: 0;
   opacity: 0.8;
+}
+
+.sidebar-item-icon {
+  font-size: 16px;
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.sidebar-item-label {
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar li.active .sidebar-item-icon,
+.sidebar li:hover .sidebar-item-icon {
+  opacity: 1;
 }
 
 .sidebar li.active .icon,
@@ -140,7 +164,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 11px;
+  gap: 12px;
   margin: 8px 10px 16px;
   padding: 10px 14px;
   border-radius: 10px;
@@ -746,10 +770,109 @@
 
 /* Admin sidebar active item uses purple accent */
 .sidebar.sidebar-admin li.active {
-  background: rgba(139, 92, 246, 0.22);
-  border-left-color: #8b5cf6;
+  background: #2e1065;
+  border-left: 4px solid #8b5cf6;
+}
+
+.sidebar.sidebar-admin li.active::before {
+  display: none;
 }
 
 .sidebar.sidebar-admin li:hover {
   background: rgba(139, 92, 246, 0.12);
+}
+
+/* =============================================
+   SIDEBAR COLLAPSE (desktop)
+   ============================================= */
+.sidebar-collapsed {
+  width: 68px !important;
+  transition: width 0.25s ease;
+}
+
+.sidebar {
+  transition: width 0.25s ease;
+}
+
+.sidebar-collapsed .sidebar-logo {
+  justify-content: center !important;
+  padding: 18px 0 !important;
+}
+
+.sidebar-collapsed ul {
+  padding: 0 8px !important;
+}
+
+.sidebar-collapsed li {
+  justify-content: center !important;
+  padding: 14px 0 !important;
+  gap: 0 !important;
+  border-radius: 12px !important;
+}
+
+.sidebar-collapsed li.active {
+  background: #1e3a8a !important;
+  border-left: 4px solid #4285f4 !important;
+}
+
+.sidebar-collapsed .sidebar-item-label {
+  display: none;
+}
+
+.sidebar-collapsed .sidebar-logout {
+  justify-content: center !important;
+  padding: 11px 0 !important;
+  gap: 0 !important;
+  margin: 4px 8px 16px !important;
+}
+
+.sidebar-collapsed .sidebar-logout .sidebar-item-label {
+  display: none;
+}
+
+/* Desktop toggle button inside sidebar logo row */
+.sidebar-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+/* When collapsed, logo is hidden — center the toggle */
+.sidebar-collapsed .sidebar-toggle-btn {
+  margin-left: 0;
+}
+
+.sidebar-collapsed .sidebar-logo {
+  justify-content: center;
+  padding: 18px 0 !important;
+}
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+  .sidebar-toggle-btn {
+    display: none;
+  }
+}
+
+/* Hide on mobile — hamburger in header handles mobile */
+@media (max-width: 768px) {
+  .sidebar-toggle-item {
+    display: none !important;
+  }
 }
