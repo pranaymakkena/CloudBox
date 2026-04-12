@@ -31,6 +31,7 @@ function Sidebar({ type, collapsed, onToggle }) {
   const adminMenu = [
     { name: "Dashboard",              path: "/admin",               icon: <FaHome /> },
     { name: "User Management",        path: "/admin/users",         icon: <FaUsers /> },
+    { name: "Payment Requests",       path: "/admin/payments",      icon: <FaCreditCard /> },
     { name: "Authentication Logs",    path: "/admin/logs",          icon: <FaHistory /> },
     { name: "File Management",        path: "/admin/files",         icon: <FaFolder /> },
     { name: "File Sharing Control",   path: "/admin/sharing",       icon: <FaShareAlt /> },

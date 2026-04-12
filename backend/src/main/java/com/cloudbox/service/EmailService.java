@@ -82,8 +82,12 @@ public class EmailService {
             "<div style='font-size:15px;font-weight:700;color:#1a2236;'>" + fileName + "</div>" +
             (fileSize != null ? "<div style='font-size:12px;color:#9baabf;margin-top:2px;'>" + fileSize + "</div>" : "") +
             "</div>" +
-            (permission != null ? "<span style='background:" + permBg + ";color:" + permColor + ";font-size:11px;" +
-            "font-weight:700;padding:4px 12px;border-radius:20px;'>" + permission + "</span>" : "") +
+                (permission != null ?
+                        "<span style='display:inline-block;background:" + permBg + ";color:" + permColor + ";" +
+                                "font-size:11px;font-weight:700;" +
+                                "padding:0 12px;height:22px;line-height:22px;" +
+                                "border-radius:20px;'>" + permission + "</span>"
+                        : "")+
             "</div>";
     }
 
@@ -226,7 +230,30 @@ public class EmailService {
     }
 
     // ══════════════════════════════════════
-    // 6. PASSWORD RESET
+    // 6. SHARE PUBLIC LINK
+    // ══════════════════════════════════════
+    public void sendPublicLink(String to, String senderEmail, String fileName, String linkUrl, String permission) {
+        String permLabel = "EDIT".equals(permission) ? "View &amp; Edit" :
+                           "DOWNLOAD".equals(permission) ? "View &amp; Download" : "View only";
+        String body =
+            h("Someone shared a file link with you") +
+            p("<strong>" + senderEmail + "</strong> shared a file with you via CloudBox.") +
+            fileBox(fileName, null, permission) +
+            "<div style='background:#eff6ff;border-left:4px solid #4285f4;border-radius:0 8px 8px 0;" +
+            "padding:14px 18px;margin:16px 0;'>" +
+            "<div style='font-size:13px;font-weight:700;color:#1a2236;margin-bottom:4px;'>Access level</div>" +
+            "<div style='font-size:14px;color:#4285f4;font-weight:600;'>" + permLabel + "</div>" +
+            "</div>" +
+            divider() +
+            btn(linkUrl, "Open File →", "#4285f4") +
+            p("<small style='color:#9baabf;'>No account required — just click the link above to access the file.</small>");
+
+        send(to, senderEmail + " shared \"" + fileName + "\" with you",
+             wrap("#4285f4", "🔗", "File Link Shared", body));
+    }
+
+    // ══════════════════════════════════════
+    // 7. PASSWORD RESET
     // ══════════════════════════════════════
     public void sendPasswordReset(String to, String name) {
         String body =
