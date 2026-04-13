@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api/axiosConfig";
 
 import Layout from "../components/layout/Layout";
+import ChatWidget from "../components/ChatWidget";
 import "../components/common/card.css";
 import "../components/layout/layout.css";
 import "../styles/style.css";
@@ -74,6 +75,7 @@ function AdminDashboard() {
   );
 
   return (
+    <>
     <Layout type="admin">
 
       <div className="content">
@@ -188,6 +190,8 @@ function AdminDashboard() {
       </div>
 
     </Layout>
+    <ChatWidget mode="dashboard" />
+    </>
   );
 }
 

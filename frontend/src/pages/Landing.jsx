@@ -4,6 +4,7 @@ import {
   HowItWorks, WhyChoose, Testimonials,
   Pricing, CTA, Footer,
 } from "../components/LandingComponents";
+import ChatWidget from "../components/ChatWidget";
 
 export default function Landing() {
   return (
@@ -18,6 +19,7 @@ export default function Landing() {
       <Pricing />
       <CTA />
       <Footer />
+      <ChatWidget mode="landing" />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import API from "../api/axiosConfig";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
+import ChatWidget from "../components/ChatWidget";
 import "../styles/style.css";
 import "../styles/UserDashboard.css";
 
@@ -78,6 +79,7 @@ export default function UserDashboard() {
   ];
 
   return (
+    <>
     <Layout type="user">
       <div className="ud-page">
 
@@ -199,5 +201,7 @@ export default function UserDashboard() {
         </div>
       </div>
     </Layout>
+    <ChatWidget mode="dashboard" />
+    </>
   );
 }
