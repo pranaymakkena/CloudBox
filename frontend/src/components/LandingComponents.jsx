@@ -7,7 +7,7 @@ export function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link to="/" style={{ textDecoration: "none" }}>
-          <CloudBoxLogo size={34} textSize={20} variant="color" />
+          <CloudBoxLogo size={34} textSize={20} variant="white" />
         </Link>
         <ul className="nav-links">
           <li><a href="#features">Features</a></li>

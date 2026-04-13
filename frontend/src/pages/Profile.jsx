@@ -12,6 +12,8 @@ function Profile() {
   const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [edit, setEdit] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const name = localStorage.getItem("name") || "User";
   const role = localStorage.getItem("role") || "USER";
@@ -41,6 +43,19 @@ function Profile() {
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
+  };
+
+  const deleteAccount = async () => {
+    setDeleting(true);
+    try {
+      await API.delete("/user/account");
+      localStorage.clear();
+      navigate("/login");
+    } catch (e) {
+      toast.error(e.response?.data || "Failed to delete account");
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
   };
 
   const fields = [
@@ -111,11 +126,50 @@ function Profile() {
                 </div>
               ))}
             </div>
+
+            {/* ── Danger zone ── */}
+            <div style={{
+              marginTop: 32, padding: "20px 24px",
+              border: "1.5px solid #fee2e2", borderRadius: 12,
+              background: "#fff5f5",
+            }}>
+              <div style={{ fontWeight: 700, color: "#dc2626", marginBottom: 6, fontSize: 14 }}>
+                <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 7 }}></i>
+                Danger Zone
+              </div>
+              <p style={{ fontSize: 13, color: "#6b7280", marginBottom: 14 }}>
+                Permanently delete your account and all your files. This action cannot be undone.
+              </p>
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={() => setConfirmDelete(true)}
+              >
+                <i className="fa-solid fa-trash"></i> Delete My Account
+              </button>
+            </div>
           </div>
 
         </div>
       </div>
       <Toast messages={messages} removeToast={removeToast} />
+
+      {confirmDelete && (
+        <div className="viewer-modal" onClick={() => setConfirmDelete(false)}>
+          <div className="confirm-dialog" onClick={e => e.stopPropagation()}>
+            <i className="fa-solid fa-triangle-exclamation confirm-icon" style={{ color: "#dc2626" }}></i>
+            <h3>Delete Account?</h3>
+            <p>All your files, shares, and data will be <strong>permanently deleted</strong>. This cannot be undone.</p>
+            <div className="confirm-actions">
+              <button className="btn btn-danger" onClick={deleteAccount} disabled={deleting}>
+                {deleting ? <><i className="fa-solid fa-spinner fa-spin"></i> Deleting…</> : "Yes, Delete Everything"}
+              </button>
+              <button className="btn btn-secondary" onClick={() => setConfirmDelete(false)} disabled={deleting}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

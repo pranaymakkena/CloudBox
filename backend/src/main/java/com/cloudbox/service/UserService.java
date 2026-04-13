@@ -132,6 +132,35 @@ public class UserService {
         return mapToDTO(user);
     }
 
+    @Transactional
+    public void deleteOwnAccount(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Delete all user files from DB (storage cleanup is best-effort)
+        var files = fileService.getUserFiles(email);
+        for (var file : files) {
+            try { fileService.deleteFile(file.getId(), email); } catch (Exception ignored) {}
+        }
+        // Delete trashed files too
+        var trashed = fileService.getTrash(email);
+        for (var file : trashed) {
+            try { fileService.deleteFile(file.getId(), email); } catch (Exception ignored) {}
+        }
+
+        // Delete notifications
+        var notifications = userNotificationRepository.findTop20ByUserEmailOrderByCreatedAtDesc(email);
+        userNotificationRepository.deleteAll(notifications);
+
+        // Delete activity logs
+        var logs = systemLogRepository.findByUserEmailOrderByCreatedAtDesc(email);
+        systemLogRepository.deleteAll(logs);
+
+        // Delete the user
+        userRepository.delete(user);
+        systemEventService.log(email, "DELETE_ACCOUNT", "User deleted their own account");
+    }
+
     private boolean isCollaborationAction(String action) {
         if (action == null) {
             return false;

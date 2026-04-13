@@ -72,4 +72,10 @@ public class UserController {
     public UserProfileDTO cancelPlan(Principal principal) {
         return userService.cancelPlan(principal.getName());
     }
+
+    @DeleteMapping("/account")
+    public org.springframework.http.ResponseEntity<String> deleteAccount(Principal principal) {
+        userService.deleteOwnAccount(principal.getName());
+        return org.springframework.http.ResponseEntity.ok("Account deleted");
+    }
 }
