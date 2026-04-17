@@ -14,14 +14,14 @@ import "../components/common/card.css";
 const CATEGORIES = ["All", "Starred", "Documents", "Images", "Videos", "Audio", "Other"];
 
 const ICON_MAP = {
-  Images:    { icon: "fa-image",       bg: "#e0f2fe", color: "#0284c7" },
-  Videos:    { icon: "fa-film",        bg: "#ede9fe", color: "#7c3aed" },
-  Audio:     { icon: "fa-music",       bg: "#fce7f3", color: "#be185d" },
-  pdf:       { icon: "fa-file-pdf",    bg: "#fee2e2", color: "#dc2626" },
-  word:      { icon: "fa-file-word",   bg: "#dbeafe", color: "#2563eb" },
-  excel:     { icon: "fa-file-excel",  bg: "#dcfce7", color: "#16a34a" },
-  Documents: { icon: "fa-file-lines",  bg: "#f0f4fa", color: "#5b6b8a" },
-  Other:     { icon: "fa-file",        bg: "#f0f4fa", color: "#9baabf" },
+  Images: { icon: "fa-image", bg: "#e0f2fe", color: "#0284c7" },
+  Videos: { icon: "fa-film", bg: "#ede9fe", color: "#7c3aed" },
+  Audio: { icon: "fa-music", bg: "#fce7f3", color: "#be185d" },
+  pdf: { icon: "fa-file-pdf", bg: "#fee2e2", color: "#dc2626" },
+  word: { icon: "fa-file-word", bg: "#dbeafe", color: "#2563eb" },
+  excel: { icon: "fa-file-excel", bg: "#dcfce7", color: "#16a34a" },
+  Documents: { icon: "fa-file-lines", bg: "#f0f4fa", color: "#5b6b8a" },
+  Other: { icon: "fa-file", bg: "#f0f4fa", color: "#9baabf" },
 };
 
 function getCategory(file) {
@@ -45,7 +45,7 @@ function getIconStyle(file) {
 
 function formatSize(bytes) {
   if (!bytes) return "0 B";
-  const k = 1024, sizes = ["B","KB","MB","GB"];
+  const k = 1024, sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return (bytes / Math.pow(k, i)).toFixed(1) + " " + sizes[i];
 }
@@ -54,30 +54,30 @@ export default function MyFiles() {
   const { messages, removeToast, toast } = useToast();
   const { setQuery } = useSearch();
 
-  const [files,        setFiles]        = useState([]);
-  const [folders,      setFolders]      = useState(["root"]);
-  const [localSearch,  setLocalSearch]  = useState("");
-  const [category,     setCategory]     = useState("All");
-  const [sortBy,       setSortBy]       = useState("date");
-  const [sortDir,      setSortDir]      = useState("desc");
-  const [expandMove,   setExpandMove]   = useState(null); // fileId
-  const [moveTarget,   setMoveTarget]   = useState({});
-  const [renameId,     setRenameId]     = useState(null);
-  const [renameName,   setRenameName]   = useState("");
+  const [files, setFiles] = useState([]);
+  const [folders, setFolders] = useState(["root"]);
+  const [localSearch, setLocalSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [sortBy, setSortBy] = useState("date");
+  const [sortDir, setSortDir] = useState("desc");
+  const [expandMove, setExpandMove] = useState(null); // fileId
+  const [moveTarget, setMoveTarget] = useState({});
+  const [renameId, setRenameId] = useState(null);
+  const [renameName, setRenameName] = useState("");
   const [confirmTrash, setConfirmTrash] = useState(null);
-  const [viewer,       setViewer]       = useState(null);
+  const [viewer, setViewer] = useState(null);
   const [docxEditMode, setDocxEditMode] = useState(false);
   const [docxEditText, setDocxEditText] = useState("");
-  const [docxSaving,   setDocxSaving]   = useState(false);
-  const [linkModal,    setLinkModal]    = useState(null);
-  const [linkPerm,     setLinkPerm]     = useState("VIEW");
-  const [linkExpiry,   setLinkExpiry]   = useState("");
-  const [linkEmailTo,  setLinkEmailTo]  = useState("");
+  const [docxSaving, setDocxSaving] = useState(false);
+  const [linkModal, setLinkModal] = useState(null);
+  const [linkPerm, setLinkPerm] = useState("VIEW");
+  const [linkExpiry, setLinkExpiry] = useState("");
+  const [linkEmailTo, setLinkEmailTo] = useState("");
   const [linkEmailPerm, setLinkEmailPerm] = useState("VIEW");
   const [linkEmailSending, setLinkEmailSending] = useState(false);
-  const [shareModal,   setShareModal]   = useState(null);
-  const [shareEmails,  setShareEmails]  = useState("");
-  const [sharePerm,    setSharePerm]    = useState("");
+  const [shareModal, setShareModal] = useState(null);
+  const [shareEmails, setShareEmails] = useState("");
+  const [sharePerm, setSharePerm] = useState("");
   const docxRef = useRef(null);
 
   useEffect(() => { setQuery(""); fetchFiles(); fetchFolders(); }, []);
@@ -88,7 +88,7 @@ export default function MyFiles() {
   };
   const fetchFolders = async () => {
     try { const r = await API.get("/files/folders"); setFolders(r.data); }
-    catch {}
+    catch { }
   };
 
   const filtered = useMemo(() => {
@@ -102,8 +102,8 @@ export default function MyFiles() {
     r = [...r].sort((a, b) => {
       let c = 0;
       if (sortBy === "name") c = a.fileName.localeCompare(b.fileName);
-      else if (sortBy === "size") c = (a.fileSize||0) - (b.fileSize||0);
-      else c = new Date(a.uploadedAt||0) - new Date(b.uploadedAt||0);
+      else if (sortBy === "size") c = (a.fileSize || 0) - (b.fileSize || 0);
+      else c = new Date(a.uploadedAt || 0) - new Date(b.uploadedAt || 0);
       return sortDir === "asc" ? c : -c;
     });
     return r;
@@ -113,7 +113,7 @@ export default function MyFiles() {
   const toggleStar = async (file) => {
     try {
       await API.put(`/files/${file.id}/star`);
-      setFiles(p => p.map(f => f.id === file.id ? {...f, starred: !f.starred} : f));
+      setFiles(p => p.map(f => f.id === file.id ? { ...f, starred: !f.starred } : f));
     } catch { toast.error("Failed"); }
   };
 
@@ -140,7 +140,7 @@ export default function MyFiles() {
     if (!renameName.trim()) return;
     try {
       await API.put(`/files/${id}/rename`, { newName: renameName.trim() });
-      setFiles(p => p.map(f => f.id === id ? {...f, fileName: renameName.trim()} : f));
+      setFiles(p => p.map(f => f.id === id ? { ...f, fileName: renameName.trim() } : f));
       toast.success("Renamed");
     } catch (e) { toast.error(e.response?.data || "Failed"); }
     setRenameId(null);
@@ -158,78 +158,78 @@ export default function MyFiles() {
     } catch (e) { toast.error(e.response?.data || "Failed"); }
   };
 
-const downloadFile = async (file) => {
-  try {
-    const res = await API.get(`/files/download/${file.id}`, {
-      responseType: "blob"
-    });
+  const downloadFile = async (file) => {
+    try {
+      const res = await API.get(`/files/download/${file.id}`, {
+        responseType: "blob"
+      });
 
-    const blob = new Blob([res.data], {
-      type: res.headers["content-type"]
-    });
+      const blob = new Blob([res.data], {
+        type: res.headers["content-type"]
+      });
 
-    const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(blob);
 
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = file.fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = file.fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
-    URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url);
 
-  } catch (err) {
-    toast.error("Download failed");
-  }
-};
+    } catch (err) {
+      toast.error("Download failed");
+    }
+  };
 
   const viewFile = async (file) => {
-  const isDocx = /\.(doc|docx)$/i.test(file.fileName);
+    const isDocx = /\.(doc|docx)$/i.test(file.fileName);
 
-  if (isDocx) {
+    if (isDocx) {
+      try {
+        const r = await API.get(`/files/preview/${file.id}`, {
+          responseType: "arraybuffer"
+        });
+
+        setDocxEditMode(false);
+        setDocxEditText("");
+
+        setViewer({
+          type: "docx",
+          name: file.fileName,
+          fileId: file.id,
+          arrayBuffer: r.data
+        });
+      } catch {
+        toast.error("Failed to open document");
+      }
+      return;
+    }
+
     try {
-      const r = await API.get(`/files/preview/${file.id}`, {
-        responseType: "arraybuffer"
+      const res = await API.get(`/files/preview/${file.id}`, {
+        responseType: "blob"
       });
 
-      setDocxEditMode(false);
-      setDocxEditText("");
+      const blob = new Blob([res.data], {
+        type: res.headers["content-type"]
+      });
+
+      const url = URL.createObjectURL(blob);
 
       setViewer({
-        type: "docx",
+        url,
+        type: res.headers["content-type"], // ✅ REAL TYPE
         name: file.fileName,
-        fileId: file.id,
-        arrayBuffer: r.data
+        blobUrl: true
       });
-    } catch {
-      toast.error("Failed to open document");
+
+    } catch (err) {
+      toast.error("Failed to open file");
     }
-    return;
-  }
-
-  try {
-    const res = await API.get(`/files/preview/${file.id}`, {
-      responseType: "blob"
-    });
-
-    const blob = new Blob([res.data], {
-      type: res.headers["content-type"]
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    setViewer({
-      url,
-      type: res.headers["content-type"], // ✅ REAL TYPE
-      name: file.fileName,
-      blobUrl: true
-    });
-
-  } catch (err) {
-    toast.error("Failed to open file");
-  }
-};
+  };
   const startDocxEdit = async () => {
     if (!viewer?.fileId) return;
     if (docxEditText) { setDocxEditMode(true); return; }
@@ -247,7 +247,7 @@ const downloadFile = async (file) => {
       toast.success("Saved");
       const r = await API.get(`/files/preview/${viewer.fileId}`, { responseType: "arraybuffer" });
       setDocxEditText(""); setDocxEditMode(false);
-      setViewer(p => ({...p, arrayBuffer: r.data}));
+      setViewer(p => ({ ...p, arrayBuffer: r.data }));
     } catch (e) { toast.error(e.response?.data || "Save failed"); }
     finally { setDocxSaving(false); }
   };
@@ -264,9 +264,9 @@ const downloadFile = async (file) => {
     if (!viewer?.fileId || viewer.type !== "docx" || docxEditMode) return;
     try {
       const r = await API.get(`/files/preview/${viewer.fileId}`, { responseType: "arraybuffer" });
-      setViewer(p => ({...p, arrayBuffer: r.data}));
+      setViewer(p => ({ ...p, arrayBuffer: r.data }));
       toast.info("Document updated by another user");
-    } catch {}
+    } catch { }
   }, [viewer, docxEditMode]);
 
   useFileSync({
@@ -286,17 +286,17 @@ const downloadFile = async (file) => {
       if (linkExpiry) body.expiryHours = parseInt(linkExpiry);
       await API.post("/public/link", body);
       const r = await API.get(`/public/links/${linkModal.fileId}`);
-      setLinkModal(p => ({...p, links: r.data})); toast.success("Link created");
+      setLinkModal(p => ({ ...p, links: r.data })); toast.success("Link created");
     } catch (e) { toast.error(e.response?.data || "Failed"); }
   };
   const revokeLink = async (token) => {
-    try { await API.delete(`/public/link/${token}`); setLinkModal(p => ({...p, links: p.links.filter(l => l.token !== token)})); toast.success("Revoked"); }
+    try { await API.delete(`/public/link/${token}`); setLinkModal(p => ({ ...p, links: p.links.filter(l => l.token !== token) })); toast.success("Revoked"); }
     catch { toast.error("Failed"); }
   };
   const updateLinkPermission = async (token, newPerm) => {
     try {
       await API.put(`/public/link/${token}/permission`, { permission: newPerm });
-      setLinkModal(p => ({...p, links: p.links.map(l => l.token === token ? {...l, permission: newPerm} : l)}));
+      setLinkModal(p => ({ ...p, links: p.links.map(l => l.token === token ? { ...l, permission: newPerm } : l) }));
       toast.success("Permission updated");
     } catch (e) { toast.error(e.response?.data || "Failed"); }
   };
@@ -316,7 +316,7 @@ const downloadFile = async (file) => {
       setLinkEmailTo("");
       // refresh link list
       const r = await API.get(`/public/links/${linkModal.fileId}`);
-      setLinkModal(p => ({...p, links: r.data}));
+      setLinkModal(p => ({ ...p, links: r.data }));
     } catch (e) { toast.error(e.response?.data || "Failed to send email"); }
     finally { setLinkEmailSending(false); }
   };
@@ -423,7 +423,7 @@ const downloadFile = async (file) => {
                 {expandMove === file.id && (
                   <div className="mf-move-row">
                     <select value={moveTarget[file.id] || file.folder || "root"}
-                      onChange={e => setMoveTarget(p => ({...p, [file.id]: e.target.value}))}>
+                      onChange={e => setMoveTarget(p => ({ ...p, [file.id]: e.target.value }))}>
                       {folders.map(f => <option key={f} value={f}>Move to {f}</option>)}
                     </select>
                     <button className="mf-btn mf-btn-view" onClick={() => moveFile(file.id)}>Move</button>
@@ -440,11 +440,11 @@ const downloadFile = async (file) => {
           <div className="viewer-modal" onClick={() => setShareModal(null)}>
             <div className="link-modal" onClick={e => e.stopPropagation()}>
               <div className="viewer-header">
-                <span><i className="fa-solid fa-share-alt" style={{marginRight:8}}></i>Share — {shareModal.fileName}</span>
+                <span><i className="fa-solid fa-share-alt" style={{ marginRight: 8 }}></i>Share — {shareModal.fileName}</span>
                 <button className="close-btn" onClick={() => setShareModal(null)}>✕</button>
               </div>
               <div className="link-create-row">
-                <input className="inline-input" style={{flex:1}} placeholder="Recipient emails (comma separated)"
+                <input className="inline-input" style={{ flex: 1 }} placeholder="Recipient emails (comma separated)"
                   value={shareEmails} onChange={e => setShareEmails(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && shareFile(shareModal.id)} />
                 <select className="inline-select" value={sharePerm} onChange={e => setSharePerm(e.target.value)}>
@@ -508,21 +508,21 @@ const downloadFile = async (file) => {
               {viewer.type?.startsWith("image/") && <img src={viewer.url} alt="preview" className="viewer-media" />}
               {viewer.type?.includes("pdf") && <iframe src={viewer.url} className="viewer-frame" title={viewer.name} />}
               {viewer.type?.startsWith("video/") && <video controls className="viewer-media"><source src={viewer.url} type={viewer.type} /></video>}
-              {viewer.type?.startsWith("audio/") && <audio controls style={{width:"100%",marginTop:20}}><source src={viewer.url} type={viewer.type} /></audio>}
+              {viewer.type?.startsWith("audio/") && <audio controls style={{ width: "100%", marginTop: 20 }}><source src={viewer.url} type={viewer.type} /></audio>}
               {viewer.type?.startsWith("text/") && (
-                <iframe src={viewer.url} className="viewer-frame" title={viewer.name} style={{background:"#fff"}} />
+                <iframe src={viewer.url} className="viewer-frame" title={viewer.name} style={{ background: "#fff" }} />
               )}
               {viewer.url && !viewer.type?.startsWith("image/") && !viewer.type?.includes("pdf") &&
-               !viewer.type?.startsWith("video/") && !viewer.type?.startsWith("audio/") &&
-               !viewer.type?.startsWith("text/") && (
-                <div style={{textAlign:"center",padding:"40px 20px",color:"#9baabf"}}>
-                  <i className="fa-solid fa-file" style={{fontSize:48,marginBottom:16,display:"block"}}></i>
-                  <p style={{marginBottom:16}}>Preview not available for this file type.</p>
-                  <a href={viewer.url} download={viewer.name} className="btn btn-primary btn-sm">
-                    <i className="fa-solid fa-download"></i> Download to view
-                  </a>
-                </div>
-              )}
+                !viewer.type?.startsWith("video/") && !viewer.type?.startsWith("audio/") &&
+                !viewer.type?.startsWith("text/") && (
+                  <div style={{ textAlign: "center", padding: "40px 20px", color: "#9baabf" }}>
+                    <i className="fa-solid fa-file" style={{ fontSize: 48, marginBottom: 16, display: "block" }}></i>
+                    <p style={{ marginBottom: 16 }}>Preview not available for this file type.</p>
+                    <a href={viewer.url} download={viewer.name} className="btn btn-primary btn-sm">
+                      <i className="fa-solid fa-download"></i> Download to view
+                    </a>
+                  </div>
+                )}
             </div>
           </div>
         )}
@@ -532,7 +532,7 @@ const downloadFile = async (file) => {
           <div className="viewer-modal" onClick={() => setLinkModal(null)}>
             <div className="link-modal" onClick={e => e.stopPropagation()}>
               <div className="viewer-header">
-                <span><i className="fa-solid fa-link" style={{marginRight:8}}></i>Links — {linkModal.fileName}</span>
+                <span><i className="fa-solid fa-link" style={{ marginRight: 8 }}></i>Links — {linkModal.fileName}</span>
                 <button className="close-btn" onClick={() => setLinkModal(null)}>✕</button>
               </div>
               <div className="link-create-row">
@@ -553,34 +553,34 @@ const downloadFile = async (file) => {
               {linkModal.links.length === 0
                 ? <p className="empty-msg">No active links.</p>
                 : <div className="link-list">
-                    {linkModal.links.map(link => (
-                      <div key={link.token} className="link-item">
-                        <div className="link-item-info">
-                          <select
-                            className="inline-select"
-                            style={{fontSize:11,padding:"2px 6px"}}
-                            value={link.permission}
-                            onChange={e => updateLinkPermission(link.token, e.target.value)}
-                          >
-                            <option value="VIEW">VIEW</option>
-                            <option value="DOWNLOAD">DOWNLOAD</option>
-                            {linkModal.isDocx && <option value="EDIT">EDIT</option>}
-                          </select>
-                          <span className="link-url">{`${window.location.origin}/shared/${link.token}`}</span>
-                          {link.expiresAt && <span className="link-expiry">Expires {new Date(link.expiresAt).toLocaleDateString()}</span>}
-                        </div>
-                        <div style={{display:"flex",gap:6}}>
-                          <button className="btn btn-info btn-sm" onClick={() => copyLink(link.token)}><i className="fa-solid fa-copy"></i></button>
-                          <button className="btn btn-danger btn-sm" onClick={() => revokeLink(link.token)}>Revoke</button>
-                        </div>
+                  {linkModal.links.map(link => (
+                    <div key={link.token} className="link-item">
+                      <div className="link-item-info">
+                        <select
+                          className="inline-select"
+                          style={{ fontSize: 11, padding: "2px 6px" }}
+                          value={link.permission}
+                          onChange={e => updateLinkPermission(link.token, e.target.value)}
+                        >
+                          <option value="VIEW">VIEW</option>
+                          <option value="DOWNLOAD">DOWNLOAD</option>
+                          {linkModal.isDocx && <option value="EDIT">EDIT</option>}
+                        </select>
+                        <span className="link-url">{`${window.location.origin}/shared/${link.token}`}</span>
+                        {link.expiresAt && <span className="link-expiry">Expires {new Date(link.expiresAt).toLocaleDateString()}</span>}
                       </div>
-                    ))}
-                  </div>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        <button className="btn btn-info btn-sm" onClick={() => copyLink(link.token)}><i className="fa-solid fa-copy"></i></button>
+                        <button className="btn btn-danger btn-sm" onClick={() => revokeLink(link.token)}>Revoke</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               }
               <div className="link-email-row">
-                <div className="link-email-label"><i className="fa-solid fa-envelope" style={{marginRight:6}}></i>Share via email</div>
-                <div className="link-create-row" style={{marginTop:6}}>
-                  <input className="inline-input" style={{flex:1}} type="email" placeholder="Recipient email"
+                <div className="link-email-label"><i className="fa-solid fa-envelope" style={{ marginRight: 6 }}></i>Share via email</div>
+                <div className="link-create-row" style={{ marginTop: 6 }}>
+                  <input className="inline-input" style={{ flex: 1 }} type="email" placeholder="Recipient email"
                     value={linkEmailTo} onChange={e => setLinkEmailTo(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && sendLinkByEmail()} />
                   <select className="inline-select" value={linkEmailPerm} onChange={e => setLinkEmailPerm(e.target.value)}>

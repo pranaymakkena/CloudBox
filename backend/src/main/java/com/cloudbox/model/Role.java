@@ -5,8 +5,6 @@ package com.cloudbox.model;
 */
 
 public enum Role {
-
     USER,
     ADMIN
-
 }

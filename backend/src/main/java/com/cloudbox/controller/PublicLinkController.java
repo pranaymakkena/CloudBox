@@ -31,7 +31,7 @@ public class PublicLinkController {
     private String frontendUrl;
 
     public PublicLinkController(PublicLinkService publicLinkService,
-                                EmailService emailService, MinioStorageService minioStorageService) {
+            EmailService emailService, MinioStorageService minioStorageService) {
         this.publicLinkService = publicLinkService;
         this.emailService = emailService;
         this.minioStorageService = minioStorageService;
@@ -46,7 +46,8 @@ public class PublicLinkController {
         String permission = (String) body.getOrDefault("permission", "VIEW");
         Integer expiryHours = body.containsKey("expiryHours")
 
-                ? Integer.valueOf(body.get("expiryHours").toString()) : null;
+                ? Integer.valueOf(body.get("expiryHours").toString())
+                : null;
 
         return ResponseEntity.ok(publicLinkService.createLink(fileId, auth.getName(), permission, expiryHours));
     }
@@ -75,13 +76,16 @@ public class PublicLinkController {
         String key = file.getStorageKey();
         if (key == null || key.isBlank()) {
             String url = file.getFileUrl();
-            if (url != null && url.contains("/")) key = url.substring(url.lastIndexOf("/") + 1);
+            if (url != null && url.contains("/"))
+                key = url.substring(url.lastIndexOf("/") + 1);
         }
-        if (key == null || key.isBlank()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (key == null || key.isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         byte[] content = minioStorageService.getFileBytes(key);
         String contentType = file.getContentType() != null
-                ? file.getContentType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+                ? file.getContentType()
+                : MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
         ContentDisposition cd = link.getPermission().equals("DOWNLOAD")
                 ? ContentDisposition.attachment().filename(file.getFileName()).build()
@@ -104,8 +108,7 @@ public class PublicLinkController {
                 "fileType", file.getContentType() != null ? file.getContentType() : "",
                 "permission", link.getPermission(),
 
-                "fileUrl", file.getFileUrl() != null ? file.getFileUrl() : ""
-        ));
+                "fileUrl", file.getFileUrl() != null ? file.getFileUrl() : ""));
 
     }
 
@@ -134,7 +137,8 @@ public class PublicLinkController {
         Long fileId = Long.valueOf(body.get("fileId").toString());
         String permission = body.containsKey("permission") ? (String) body.get("permission") : "VIEW";
         Integer expiryHours = body.containsKey("expiryHours")
-                ? Integer.valueOf(body.get("expiryHours").toString()) : null;
+                ? Integer.valueOf(body.get("expiryHours").toString())
+                : null;
 
         Map<String, String> result = publicLinkService.createLink(fileId, auth.getName(), permission, expiryHours);
         String token = result.get("token");
@@ -156,12 +160,14 @@ public class PublicLinkController {
 
         FileEntity file = link.getFile();
         String key = resolveKey(file);
-        if (key == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (key == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         byte[] bytes = minioStorageService.getFileBytes(key);
         StringBuilder sb = new StringBuilder();
         try (XWPFDocument doc = new XWPFDocument(new ByteArrayInputStream(bytes))) {
-            for (XWPFParagraph p : doc.getParagraphs()) sb.append(p.getText()).append("\n");
+            for (XWPFParagraph p : doc.getParagraphs())
+                sb.append(p.getText()).append("\n");
         }
         return ResponseEntity.ok(Map.of("text", sb.toString(), "fileName", file.getFileName()));
     }
@@ -177,7 +183,8 @@ public class PublicLinkController {
 
         FileEntity file = link.getFile();
         String key = resolveKey(file);
-        if (key == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (key == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         String newText = body.getOrDefault("text", "");
         byte[] bytes = minioStorageService.getFileBytes(key);
@@ -199,9 +206,11 @@ public class PublicLinkController {
     }
 
     private String resolveKey(FileEntity file) {
-        if (file.getStorageKey() != null && !file.getStorageKey().isBlank()) return file.getStorageKey();
+        if (file.getStorageKey() != null && !file.getStorageKey().isBlank())
+            return file.getStorageKey();
         String url = file.getFileUrl();
-        if (url != null && url.contains("/")) return url.substring(url.lastIndexOf("/") + 1);
+        if (url != null && url.contains("/"))
+            return url.substring(url.lastIndexOf("/") + 1);
         return null;
     }
 }

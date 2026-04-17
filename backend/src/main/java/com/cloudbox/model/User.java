@@ -128,9 +128,19 @@ public class User {
         this.suspended = suspended;
     }
 
-    public Long getStorageLimitMb() { return storageLimitMb; }
-    public void setStorageLimitMb(Long storageLimitMb) { this.storageLimitMb = storageLimitMb; }
+    public Long getStorageLimitMb() {
+        return storageLimitMb;
+    }
 
-    public Plan getPlan() { return plan; }
-    public void setPlan(Plan plan) { this.plan = plan; }
+    public void setStorageLimitMb(Long storageLimitMb) {
+        this.storageLimitMb = storageLimitMb;
+    }
+
+    public Plan getPlan() {
+        return plan;
+    }
+
+    public void setPlan(Plan plan) {
+        this.plan = plan;
+    }
 }

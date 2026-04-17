@@ -8,10 +8,12 @@ import {
     getFileTypeCategory,
     formatFileSize,
 } from "../utils/fileShareUtils";
+import { getSessionUser } from "../services/sessionService";
 import "../styles/shareModal.css";
 
 function ShareModal({ file, isOpen, onClose, onShareSuccess }) {
     const { toast } = useToast();
+    const currentUserEmail = getSessionUser()?.email?.toLowerCase() || "";
     const [recipients, setRecipients] = useState([]); // [{ email, permission }, ...]
     const [emailInput, setEmailInput] = useState("");
     const [availablePermissions, setAvailablePermissions] = useState([]);
@@ -73,7 +75,7 @@ function ShareModal({ file, isOpen, onClose, onShareSuccess }) {
             return;
         }
 
-        if (email.toLowerCase() === localStorage.getItem("email")?.toLowerCase()) {
+        if (email.toLowerCase() === currentUserEmail) {
             toast.error("You cannot share a file with yourself");
             return;
         }

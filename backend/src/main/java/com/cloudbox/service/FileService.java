@@ -57,8 +57,10 @@ public class FileService {
     // ── Upload ──
     @Transactional
     public FileEntity uploadFile(MultipartFile file, String userEmail, String folder) throws IOException {
-        if (file.isEmpty()) throw new RuntimeException("File is empty");
-        if (folder == null || folder.isEmpty()) folder = "root";
+        if (file.isEmpty())
+            throw new RuntimeException("File is empty");
+        if (folder == null || folder.isEmpty())
+            folder = "root";
 
         folderService.ensureFolderExists(userEmail, folder);
 
@@ -110,7 +112,8 @@ public class FileService {
                 .orElseThrow(() -> new RuntimeException("File not found"));
         boolean isOwner = file.getOwnerEmail().equals(userEmail);
         boolean canDownload = fileShareService.canDownloadFile(fileId, userEmail);
-        if (!isOwner && !canDownload) throw new RuntimeException("Unauthorized");
+        if (!isOwner && !canDownload)
+            throw new RuntimeException("Unauthorized");
         if (isOwner) {
             systemEventService.log(userEmail, "DOWNLOAD_FILE", "Downloaded " + file.getFileName());
         } else {
@@ -142,13 +145,17 @@ public class FileService {
         if (!file.getOwnerEmail().equals(userEmail) && user.getRole() != Role.ADMIN)
             throw new RuntimeException("Unauthorized");
 
-        try { publicLinkRepository.deleteAll(publicLinkRepository.findByFileId(fileId)); } catch (Exception ignored) {}
+        try {
+            publicLinkRepository.deleteAll(publicLinkRepository.findByFileId(fileId));
+        } catch (Exception ignored) {
+        }
         fileShareService.deleteSharesForFile(fileId);
         collaborationCommentRepository.deleteByFileId(fileId);
 
         try {
             String key = resolveKey(file);
-            if (key != null && !key.isBlank()) storageService.deleteFile(key);
+            if (key != null && !key.isBlank())
+                storageService.deleteFile(key);
         } catch (Exception e) {
             System.out.println("MinIO delete failed, ignoring: " + file.getFileName());
         }
@@ -162,13 +169,17 @@ public class FileService {
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
-        try { publicLinkRepository.deleteAll(publicLinkRepository.findByFileId(fileId)); } catch (Exception ignored) {}
+        try {
+            publicLinkRepository.deleteAll(publicLinkRepository.findByFileId(fileId));
+        } catch (Exception ignored) {
+        }
         fileShareService.deleteSharesForFile(fileId);
         collaborationCommentRepository.deleteByFileId(fileId);
 
         try {
             String key = resolveKey(file);
-            if (key != null && !key.isBlank()) storageService.deleteFile(key);
+            if (key != null && !key.isBlank())
+                storageService.deleteFile(key);
         } catch (Exception e) {
             System.out.println("Admin delete: MinIO file missing, ignoring: " + file.getFileName());
         }
@@ -193,14 +204,18 @@ public class FileService {
     }
 
     // ── Stats ──
-    public long getUserFileCount(String email) { return fileRepository.countByOwnerEmail(email); }
+    public long getUserFileCount(String email) {
+        return fileRepository.countByOwnerEmail(email);
+    }
 
     public long getUserStorage(String email) {
         return fileRepository.findByOwnerEmail(email).stream()
                 .mapToLong(f -> f.getFileSize() != null ? f.getFileSize() : 0L).sum();
     }
 
-    public long getTotalFiles() { return fileRepository.count(); }
+    public long getTotalFiles() {
+        return fileRepository.count();
+    }
 
     public long getTotalStorage() {
         return fileRepository.findAll().stream()
@@ -214,7 +229,8 @@ public class FileService {
         boolean isOwner = file.getOwnerEmail().equals(userEmail);
         boolean hasAccess = fileShareService.canViewFile(fileId, userEmail)
                 || fileShareService.canDownloadFile(fileId, userEmail);
-        if (!isOwner && !hasAccess) throw new RuntimeException("Unauthorized");
+        if (!isOwner && !hasAccess)
+            throw new RuntimeException("Unauthorized");
         return file;
     }
 
@@ -230,11 +246,13 @@ public class FileService {
         return storageService.getFileBytes(resolveKey(file));
     }
 
-    public void replaceFileContent(Long fileId, String userEmail, byte[] content, String contentType) throws IOException {
+    public void replaceFileContent(Long fileId, String userEmail, byte[] content, String contentType)
+            throws IOException {
         FileEntity file = getFileIfAccessible(fileId, userEmail);
         boolean isOwner = file.getOwnerEmail().equals(userEmail);
         boolean canEdit = fileShareService.canEditFile(fileId, userEmail);
-        if (!isOwner && !canEdit) throw new RuntimeException("No edit permission");
+        if (!isOwner && !canEdit)
+            throw new RuntimeException("No edit permission");
         storageService.replaceFile(resolveKey(file), content, contentType);
         file.setSize((long) content.length);
         file.setLastModifiedAt(LocalDateTime.now());
@@ -245,7 +263,8 @@ public class FileService {
     public String toggleStar(Long fileId, String userEmail) {
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
-        if (!file.getOwnerEmail().equals(userEmail)) throw new RuntimeException("Unauthorized");
+        if (!file.getOwnerEmail().equals(userEmail))
+            throw new RuntimeException("Unauthorized");
         file.setStarred(!file.isStarred());
         fileRepository.save(file);
         return file.isStarred() ? "Starred" : "Unstarred";
@@ -254,7 +273,8 @@ public class FileService {
     public void moveToTrash(Long fileId, String userEmail) {
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
-        if (!file.getOwnerEmail().equals(userEmail)) throw new RuntimeException("Unauthorized");
+        if (!file.getOwnerEmail().equals(userEmail))
+            throw new RuntimeException("Unauthorized");
         file.setDeleted(true);
         file.setDeletedAt(LocalDateTime.now());
         fileRepository.save(file);
@@ -268,7 +288,8 @@ public class FileService {
     public void restoreFromTrash(Long fileId, String userEmail) {
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
-        if (!file.getOwnerEmail().equals(userEmail)) throw new RuntimeException("Unauthorized");
+        if (!file.getOwnerEmail().equals(userEmail))
+            throw new RuntimeException("Unauthorized");
         file.setDeleted(false);
         file.setDeletedAt(null);
         fileRepository.save(file);
@@ -281,9 +302,18 @@ public class FileService {
 
         for (FileEntity file : trashed) {
             // Clean up all related records first (foreign key safety)
-            try { publicLinkRepository.deleteAll(publicLinkRepository.findByFileId(file.getId())); } catch (Exception ignored) {}
-            try { fileShareService.deleteSharesForFile(file.getId()); } catch (Exception ignored) {}
-            try { collaborationCommentRepository.deleteByFileId(file.getId()); } catch (Exception ignored) {}
+            try {
+                publicLinkRepository.deleteAll(publicLinkRepository.findByFileId(file.getId()));
+            } catch (Exception ignored) {
+            }
+            try {
+                fileShareService.deleteSharesForFile(file.getId());
+            } catch (Exception ignored) {
+            }
+            try {
+                collaborationCommentRepository.deleteByFileId(file.getId());
+            } catch (Exception ignored) {
+            }
 
             // Try to delete from MinIO — skip if not found
             try {
@@ -303,19 +333,24 @@ public class FileService {
     }
 
     public void renameFile(Long fileId, String newName, String userEmail) {
-        if (newName == null || newName.isBlank()) throw new RuntimeException("Name required");
+        if (newName == null || newName.isBlank())
+            throw new RuntimeException("Name required");
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
-        if (!file.getOwnerEmail().equals(userEmail)) throw new RuntimeException("Unauthorized");
+        if (!file.getOwnerEmail().equals(userEmail))
+            throw new RuntimeException("Unauthorized");
         file.setFileName(newName.trim());
         fileRepository.save(file);
         systemEventService.log(userEmail, "RENAME_FILE", "Renamed to " + newName);
     }
 
     private String formatSize(long bytes) {
-        if (bytes < 1024) return bytes + " B";
-        if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
-        if (bytes < 1024 * 1024 * 1024) return String.format("%.1f MB", bytes / (1024.0 * 1024));
+        if (bytes < 1024)
+            return bytes + " B";
+        if (bytes < 1024 * 1024)
+            return String.format("%.1f KB", bytes / 1024.0);
+        if (bytes < 1024 * 1024 * 1024)
+            return String.format("%.1f MB", bytes / (1024.0 * 1024));
         return String.format("%.1f GB", bytes / (1024.0 * 1024 * 1024));
     }
 
@@ -325,7 +360,7 @@ public class FileService {
             return file.getStorageKey();
         }
 
-// fallback → try fileUrl
+        // fallback → try fileUrl
         if (file.getFileUrl() != null && file.getFileUrl().contains("/")) {
             return file.getFileUrl().substring(file.getFileUrl().lastIndexOf("/") + 1);
         }
@@ -334,9 +369,12 @@ public class FileService {
     }
 
     private int compareUploadDates(FileEntity a, FileEntity b) {
-        if (a.getUploadDate() == null && b.getUploadDate() == null) return 0;
-        if (a.getUploadDate() == null) return -1;
-        if (b.getUploadDate() == null) return 1;
+        if (a.getUploadDate() == null && b.getUploadDate() == null)
+            return 0;
+        if (a.getUploadDate() == null)
+            return -1;
+        if (b.getUploadDate() == null)
+            return 1;
         return a.getUploadDate().compareTo(b.getUploadDate());
     }
 }

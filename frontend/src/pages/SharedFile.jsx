@@ -9,15 +9,15 @@ const BASE = "http://localhost:8080/api";
 
 export default function SharedFile() {
   const { token } = useParams();
-  const [info,        setInfo]        = useState(null);
-  const [error,       setError]       = useState("");
-  const [loading,     setLoading]     = useState(true);
-  const [previewUrl,  setPreviewUrl]  = useState(null);
-  const [docxBuffer,  setDocxBuffer]  = useState(null);
-  const [editMode,    setEditMode]    = useState(false);
-  const [editText,    setEditText]    = useState("");
-  const [saving,      setSaving]      = useState(false);
-  const [saveMsg,     setSaveMsg]     = useState("");
+  const [info, setInfo] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [docxBuffer, setDocxBuffer] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editText, setEditText] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState("");
   const docxRef = useRef(null);
 
   // 1. Fetch file info
@@ -31,23 +31,23 @@ export default function SharedFile() {
   // 2. Load preview once info is ready
   useEffect(() => {
     if (!info) return;
-    const isDocx  = /\.(doc|docx)$/i.test(info.fileName);
+    const isDocx = /\.(doc|docx)$/i.test(info.fileName);
     const isMedia = info.fileType?.startsWith("image/") ||
-                    info.fileType?.includes("pdf") ||
-                    info.fileType?.startsWith("video/") ||
-                    info.fileType?.startsWith("audio/") ||
-                    info.fileType?.startsWith("text/");
+      info.fileType?.includes("pdf") ||
+      info.fileType?.startsWith("video/") ||
+      info.fileType?.startsWith("audio/") ||
+      info.fileType?.startsWith("text/");
 
     if (isDocx) {
       axios.get(`${BASE}/public/file/${token}`, { responseType: "arraybuffer" })
         .then(res => setDocxBuffer(res.data))
-        .catch(() => {});
+        .catch(() => { });
       return;
     }
     if (isMedia) {
       axios.get(`${BASE}/public/file/${token}`, { responseType: "blob" })
         .then(res => setPreviewUrl(URL.createObjectURL(new Blob([res.data], { type: info.fileType }))))
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [info, token]);
 
@@ -55,7 +55,7 @@ export default function SharedFile() {
   useEffect(() => {
     if (docxBuffer && docxRef.current && !editMode) {
       docxRef.current.innerHTML = "";
-      renderAsync(docxBuffer, docxRef.current).catch(() => {});
+      renderAsync(docxBuffer, docxRef.current).catch(() => { });
     }
   }, [docxBuffer, editMode]);
 
@@ -111,14 +111,14 @@ export default function SharedFile() {
     </div>
   );
 
-  const isDocx      = /\.(doc|docx)$/i.test(info.fileName);
-  const isImage     = info.fileType?.startsWith("image/");
-  const isPdf       = info.fileType?.includes("pdf");
-  const isVideo     = info.fileType?.startsWith("video/");
-  const isAudio     = info.fileType?.startsWith("audio/");
-  const isText      = info.fileType?.startsWith("text/");
+  const isDocx = /\.(doc|docx)$/i.test(info.fileName);
+  const isImage = info.fileType?.startsWith("image/");
+  const isPdf = info.fileType?.includes("pdf");
+  const isVideo = info.fileType?.startsWith("video/");
+  const isAudio = info.fileType?.startsWith("audio/");
+  const isText = info.fileType?.startsWith("text/");
   const canDownload = info.permission === "DOWNLOAD" || info.permission === "EDIT";
-  const canEdit     = info.permission === "EDIT" && isDocx;
+  const canEdit = info.permission === "EDIT" && isDocx;
 
   return (
     <div className="sf-page">
@@ -131,8 +131,8 @@ export default function SharedFile() {
               {info.permission}
             </span>
           </div>
-          <div style={{display:"flex",gap:8,alignItems:"center"}}>
-            {saveMsg && <span style={{fontSize:13,color:"#16a34a",fontWeight:600}}>{saveMsg}</span>}
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {saveMsg && <span style={{ fontSize: 13, color: "#16a34a", fontWeight: 600 }}>{saveMsg}</span>}
             {canEdit && !editMode && (
               <button className="btn btn-secondary btn-sm" onClick={loadEditText}>
                 <i className="fa-solid fa-pen"></i> Edit
@@ -160,11 +160,11 @@ export default function SharedFile() {
               ? <textarea className="sf-edit-textarea" value={editText} onChange={e => setEditText(e.target.value)} spellCheck />
               : <div ref={docxRef} className="docx-render-container" />
           )}
-          {isImage  && previewUrl && <img src={previewUrl} alt={info.fileName} className="sf-img" />}
-          {isPdf    && previewUrl && <iframe src={previewUrl} className="sf-frame" title={info.fileName} />}
-          {isVideo  && previewUrl && <video controls className="sf-video"><source src={previewUrl} type={info.fileType} /></video>}
-          {isAudio  && previewUrl && <audio controls className="sf-audio"><source src={previewUrl} type={info.fileType} /></audio>}
-          {isText   && previewUrl && <iframe src={previewUrl} className="sf-frame" title={info.fileName} style={{background:"#fff"}} />}
+          {isImage && previewUrl && <img src={previewUrl} alt={info.fileName} className="sf-img" />}
+          {isPdf && previewUrl && <iframe src={previewUrl} className="sf-frame" title={info.fileName} />}
+          {isVideo && previewUrl && <video controls className="sf-video"><source src={previewUrl} type={info.fileType} /></video>}
+          {isAudio && previewUrl && <audio controls className="sf-audio"><source src={previewUrl} type={info.fileType} /></audio>}
+          {isText && previewUrl && <iframe src={previewUrl} className="sf-frame" title={info.fileName} style={{ background: "#fff" }} />}
           {!isDocx && !isImage && !isPdf && !isVideo && !isAudio && !isText && (
             <div className="sf-no-preview">
               <i className="fa-solid fa-file sf-file-icon"></i>

@@ -126,10 +126,10 @@ public class MinioStorageService {
                 + "}";
         try {
             minioClient.setBucketPolicy(
-                io.minio.SetBucketPolicyArgs.builder()
-                    .bucket(bucketName)
-                    .config(policy)
-                    .build());
+                    io.minio.SetBucketPolicyArgs.builder()
+                            .bucket(bucketName)
+                            .config(policy)
+                            .build());
         } catch (Exception ignored) {
             // Policy may already be set or not supported — non-fatal
         }

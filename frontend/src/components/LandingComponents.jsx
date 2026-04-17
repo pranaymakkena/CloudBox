@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import CloudBoxLogo from "./CloudBoxLogo";
+import { isSessionActive } from "../services/sessionService";
 
 /* NAVBAR */
 export function Navbar() {
@@ -18,8 +19,10 @@ export function Navbar() {
 
           {/* if user is logged in, show dashboard button, else show sign in and get started buttons */}
 
-          {localStorage.getItem("token") ? (
-            <Link to="/dashboard"><button className="login">Dashboard</button></Link>
+          {isSessionActive() ? (
+            <Link to="/login">
+              <button className="login">Dashboard</button>
+            </Link>
           ) : (
             <>
               <Link to="/login"><button className="login">Sign in</button></Link>

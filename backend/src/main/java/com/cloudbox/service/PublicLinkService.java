@@ -19,15 +19,15 @@ public class PublicLinkService {
     private final SystemEventService systemEventService;
 
     public PublicLinkService(PublicFileLinkRepository linkRepository,
-                             FileRepository fileRepository,
-                             SystemEventService systemEventService) {
+            FileRepository fileRepository,
+            SystemEventService systemEventService) {
         this.linkRepository = linkRepository;
         this.fileRepository = fileRepository;
         this.systemEventService = systemEventService;
     }
 
     public Map<String, String> createLink(Long fileId, String ownerEmail,
-                                          String permission, Integer expiryHours) {
+            String permission, Integer expiryHours) {
         FileEntity file = fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 

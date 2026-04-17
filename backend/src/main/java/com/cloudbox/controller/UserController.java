@@ -1,6 +1,5 @@
 package com.cloudbox.controller;
 
-
 import com.cloudbox.dto.UserProfileDTO;
 import com.cloudbox.model.SystemLog;
 // import com.cloudbox.model.User;
@@ -8,7 +7,6 @@ import com.cloudbox.model.UserNotification;
 import com.cloudbox.service.UserService;
 
 import org.springframework.web.bind.annotation.*;
-
 
 import java.security.Principal;
 import java.util.List;

@@ -1,6 +1,8 @@
 package com.cloudbox.config;
 
 import com.cloudbox.security.JwtAuthFilter;
+import com.cloudbox.security.RestAccessDeniedHandler;
+import com.cloudbox.security.RestAuthenticationEntryPoint;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,15 +20,27 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
+    @Autowired
+    private RestAuthenticationEntryPoint authenticationEntryPoint;
+
+    @Autowired
+    private RestAccessDeniedHandler accessDeniedHandler;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors(cors -> {
+                })
                 // Disable CSRF
                 .csrf(csrf -> csrf.disable())
 
                 // Stateless session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
 
                 // Authorization rules
                 .authorizeHttpRequests(auth -> auth

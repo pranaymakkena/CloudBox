@@ -42,7 +42,7 @@ function SharedWithMe() {
       const res = await API.get(`/files/preview/${viewer.fileId}`, { responseType: "arraybuffer" });
       setViewer(prev => ({ ...prev, arrayBuffer: res.data }));
       toast.info("Document updated by collaborator");
-    } catch {}
+    } catch { }
   }, [viewer, docxEditMode]);
 
   useFileSync({

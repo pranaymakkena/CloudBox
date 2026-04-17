@@ -1,16 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { loginUser } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import CloudBoxLogo from "../components/CloudBoxLogo";
+import {
+  getDashboardRouteForRole,
+  getValidatedSession,
+} from "../services/sessionService";
 import "../styles/login.css";
 
 function Login() {
-  if (localStorage.getItem("token")) {
-    window.location.href = localStorage.getItem("role") === "ADMIN" ? "/admin" : "/dashboard";
-  }
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,19 @@ function Login() {
   const [locked, setLocked] = useState(false);
   const navigate = useNavigate();
   const { messages, removeToast, toast } = useToast();
+
+  
+  useEffect(() => {
+    const session = getValidatedSession();
+    console.log(session);
+    
+    if (session) {
+      navigate(getDashboardRouteForRole(session.decoded.role), {
+        replace: true,
+      });
+    }
+  }, [navigate]);
+  
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -30,7 +43,7 @@ function Login() {
       setAttemptsLeft(null);
       setLocked(false);
       localStorage.setItem("name", email.split("@")[0]);
-      navigate(user.role === "ADMIN" ? "/admin" : "/dashboard");
+      navigate(getDashboardRouteForRole(user.role), { replace: true });
     } catch (err) {
       const msg = err.response?.data || "";
 

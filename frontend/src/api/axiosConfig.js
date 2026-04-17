@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clearSession, getValidatedSession } from "../services/sessionService";
 
 
 const API = axios.create({
@@ -6,16 +7,26 @@ const API = axios.create({
 });
 
 API.interceptors.request.use((config) => {
+  const session = getValidatedSession();
 
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  if (session) {
+    config.headers.Authorization = `Bearer ${session.token}`;
   }
 
   return config;
 
 });
+
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      clearSession();
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 
 export default API;

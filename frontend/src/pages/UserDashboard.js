@@ -3,6 +3,7 @@ import API from "../api/axiosConfig";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout/Layout";
 import ChatWidget from "../components/ChatWidget";
+import { getSessionUser } from "../services/sessionService";
 import "../styles/style.css";
 import "../styles/UserDashboard.css";
 
@@ -36,7 +37,7 @@ function timeAgo(dateStr) {
 
 export default function UserDashboard() {
   const navigate = useNavigate();
-  const rawName = localStorage.getItem("name") || "User";
+  const rawName = getSessionUser()?.name || "User";
   const name = rawName.charAt(0).toUpperCase() + rawName.slice(1);
 
   const [files, setFiles] = useState([]);
@@ -80,128 +81,128 @@ export default function UserDashboard() {
 
   return (
     <>
-    <Layout type="user">
-      <div className="ud-page">
+      <Layout type="user">
+        <div className="ud-page">
 
-        {/* HERO */}
-        <div className="ud-hero">
-          <div className="ud-hero-orb" />
-          <div className="ud-hero-left">
-            <p className="ud-hero-greeting">Good day 👋</p>
-            <h1 className="ud-hero-name">Welcome back, {name}</h1>
-            <p className="ud-hero-sub">Here's an overview of your cloud storage activity.</p>
-          </div>
-          <div className="ud-hero-stats">
-            <div className="ud-hero-stat" onClick={() => navigate("/files")} style={{ cursor: "pointer" }}>
-              <span className="ud-hero-stat-val">{files.length}</span>
-              <span className="ud-hero-stat-lbl">Total Files</span>
+          {/* HERO */}
+          <div className="ud-hero">
+            <div className="ud-hero-orb" />
+            <div className="ud-hero-left">
+              <p className="ud-hero-greeting">Good day 👋</p>
+              <h1 className="ud-hero-name">Welcome back, {name}</h1>
+              <p className="ud-hero-sub">Here's an overview of your cloud storage activity.</p>
             </div>
-            <div className="ud-hero-stat-divider" />
-            <div className="ud-hero-stat" onClick={() => navigate("/storage")} style={{ cursor: "pointer" }}>
-              <span className="ud-hero-stat-val">{formatSize(totalSize)}</span>
-              <span className="ud-hero-stat-lbl">Storage Used</span>
-            </div>
-            <div className="ud-hero-stat-divider" />
-            <div className="ud-hero-stat" onClick={() => navigate("/notifications")} style={{ cursor: "pointer" }}>
-              <span className="ud-hero-stat-val">{unread}</span>
-              <span className="ud-hero-stat-lbl">Unread Alerts</span>
-            </div>
-          </div>
-        </div>
-
-        {/* STORAGE BAR */}
-        <div className="ud-storage-bar-card">
-          <div className="ud-storage-bar-left" onClick={() => navigate("/storage")} style={{ cursor: "pointer" }}>
-            <i className="fa-solid fa-hard-drive ud-storage-icon" />
-            <div>
-              <div className="ud-storage-label">Storage</div>
-              <div className="ud-storage-vals">{formatSize(totalSize)} <span>of {formatSize(limitBytes)}</span></div>
-            </div>
-          </div>
-          <div className="ud-storage-bar-right">
-            <button
-              className="btn btn-sm btn-outline"
-              onClick={fetchData}
-              disabled={loading}
-              style={{ marginRight: "10px" }}
-            >
-              <i className="fa-solid fa-refresh" /> {loading ? "Loading..." : "Refresh"}
-            </button>
-            <div className="ud-storage-track">
-              <div className="ud-storage-fill" style={{ width: `${Math.max(usedPct, totalSize > 0 ? 0.5 : 0)}%` }} />
-            </div>
-            <span className="ud-storage-pct">{usedPct < 0.1 ? "< 0.1%" : usedPct.toFixed(1) + "%"}</span>
-          </div>
-        </div>
-
-        {/* QUICK LINKS */}
-        <div className="ud-quick-grid">
-          {quickLinks.map(q => (
-            <div key={q.label} className="ud-quick-card" onClick={() => navigate(q.path)}>
-              <div className="ud-quick-icon" style={{ background: q.bg, color: q.color }}>
-                <i className={`fa-solid ${q.icon}`} />
+            <div className="ud-hero-stats">
+              <div className="ud-hero-stat" onClick={() => navigate("/files")} style={{ cursor: "pointer" }}>
+                <span className="ud-hero-stat-val">{files.length}</span>
+                <span className="ud-hero-stat-lbl">Total Files</span>
               </div>
-              <span className="ud-quick-label">{q.label}</span>
+              <div className="ud-hero-stat-divider" />
+              <div className="ud-hero-stat" onClick={() => navigate("/storage")} style={{ cursor: "pointer" }}>
+                <span className="ud-hero-stat-val">{formatSize(totalSize)}</span>
+                <span className="ud-hero-stat-lbl">Storage Used</span>
+              </div>
+              <div className="ud-hero-stat-divider" />
+              <div className="ud-hero-stat" onClick={() => navigate("/notifications")} style={{ cursor: "pointer" }}>
+                <span className="ud-hero-stat-val">{unread}</span>
+                <span className="ud-hero-stat-lbl">Unread Alerts</span>
+              </div>
             </div>
-          ))}
-        </div>
-
-        {/* BOTTOM GRID */}
-        <div className="ud-bottom-grid">
-
-          {/* Recent Files */}
-          <div className="ud-panel">
-            <div className="ud-panel-head">
-              <span><i className="fa-solid fa-clock-rotate-left" /> Recent Files</span>
-              <button className="ud-panel-link" onClick={() => navigate("/files")}>View all →</button>
-            </div>
-            {recentFiles.length === 0
-              ? <div className="ud-empty"><i className="fa-solid fa-folder-open" /><p>No files yet</p></div>
-              : recentFiles.map(f => {
-                const meta = getFileIcon(f.fileName);
-                return (
-                  <div key={f.id} className="ud-file-row" onClick={() => navigate("/files")}>
-                    <div className="ud-file-icon" style={{ color: meta.color }}>
-                      <i className={`fa-solid ${meta.icon}`} />
-                    </div>
-                    <div className="ud-file-info">
-                      <span className="ud-file-name">{f.fileName}</span>
-                      <span className="ud-file-meta">{formatSize(f.fileSize)} · {timeAgo(f.uploadedAt)}</span>
-                    </div>
-                  </div>
-                );
-              })
-            }
           </div>
 
-          {/* Notifications */}
-          <div className="ud-panel">
-            <div className="ud-panel-head">
-              <span>
-                <i className="fa-solid fa-bell" /> Notifications
-                {unread > 0 && <span className="ud-notif-badge">{unread}</span>}
-              </span>
-              <button className="ud-panel-link" onClick={() => navigate("/notifications")}>View all →</button>
+          {/* STORAGE BAR */}
+          <div className="ud-storage-bar-card">
+            <div className="ud-storage-bar-left" onClick={() => navigate("/storage")} style={{ cursor: "pointer" }}>
+              <i className="fa-solid fa-hard-drive ud-storage-icon" />
+              <div>
+                <div className="ud-storage-label">Storage</div>
+                <div className="ud-storage-vals">{formatSize(totalSize)} <span>of {formatSize(limitBytes)}</span></div>
+              </div>
             </div>
-            {notifications.length === 0
-              ? <div className="ud-empty"><i className="fa-solid fa-bell-slash" /><p>No notifications</p></div>
-              : notifications.map(n => (
-                <div key={n.id} className={`ud-notif-row${n.read ? "" : " ud-notif-unread"}`} onClick={() => navigate("/notifications")}>
-                  <div className="ud-notif-dot" style={{ background: n.read ? "#e2e8f0" : "#2563eb" }} />
-                  <div className="ud-notif-body">
-                    <span className="ud-notif-title">{n.title}</span>
-                    <span className="ud-notif-msg">{n.message}</span>
-                  </div>
-                  <span className="ud-notif-time">{timeAgo(n.createdAt)}</span>
+            <div className="ud-storage-bar-right">
+              <button
+                className="btn btn-sm btn-outline"
+                onClick={fetchData}
+                disabled={loading}
+                style={{ marginRight: "10px" }}
+              >
+                <i className="fa-solid fa-refresh" /> {loading ? "Loading..." : "Refresh"}
+              </button>
+              <div className="ud-storage-track">
+                <div className="ud-storage-fill" style={{ width: `${Math.max(usedPct, totalSize > 0 ? 0.5 : 0)}%` }} />
+              </div>
+              <span className="ud-storage-pct">{usedPct < 0.1 ? "< 0.1%" : usedPct.toFixed(1) + "%"}</span>
+            </div>
+          </div>
+
+          {/* QUICK LINKS */}
+          <div className="ud-quick-grid">
+            {quickLinks.map(q => (
+              <div key={q.label} className="ud-quick-card" onClick={() => navigate(q.path)}>
+                <div className="ud-quick-icon" style={{ background: q.bg, color: q.color }}>
+                  <i className={`fa-solid ${q.icon}`} />
                 </div>
-              ))
-            }
+                <span className="ud-quick-label">{q.label}</span>
+              </div>
+            ))}
           </div>
 
+          {/* BOTTOM GRID */}
+          <div className="ud-bottom-grid">
+
+            {/* Recent Files */}
+            <div className="ud-panel">
+              <div className="ud-panel-head">
+                <span><i className="fa-solid fa-clock-rotate-left" /> Recent Files</span>
+                <button className="ud-panel-link" onClick={() => navigate("/files")}>View all →</button>
+              </div>
+              {recentFiles.length === 0
+                ? <div className="ud-empty"><i className="fa-solid fa-folder-open" /><p>No files yet</p></div>
+                : recentFiles.map(f => {
+                  const meta = getFileIcon(f.fileName);
+                  return (
+                    <div key={f.id} className="ud-file-row" onClick={() => navigate("/files")}>
+                      <div className="ud-file-icon" style={{ color: meta.color }}>
+                        <i className={`fa-solid ${meta.icon}`} />
+                      </div>
+                      <div className="ud-file-info">
+                        <span className="ud-file-name">{f.fileName}</span>
+                        <span className="ud-file-meta">{formatSize(f.fileSize)} · {timeAgo(f.uploadedAt)}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              }
+            </div>
+
+            {/* Notifications */}
+            <div className="ud-panel">
+              <div className="ud-panel-head">
+                <span>
+                  <i className="fa-solid fa-bell" /> Notifications
+                  {unread > 0 && <span className="ud-notif-badge">{unread}</span>}
+                </span>
+                <button className="ud-panel-link" onClick={() => navigate("/notifications")}>View all →</button>
+              </div>
+              {notifications.length === 0
+                ? <div className="ud-empty"><i className="fa-solid fa-bell-slash" /><p>No notifications</p></div>
+                : notifications.map(n => (
+                  <div key={n.id} className={`ud-notif-row${n.read ? "" : " ud-notif-unread"}`} onClick={() => navigate("/notifications")}>
+                    <div className="ud-notif-dot" style={{ background: n.read ? "#e2e8f0" : "#2563eb" }} />
+                    <div className="ud-notif-body">
+                      <span className="ud-notif-title">{n.title}</span>
+                      <span className="ud-notif-msg">{n.message}</span>
+                    </div>
+                    <span className="ud-notif-time">{timeAgo(n.createdAt)}</span>
+                  </div>
+                ))
+              }
+            </div>
+
+          </div>
         </div>
-      </div>
-    </Layout>
-    <ChatWidget mode="dashboard" />
+      </Layout>
+      <ChatWidget mode="dashboard" />
     </>
   );
 }

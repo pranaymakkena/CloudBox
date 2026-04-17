@@ -390,7 +390,9 @@
   color: #854d0e;
 }
 
-.login-warning-yellow i { color: #ca8a04; }
+.login-warning-yellow i {
+  color: #ca8a04;
+}
 
 .login-warning-orange {
   background: #fff7ed;
@@ -398,7 +400,9 @@
   color: #7c2d12;
 }
 
-.login-warning-orange i { color: #ea580c; }
+.login-warning-orange i {
+  color: #ea580c;
+}
 
 .login-warning-danger {
   background: #fef2f2;
@@ -406,7 +410,9 @@
   color: #7f1d1d;
 }
 
-.login-warning-danger i { color: #dc2626; }
+.login-warning-danger i {
+  color: #dc2626;
+}
 
 .login-warning-link {
   color: inherit;
@@ -415,7 +421,9 @@
   text-underline-offset: 2px;
 }
 
-.login-warning-link:hover { opacity: 0.75; }
+.login-warning-link:hover {
+  opacity: 0.75;
+}
 
 /* ── Attempt dots ── */
 .login-attempt-dots {
@@ -433,8 +441,13 @@
   transition: background 0.2s;
 }
 
-.login-dot-used  { background: #ef4444; }
-.login-dot-free  { background: #d1d5db; }
+.login-dot-used {
+  background: #ef4444;
+}
+
+.login-dot-free {
+  background: #d1d5db;
+}
 
 .login-dot-label {
   font-size: 11px;

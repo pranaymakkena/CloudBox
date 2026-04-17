@@ -140,12 +140,18 @@ public class UserService {
         // Delete all user files from DB (storage cleanup is best-effort)
         var files = fileService.getUserFiles(email);
         for (var file : files) {
-            try { fileService.deleteFile(file.getId(), email); } catch (Exception ignored) {}
+            try {
+                fileService.deleteFile(file.getId(), email);
+            } catch (Exception ignored) {
+            }
         }
         // Delete trashed files too
         var trashed = fileService.getTrash(email);
         for (var file : trashed) {
-            try { fileService.deleteFile(file.getId(), email); } catch (Exception ignored) {}
+            try {
+                fileService.deleteFile(file.getId(), email);
+            } catch (Exception ignored) {
+            }
         }
 
         // Delete notifications

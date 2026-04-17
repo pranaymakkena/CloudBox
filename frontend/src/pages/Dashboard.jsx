@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API from "../api/axiosConfig";
+import { logoutUser } from "../services/authService";
+import { getSessionUser } from "../services/sessionService";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -31,20 +33,15 @@ function Dashboard() {
 
   // ✅ Fetch User
   useEffect(() => {
-    const email = localStorage.getItem("email");
-    const token = localStorage.getItem("token");
+    const sessionUser = getSessionUser();
 
-    if (!email || !token) {
+    if (!sessionUser) {
       navigate("/login");
       return;
     }
 
-    axios
-      .get(`http://localhost:8080/api/user/profile?email=${email}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    API
+      .get("/user/profile")
       .then((res) => setUser(res.data))
       .catch((err) => {
         console.error(err);
@@ -54,19 +51,8 @@ function Dashboard() {
 
   // ✅ Update Profile
   const handleUpdate = () => {
-    const email = localStorage.getItem("email");
-    const token = localStorage.getItem("token");
-
-    axios
-      .put(
-        `http://localhost:8080/api/user/profile?email=${email}`,
-        user,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+    API
+      .put("/user/profile", user)
       .then(() => {
         alert("Profile updated successfully");
         setEditMode(false);
@@ -105,17 +91,17 @@ function Dashboard() {
   const handleDeleteAccount = () => {
     if (!window.confirm("Delete your account permanently?")) return;
 
-    const email = localStorage.getItem("email");
-    const token = localStorage.getItem("token");
+    const sessionUser = getSessionUser();
 
-    axios
-      .delete(`http://localhost:8080/api/user/delete?email=${email}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    if (!sessionUser) {
+      navigate("/login");
+      return;
+    }
+
+    API
+      .delete("/user/account")
       .then(() => {
-        localStorage.clear();
+        logoutUser();
         navigate("/login");
       })
       .catch((err) => {
@@ -126,7 +112,7 @@ function Dashboard() {
 
   // ✅ Logout
   const handleLogout = () => {
-    localStorage.clear();
+    logoutUser();
     navigate("/login");
   };
 

@@ -1,26 +1,20 @@
 import { Navigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import { getValidatedSession } from "../services/sessionService";
 
 function ProtectedRoute({ children, allowedRoles }) {
-  const token = localStorage.getItem("token");
+  const session = getValidatedSession();
 
-  if (!token) {
+  if (!session) {
     return <Navigate to="/login" />;
   }
 
-  try {
-    const decoded = jwtDecode(token);
-    const role = decoded.role;
+  const role = session.decoded.role;
 
-    if (!allowedRoles.includes(role)) {
-      return <Navigate to="/login" />;
-    }
-
-    return children;
-
-  } catch (err) {
+  if (!allowedRoles.includes(role)) {
     return <Navigate to="/login" />;
   }
+
+  return children;
 }
 
 export default ProtectedRoute;

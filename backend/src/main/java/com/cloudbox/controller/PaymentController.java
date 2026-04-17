@@ -34,11 +34,10 @@ public class PaymentController {
             @RequestBody Map<String, String> body,
             Authentication auth) {
         paymentService.verifyAndActivate(
-            body.get("razorpay_order_id"),
-            body.get("razorpay_payment_id"),
-            body.get("razorpay_signature"),
-            auth.getName()
-        );
+                body.get("razorpay_order_id"),
+                body.get("razorpay_payment_id"),
+                body.get("razorpay_signature"),
+                auth.getName());
         return ResponseEntity.ok("Plan activated");
     }
 

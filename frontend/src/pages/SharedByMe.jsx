@@ -10,19 +10,19 @@ import "../styles/myfiles.css";
 const CATEGORIES = ["All", "Documents", "Images", "Videos", "Audio", "Other"];
 
 const PERM_STYLE = {
-  VIEW:     { bg: "#e8f0fe", color: "#4285f4", label: "View only" },
+  VIEW: { bg: "#e8f0fe", color: "#4285f4", label: "View only" },
   DOWNLOAD: { bg: "#dcfce7", color: "#16a34a", label: "Download" },
-  EDIT:     { bg: "#fef9c3", color: "#b45309", label: "Edit" },
+  EDIT: { bg: "#fef9c3", color: "#b45309", label: "Edit" },
 };
 
 const FILE_ICON = (name = "") => {
   const n = name.toLowerCase();
-  if (/\.(jpg|jpeg|png|gif|webp|svg)$/.test(n)) return { icon: "fa-image",      bg: "#e0f2fe", color: "#0284c7" };
-  if (/\.(mp4|mkv|avi|mov|webm)$/.test(n))      return { icon: "fa-film",       bg: "#ede9fe", color: "#7c3aed" };
-  if (/\.(mp3|wav|ogg|flac)$/.test(n))           return { icon: "fa-music",      bg: "#fce7f3", color: "#be185d" };
-  if (/\.(pdf)$/.test(n))                        return { icon: "fa-file-pdf",   bg: "#fee2e2", color: "#dc2626" };
-  if (/\.(doc|docx)$/.test(n))                   return { icon: "fa-file-word",  bg: "#dbeafe", color: "#2563eb" };
-  if (/\.(xls|xlsx)$/.test(n))                   return { icon: "fa-file-excel", bg: "#dcfce7", color: "#16a34a" };
+  if (/\.(jpg|jpeg|png|gif|webp|svg)$/.test(n)) return { icon: "fa-image", bg: "#e0f2fe", color: "#0284c7" };
+  if (/\.(mp4|mkv|avi|mov|webm)$/.test(n)) return { icon: "fa-film", bg: "#ede9fe", color: "#7c3aed" };
+  if (/\.(mp3|wav|ogg|flac)$/.test(n)) return { icon: "fa-music", bg: "#fce7f3", color: "#be185d" };
+  if (/\.(pdf)$/.test(n)) return { icon: "fa-file-pdf", bg: "#fee2e2", color: "#dc2626" };
+  if (/\.(doc|docx)$/.test(n)) return { icon: "fa-file-word", bg: "#dbeafe", color: "#2563eb" };
+  if (/\.(xls|xlsx)$/.test(n)) return { icon: "fa-file-excel", bg: "#dcfce7", color: "#16a34a" };
   if (/\.(pdf|doc|docx|txt|xls|xlsx|ppt|pptx)$/.test(n)) return { icon: "fa-file-lines", bg: "#f0f4fa", color: "#5b6b8a" };
   return { icon: "fa-file", bg: "#f0f4fa", color: "#9baabf" };
 };
@@ -60,7 +60,7 @@ function SharedByMe() {
 
   const filtered = useMemo(() => shares.filter(s => {
     const ms = s.fileName.toLowerCase().includes(search.toLowerCase()) ||
-               s.sharedWith.toLowerCase().includes(search.toLowerCase());
+      s.sharedWith.toLowerCase().includes(search.toLowerCase());
     const mc = category === "All" || getCategory(s.fileName) === category;
     return ms && mc;
   }), [shares, search, category]);
@@ -95,7 +95,7 @@ function SharedByMe() {
     setIsUpdating(true);
     try {
       await API.put(`/files/shares/${editModal.shareId}`, { permission: newPermission });
-      setShares(p => p.map(s => s.id === editModal.shareId ? {...s, permission: newPermission} : s));
+      setShares(p => p.map(s => s.id === editModal.shareId ? { ...s, permission: newPermission } : s));
       toast.success("Permission updated");
       setEditModal(null);
     } catch (e) { toast.error(e.response?.data || "Failed"); }
@@ -216,8 +216,10 @@ function SharedByMe() {
                   <i className={`fa-solid ${FILE_ICON(editModal.fileName).icon}`}></i>
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: "#1a2236",
-                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div style={{
+                    fontWeight: 700, fontSize: 14, color: "#1a2236",
+                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
+                  }}>
                     {editModal.fileName}
                   </div>
                   <div style={{ fontSize: 12, color: "#9baabf", marginTop: 2 }}>
@@ -228,8 +230,10 @@ function SharedByMe() {
 
               {/* Permission options */}
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: "#5b6b8a",
-                  textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                <div style={{
+                  fontSize: 12, fontWeight: 700, color: "#5b6b8a",
+                  textTransform: "uppercase", letterSpacing: "0.5px"
+                }}>
                   Select Permission
                 </div>
                 {editModal.availablePermissions.map(perm => {
@@ -260,8 +264,10 @@ function SharedByMe() {
                         <i className={`fa-solid ${icons[perm] || "fa-lock"}`}></i>
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 700, fontSize: 14,
-                          color: selected ? ps.color : "#1a2236" }}>{ps.label}</div>
+                        <div style={{
+                          fontWeight: 700, fontSize: 14,
+                          color: selected ? ps.color : "#1a2236"
+                        }}>{ps.label}</div>
                         <div style={{ fontSize: 12, color: "#9baabf", marginTop: 1 }}>{descs[perm]}</div>
                       </div>
                       {selected && (

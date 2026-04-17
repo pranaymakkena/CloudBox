@@ -36,20 +36,20 @@ public class PaymentService {
 
     // Plan prices in paise (INR)
     private static final Map<Plan, Long> PLAN_PRICES = Map.of(
-        Plan.FREE,       0L,
-        Plan.PRO,        49900L,   // ₹499/month
-        Plan.ENTERPRISE, 199900L   // ₹1999/month
+            Plan.FREE, 0L,
+            Plan.PRO, 49900L, // ₹499/month
+            Plan.ENTERPRISE, 199900L // ₹1999/month
     );
 
     // Plan storage limits in MB
     private static final Map<Plan, Long> PLAN_STORAGE = Map.of(
-        Plan.FREE,       15360L,    // 15 GB
-        Plan.PRO,        102400L,   // 100 GB
-        Plan.ENTERPRISE, 1048576L   // 1 TB
+            Plan.FREE, 15360L, // 15 GB
+            Plan.PRO, 102400L, // 100 GB
+            Plan.ENTERPRISE, 1048576L // 1 TB
     );
 
     public PaymentService(PaymentRepository paymentRepository, UserRepository userRepository,
-                          EmailService emailService, SystemEventService systemEventService) {
+            EmailService emailService, SystemEventService systemEventService) {
         this.paymentRepository = paymentRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
@@ -60,7 +60,8 @@ public class PaymentService {
         Plan plan = Plan.valueOf(planName.toUpperCase());
         long amount = PLAN_PRICES.get(plan);
 
-        if (amount == 0) throw new RuntimeException("FREE plan requires no payment");
+        if (amount == 0)
+            throw new RuntimeException("FREE plan requires no payment");
 
         if (keyId == null || keyId.isBlank() || keyId.startsWith("your_")) {
             throw new RuntimeException("Razorpay API keys not configured.");
@@ -89,13 +90,12 @@ public class PaymentService {
                     userEmail + " requested " + plan + " plan — please review and approve");
 
             return Map.of(
-                "orderId", fakeOrderId,
-                "amount", amount,
-                "currency", "INR",
-                "keyId", keyId,
-                "plan", planName,
-                "simulated", true
-            );
+                    "orderId", fakeOrderId,
+                    "amount", amount,
+                    "currency", "INR",
+                    "keyId", keyId,
+                    "plan", planName,
+                    "simulated", true);
         }
 
         // ── Real Razorpay flow ──
@@ -118,13 +118,12 @@ public class PaymentService {
         paymentRepository.save(payment);
 
         return Map.of(
-            "orderId", orderId,
-            "amount", amount,
-            "currency", "INR",
-            "keyId", keyId,
-            "plan", planName,
-            "simulated", false
-        );
+                "orderId", orderId,
+                "amount", amount,
+                "currency", "INR",
+                "keyId", keyId,
+                "plan", planName,
+                "simulated", false);
     }
 
     public void verifyAndActivate(String orderId, String paymentId, String signature, String userEmail) {

@@ -4,6 +4,8 @@ import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
+import { logoutUser } from "../services/authService";
+import { getSessionUser } from "../services/sessionService";
 import "../styles/style.css";
 import "../styles/Profile.css";
 
@@ -15,8 +17,9 @@ function Profile() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const name = localStorage.getItem("name") || "User";
-  const role = localStorage.getItem("role") || "USER";
+  const sessionUser = getSessionUser();
+  const name = sessionUser?.name || "User";
+  const role = sessionUser?.role || "USER";
   const initials = name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
   useEffect(() => { fetchProfile(); }, []);
@@ -41,7 +44,7 @@ function Profile() {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    logoutUser();
     navigate("/login");
   };
 
@@ -49,7 +52,7 @@ function Profile() {
     setDeleting(true);
     try {
       await API.delete("/user/account");
-      localStorage.clear();
+      logoutUser();
       navigate("/login");
     } catch (e) {
       toast.error(e.response?.data || "Failed to delete account");

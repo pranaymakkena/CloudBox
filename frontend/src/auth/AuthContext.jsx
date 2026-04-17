@@ -1,5 +1,9 @@
 import { createContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+import {
+  clearSession,
+  getValidatedSession,
+  persistSession,
+} from "../services/sessionService";
 
 export const AuthContext = createContext();
 
@@ -10,28 +14,20 @@ export const AuthProvider = ({ children }) => {
 
   // ✅ Restore user on page reload
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const session = getValidatedSession();
 
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-
-        setUser(decoded);
-        setIsAuthenticated(true);
-      } catch (err) {
-        logout();
-      }
+    if (session) {
+      setUser(session.decoded);
+      setIsAuthenticated(true);
+    } else {
+      setUser(null);
+      setIsAuthenticated(false);
     }
   }, []);
 
   // ✅ Login (used after authService)
   const login = (token) => {
-    localStorage.setItem("token", token);
-
-    const decoded = jwtDecode(token);
-
-    localStorage.setItem("role", decoded.role);
-    localStorage.setItem("email", decoded.sub);
+    const decoded = persistSession(token);
 
     setUser(decoded);
     setIsAuthenticated(true);
@@ -39,9 +35,7 @@ export const AuthProvider = ({ children }) => {
 
   // ✅ Logout
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("email");
+    clearSession();
 
     setUser(null);
     setIsAuthenticated(false);

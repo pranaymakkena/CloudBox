@@ -3,12 +3,14 @@ import { FaBell, FaSearch } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "../../context/SearchContext";
 import API from "../../api/axiosConfig";
+import { getSessionUser } from "../../services/sessionService";
 import "./layout.css";
 
 function Header({ onMenuToggle, sidebarOpen }) {
   const navigate = useNavigate();
-  const role = localStorage.getItem("role");
-  const name = localStorage.getItem("name") || "User";
+  const sessionUser = getSessionUser();
+  const role = sessionUser?.role || "USER";
+  const name = sessionUser?.name || "User";
   const { query, setQuery } = useSearch();
   const [unread, setUnread] = useState(0);
 

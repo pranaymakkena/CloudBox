@@ -103,7 +103,8 @@ public class AuthService {
                 systemEventService.log(user.getEmail(), "ACCOUNT_LOCKED",
                         "Account locked after 5 failed login attempts");
 
-                throw new RuntimeException("LOCKED:Account locked for 15 minutes due to too many failed attempts. Reset your password to regain access immediately.");
+                throw new RuntimeException(
+                        "LOCKED:Account locked for 15 minutes due to too many failed attempts. Reset your password to regain access immediately.");
             }
 
             userRepository.save(user);

@@ -4,12 +4,11 @@ import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
+import { getSessionUser } from "../services/sessionService";
 import { getDirectFileUrl } from "../utils/fileAccess";
 import { useFileSync } from "../hooks/useFileSync";
 import "../styles/collaboration.css";
 import "../styles/style.css";
-
-const currentUser = localStorage.getItem("email") || "";
 
 function getFileIcon(name) {
   const n = (name || "").toLowerCase();
@@ -43,19 +42,20 @@ function relTime(ts) {
 
 export default function Collaboration() {
   const { messages, removeToast, toast } = useToast();
+  const currentUser = getSessionUser()?.email || "";
   const [files, setFiles] = useState([]);
   const [selectedFileId, setSelectedFileId] = useState("");
-  const [comments,       setComments]       = useState([]);
-  const [message,        setMessage]        = useState("");
-  const [search,         setSearch]         = useState("");
-  const [sending,        setSending]        = useState(false);
-  const [viewer,         setViewer]         = useState(null);
-  const [docxEditMode,   setDocxEditMode]   = useState(false);
-  const [docxEditText,   setDocxEditText]   = useState("");
-  const [docxSaving,     setDocxSaving]     = useState(false);
+  const [comments, setComments] = useState([]);
+  const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
+  const [sending, setSending] = useState(false);
+  const [viewer, setViewer] = useState(null);
+  const [docxEditMode, setDocxEditMode] = useState(false);
+  const [docxEditText, setDocxEditText] = useState("");
+  const [docxSaving, setDocxSaving] = useState(false);
   const [selectedComment, setSelectedComment] = useState(null); // WhatsApp-style selection
-  const bottomRef    = useRef(null);
-  const docxRef      = useRef(null);
+  const bottomRef = useRef(null);
+  const docxRef = useRef(null);
 
   useEffect(() => { fetchFiles(); }, []);
 
@@ -182,7 +182,7 @@ export default function Collaboration() {
       const res = await API.get(`/files/preview/${viewer.fileId}`, { responseType: "arraybuffer" });
       setViewer(prev => ({ ...prev, arrayBuffer: res.data }));
       toast.info("Document updated by a collaborator");
-    } catch {}
+    } catch { }
   }, [viewer, docxEditMode]);
 
   useFileSync({

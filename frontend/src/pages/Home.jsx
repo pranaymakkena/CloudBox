@@ -1,7 +1,7 @@
 import { logoutUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
+import { getSessionUser } from "../services/sessionService";
 import "../styles/style.css";
 
 export default function Home() {
@@ -9,19 +9,14 @@ export default function Home() {
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const sessionUser = getSessionUser();
 
-    if (!token) {
+    if (!sessionUser) {
       navigate("/login");
       return;
     }
 
-    try {
-      const decoded = jwtDecode(token);
-      setUser(decoded);
-    } catch (err) {
-      navigate("/login");
-    }
+    setUser(sessionUser.decoded);
   }, [navigate]);
 
   const handleLogout = () => {

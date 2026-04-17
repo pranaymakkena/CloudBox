@@ -1,5 +1,5 @@
 import API from "../api/axiosConfig";
-import { jwtDecode } from "jwt-decode";
+import { clearSession, persistSession } from "./sessionService";
 
 // ✅ REGISTER
 export const registerUser = (data) => {
@@ -9,24 +9,13 @@ export const registerUser = (data) => {
 // ✅ LOGIN
 export const loginUser = async (data) => {
   const response = await API.post("/auth/login", data);
-
-  // ✅ FIXED
   const token = response.data;
 
   console.log("Received token:", response); // Debugging log
-  localStorage.setItem("token", token);
-
-  const decoded = jwtDecode(token);
-
-  localStorage.setItem("role", decoded.role);
-  localStorage.setItem("email", decoded.sub);
-
-  return decoded;
+  return persistSession(token);
 };
 
 // ✅ LOGOUT
 export const logoutUser = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("role");
-  localStorage.removeItem("email");
+  clearSession();
 };

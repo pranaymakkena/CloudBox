@@ -74,7 +74,6 @@ public class FileShareService {
         if (request.getRecipients() == null || request.getRecipients().isEmpty())
             throw new RuntimeException("At least one recipient is required");
 
-
         FileEntity file = fileRepository.findById(request.getFileId())
                 .orElseThrow(() -> new RuntimeException("File not found"));
 

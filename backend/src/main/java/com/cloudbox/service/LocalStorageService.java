@@ -18,10 +18,12 @@ public class LocalStorageService {
     @Value("${storage.upload-dir:uploads/}")
     private String uploadDir;
 
-    public record StoredFile(String storageKey, String fileUrl) {}
+    public record StoredFile(String storageKey, String fileUrl) {
+    }
 
     public StoredFile uploadFile(MultipartFile file) throws IOException {
-        if (file.isEmpty()) throw new RuntimeException("File is empty");
+        if (file.isEmpty())
+            throw new RuntimeException("File is empty");
 
         String uniqueName = UUID.randomUUID() + "_" + sanitize(file.getOriginalFilename());
         Path dir = Paths.get(uploadDir);
@@ -35,7 +37,8 @@ public class LocalStorageService {
 
     public byte[] readFile(String storageKey) throws IOException {
         Path path = Paths.get(uploadDir).resolve(storageKey);
-        if (!Files.exists(path)) throw new RuntimeException("File not found on disk: " + storageKey);
+        if (!Files.exists(path))
+            throw new RuntimeException("File not found on disk: " + storageKey);
         return Files.readAllBytes(path);
     }
 
@@ -59,7 +62,8 @@ public class LocalStorageService {
     }
 
     private String sanitize(String name) {
-        if (name == null) return "file";
+        if (name == null)
+            return "file";
         return name.replaceAll("[^a-zA-Z0-9._-]", "_");
     }
 }

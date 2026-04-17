@@ -6,9 +6,9 @@ import { useToast } from "../../hooks/useToast";
 
 const STATUS_COLORS = {
   PENDING_APPROVAL: { bg: "#fef9c3", color: "#b45309" },
-  APPROVED:         { bg: "#dcfce7", color: "#16a34a" },
-  REJECTED:         { bg: "#fee2e2", color: "#dc2626" },
-  CREATED:          { bg: "#f0f4fa", color: "#5b6b8a" },
+  APPROVED: { bg: "#dcfce7", color: "#16a34a" },
+  REJECTED: { bg: "#fee2e2", color: "#dc2626" },
+  CREATED: { bg: "#f0f4fa", color: "#5b6b8a" },
 };
 
 function formatAmount(paise) {
@@ -73,9 +73,11 @@ export default function AdminPayments() {
             <button key={s}
               className={`mf-cat${filter === s ? " active" : ""}`}
               onClick={() => setFilter(s)}
-              style={{ borderRadius: 20, padding: "6px 16px", fontSize: 12, fontWeight: 600,
+              style={{
+                borderRadius: 20, padding: "6px 16px", fontSize: 12, fontWeight: 600,
                 border: "1.5px solid #d0daea", background: filter === s ? "#4285f4" : "#fff",
-                color: filter === s ? "#fff" : "#5b6b8a", cursor: "pointer" }}>
+                color: filter === s ? "#fff" : "#5b6b8a", cursor: "pointer"
+              }}>
               {s === "PENDING_APPROVAL" ? "Pending" : s === "ALL" ? "All" : s.charAt(0) + s.slice(1).toLowerCase()}
             </button>
           ))}
@@ -106,8 +108,10 @@ export default function AdminPayments() {
                       <td>{formatAmount(p.amountPaise)}</td>
                       <td>{p.paidAt ? new Date(p.paidAt).toLocaleDateString() : new Date(p.createdAt).toLocaleDateString()}</td>
                       <td>
-                        <span style={{ background: sc.bg, color: sc.color,
-                          borderRadius: 20, padding: "3px 10px", fontSize: 12, fontWeight: 700 }}>
+                        <span style={{
+                          background: sc.bg, color: sc.color,
+                          borderRadius: 20, padding: "3px 10px", fontSize: 12, fontWeight: 700
+                        }}>
                           {p.status === "PENDING_APPROVAL" ? "Pending" : p.status}
                         </span>
                       </td>

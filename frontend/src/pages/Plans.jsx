@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
+import { getSessionUser } from "../services/sessionService";
 import "../styles/plans.css";
 
 const PLANS = [
@@ -64,22 +64,22 @@ const PLANS = [
 
 export default function Plans() {
   const { messages, removeToast, toast } = useToast();
-  const navigate = useNavigate();
   const [currentPlan, setCurrentPlan] = useState("FREE");
   const [usedBytes, setUsedBytes] = useState(0);
   const [loading, setLoading] = useState(null);
   const [cancelling, setCancelling] = useState(false);
   const [confirmCancel, setConfirmCancel] = useState(false);
-  const userEmail = localStorage.getItem("email") || "";
-  const userName = localStorage.getItem("name") || "User";
+  const sessionUser = getSessionUser();
+  const userEmail = sessionUser?.email || "";
+  const userName = sessionUser?.name || "User";
 
   useEffect(() => {
     API.get("/user/storage").then(res => {
       setUsedBytes(res.data.usedBytes || 0);
-    }).catch(() => {});
+    }).catch(() => { });
     API.get("/user/profile").then(res => {
       setCurrentPlan(res.data.plan || "FREE");
-    }).catch(() => {});
+    }).catch(() => { });
   }, []);
 
   const handleUpgrade = async (plan) => {
@@ -150,8 +150,8 @@ export default function Plans() {
 
   const formatBytes = (b) => {
     if (b >= 1e12) return (b / 1e12).toFixed(1) + " TB";
-    if (b >= 1e9)  return (b / 1e9).toFixed(1) + " GB";
-    if (b >= 1e6)  return (b / 1e6).toFixed(1) + " MB";
+    if (b >= 1e9) return (b / 1e9).toFixed(1) + " GB";
+    if (b >= 1e6) return (b / 1e6).toFixed(1) + " MB";
     return b + " B";
   };
 

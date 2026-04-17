@@ -10,8 +10,13 @@ public class UserProfileDTO {
     private String location;
     private String plan;
 
-    public String getPlan() { return plan; }
-    public void setPlan(String plan) { this.plan = plan; }
+    public String getPlan() {
+        return plan;
+    }
+
+    public void setPlan(String plan) {
+        this.plan = plan;
+    }
 
     // getters & setters
     public String getFirstName() {

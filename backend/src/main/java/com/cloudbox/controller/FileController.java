@@ -89,9 +89,11 @@ public class FileController {
         String key = file.getStorageKey();
         if (key == null || key.isBlank()) {
             String url = file.getFileUrl();
-            if (url != null && url.contains("/")) key = url.substring(url.lastIndexOf("/") + 1);
+            if (url != null && url.contains("/"))
+                key = url.substring(url.lastIndexOf("/") + 1);
         }
-        if (key == null || key.isBlank()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (key == null || key.isBlank())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         byte[] content = storageService.getFileBytes(key);
         String contentType = file.getContentType();
@@ -301,7 +303,8 @@ public class FileController {
         }
 
         String key = resolveStorageKey(file);
-        if (key == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (key == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         StringBuilder sb = new StringBuilder();
         byte[] fileBytes = storageService.getFileBytes(key);
@@ -329,7 +332,8 @@ public class FileController {
         }
 
         String key = resolveStorageKey(file);
-        if (key == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (key == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         String newText = body.getOrDefault("text", "");
         String[] lines = newText.split("\n", -1);
@@ -354,12 +358,13 @@ public class FileController {
     }
 
     private String resolveStorageKey(FileEntity file) {
-        if (file.getStorageKey() != null && !file.getStorageKey().isBlank()) return file.getStorageKey();
+        if (file.getStorageKey() != null && !file.getStorageKey().isBlank())
+            return file.getStorageKey();
         String url = file.getFileUrl();
-        if (url != null && url.contains("/")) return url.substring(url.lastIndexOf("/") + 1);
+        if (url != null && url.contains("/"))
+            return url.substring(url.lastIndexOf("/") + 1);
         return null;
     }
-
 
     // ΓöÇΓöÇ Trash / Restore / Empty Trash ΓöÇΓöÇ
     @PutMapping("/{id}/trash")
@@ -416,9 +421,11 @@ public class FileController {
         java.util.Comparator<FileEntity> cmp = switch (sortBy) {
             case "name" -> java.util.Comparator.comparing(f -> f.getFileName().toLowerCase());
             case "size" -> java.util.Comparator.comparingLong(f -> f.getFileSize() != null ? f.getFileSize() : 0L);
-            default -> java.util.Comparator.comparing(f -> f.getUploadDate() != null ? f.getUploadDate() : java.time.LocalDateTime.MIN);
+            default -> java.util.Comparator
+                    .comparing(f -> f.getUploadDate() != null ? f.getUploadDate() : java.time.LocalDateTime.MIN);
         };
-        if ("desc".equalsIgnoreCase(order)) cmp = cmp.reversed();
+        if ("desc".equalsIgnoreCase(order))
+            cmp = cmp.reversed();
         files.sort(cmp);
         return ResponseEntity.ok(files);
     }
@@ -434,9 +441,8 @@ public class FileController {
     public ResponseEntity<Map<String, Object>> lastModified(@PathVariable Long id, Authentication auth) {
         FileEntity file = fileService.getFileIfAccessible(id, auth.getName());
         return ResponseEntity.ok(Map.of(
-            "lastModifiedAt", file.getLastModifiedAt() != null ? file.getLastModifiedAt().toString() : "",
-            "fileSize", file.getSize() != null ? file.getSize() : 0L
-        ));
+                "lastModifiedAt", file.getLastModifiedAt() != null ? file.getLastModifiedAt().toString() : "",
+                "fileSize", file.getSize() != null ? file.getSize() : 0L));
     }
 
     @GetMapping("/stream/{storageKey}")

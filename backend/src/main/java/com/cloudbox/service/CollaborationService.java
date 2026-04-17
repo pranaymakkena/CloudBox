@@ -108,7 +108,8 @@ public class CollaborationService {
         // only the comment author or file owner can delete
         boolean isAuthor = comment.getUserEmail().equals(userEmail);
         boolean isFileOwner = comment.getFile().getOwnerEmail().equals(userEmail);
-        if (!isAuthor && !isFileOwner) throw new RuntimeException("Unauthorized");
+        if (!isAuthor && !isFileOwner)
+            throw new RuntimeException("Unauthorized");
         collaborationCommentRepository.delete(comment);
         systemEventService.log(userEmail, "DELETE_COMMENT", "Deleted comment on " + comment.getFile().getFileName());
     }

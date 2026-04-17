@@ -76,121 +76,121 @@ function AdminDashboard() {
 
   return (
     <>
-    <Layout type="admin">
+      <Layout type="admin">
 
-      <div className="content">
+        <div className="content">
 
-        <h2 className="dashboard-title">Admin Dashboard</h2>
+          <h2 className="dashboard-title">Admin Dashboard</h2>
 
-        {/* STATS */}
-        <div className="stats-row">
+          {/* STATS */}
+          <div className="stats-row">
 
-          <div className="stat-card stat-admin-orange">
-            <div className="stat-icon">
-              <i className="fas fa-users"></i>
-            </div>
-
-            <div className="stat-text">
-              <h4>Total Users</h4>
-              <h2>{stats.totalUsers}</h2>
-            </div>
-          </div>
-
-          <div className="stat-card stat-admin-blue">
-            <div className="stat-icon">
-              <i className="fas fa-file"></i>
-            </div>
-
-            <div className="stat-text">
-              <h4>Total Files</h4>
-              <h2>{stats.totalFiles}</h2>
-            </div>
-          </div>
-
-          <div className="stat-card stat-admin-green">
-            <div className="stat-icon">
-              <i className="fas fa-database"></i>
-            </div>
-
-            <div className="stat-text">
-              <h4>Storage Used</h4>
-              <h2>{formatSize(stats.totalStorage)}</h2>
-            </div>
-          </div>
-
-        </div>
-
-        {/* RECENT FILES */}
-        <div className="card">
-          <div className="card-title">Recent Files</div>
-
-          {stats.recentFiles?.length > 0 ? (
-            stats.recentFiles.map(file => (
-              <div key={file.id} className="list-item">
-                {file.fileName}
+            <div className="stat-card stat-admin-orange">
+              <div className="stat-icon">
+                <i className="fas fa-users"></i>
               </div>
-            ))
-          ) : (
-            <p>No recent files</p>
-          )}
-        </div>
 
-        {/* SEARCH */}
-        <div className="admin-search-box">
-          <input
-            placeholder="Search by email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+              <div className="stat-text">
+                <h4>Total Users</h4>
+                <h2>{stats.totalUsers}</h2>
+              </div>
+            </div>
 
-        {/* USERS */}
-        <div className="card">
-          <div className="card-title">User Management</div>
+            <div className="stat-card stat-admin-blue">
+              <div className="stat-icon">
+                <i className="fas fa-file"></i>
+              </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+              <div className="stat-text">
+                <h4>Total Files</h4>
+                <h2>{stats.totalFiles}</h2>
+              </div>
+            </div>
 
-            <tbody>
-              {filteredUsers.map(user => (
-                <tr key={user.id}>
-                  <td>{user.firstName} {user.lastName}</td>
-                  <td>{user.email}</td>
-                  <td>{user.location}</td>
-                  <td style={{ color: user.suspended ? "red" : "green" }}>
-                    {user.suspended ? "Suspended" : "Active"}
-                  </td>
-                  <td>
-                    <button className="btn btn-warning"
-                      onClick={() => toggleSuspend(user)}>
-                      {user.suspended ? "Activate" : "Suspend"}
-                    </button>
+            <div className="stat-card stat-admin-green">
+              <div className="stat-icon">
+                <i className="fas fa-database"></i>
+              </div>
 
-                    <button className="btn btn-danger"
-                      style={{ marginLeft: "8px" }}
-                      onClick={() => deleteUser(user.id)}>
-                      Delete
-                    </button>
-                  </td>
+              <div className="stat-text">
+                <h4>Storage Used</h4>
+                <h2>{formatSize(stats.totalStorage)}</h2>
+              </div>
+            </div>
+
+          </div>
+
+          {/* RECENT FILES */}
+          <div className="card">
+            <div className="card-title">Recent Files</div>
+
+            {stats.recentFiles?.length > 0 ? (
+              stats.recentFiles.map(file => (
+                <div key={file.id} className="list-item">
+                  {file.fileName}
+                </div>
+              ))
+            ) : (
+              <p>No recent files</p>
+            )}
+          </div>
+
+          {/* SEARCH */}
+          <div className="admin-search-box">
+            <input
+              placeholder="Search by email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* USERS */}
+          <div className="card">
+            <div className="card-title">User Management</div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {filteredUsers.map(user => (
+                  <tr key={user.id}>
+                    <td>{user.firstName} {user.lastName}</td>
+                    <td>{user.email}</td>
+                    <td>{user.location}</td>
+                    <td style={{ color: user.suspended ? "red" : "green" }}>
+                      {user.suspended ? "Suspended" : "Active"}
+                    </td>
+                    <td>
+                      <button className="btn btn-warning"
+                        onClick={() => toggleSuspend(user)}>
+                        {user.suspended ? "Activate" : "Suspend"}
+                      </button>
+
+                      <button className="btn btn-danger"
+                        style={{ marginLeft: "8px" }}
+                        onClick={() => deleteUser(user.id)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+          </div>
 
         </div>
 
-      </div>
-
-    </Layout>
-    <ChatWidget mode="dashboard" />
+      </Layout>
+      <ChatWidget mode="dashboard" />
     </>
   );
 }

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { registerUser } from "../services/authService";
 import { useNavigate, Link } from "react-router-dom";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import CloudBoxLogo from "../components/CloudBoxLogo";
+import { getValidatedSession } from "../services/sessionService";
 import "../styles/login.css";
 
 function getPasswordStrength(password) {
@@ -20,12 +21,6 @@ function getPasswordStrength(password) {
 }
 
 function Register() {
-
-  //check if user is already logged in
-  if (localStorage.getItem("token")) {
-    window.location.href = "/dashboard";
-  }
-
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { messages, removeToast, toast } = useToast();
@@ -34,6 +29,16 @@ function Register() {
     firstName: "", lastName: "", gender: "", age: "",
     location: "", email: "", password: "", confirmPassword: "",
   });
+
+  useEffect(() => {
+    const session = getValidatedSession();
+
+    if (session) {
+      navigate(session.decoded.role === "ADMIN" ? "/admin" : "/dashboard", {
+        replace: true,
+      });
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

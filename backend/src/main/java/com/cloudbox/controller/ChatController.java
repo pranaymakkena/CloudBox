@@ -21,7 +21,8 @@ public class ChatController {
     @PostMapping("/landing")
     public ResponseEntity<Map<String, String>> landingChat(@RequestBody Map<String, String> body) {
         String message = body.getOrDefault("message", "").trim();
-        if (message.isEmpty()) return ResponseEntity.badRequest().body(Map.of("reply", "Please enter a message."));
+        if (message.isEmpty())
+            return ResponseEntity.badRequest().body(Map.of("reply", "Please enter a message."));
         String reply = chatService.chatLanding(message);
         return ResponseEntity.ok(Map.of("reply", reply));
     }
@@ -32,7 +33,8 @@ public class ChatController {
             @RequestBody Map<String, String> body,
             Authentication auth) {
         String message = body.getOrDefault("message", "").trim();
-        if (message.isEmpty()) return ResponseEntity.badRequest().body(Map.of("reply", "Please enter a message."));
+        if (message.isEmpty())
+            return ResponseEntity.badRequest().body(Map.of("reply", "Please enter a message."));
         String reply = chatService.chatDashboard(message, auth.getName());
         return ResponseEntity.ok(Map.of("reply", reply));
     }

@@ -101,9 +101,18 @@
 }
 
 @media (max-width: 480px) {
-  .file-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .file-card { padding: 12px 8px 8px; }
-  .file-name { font-size: 11px; }
+  .file-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .file-card {
+    padding: 12px 8px 8px;
+  }
+
+  .file-name {
+    font-size: 11px;
+  }
 }
 
 /* Permission badges on shared file cards */
@@ -116,6 +125,18 @@
   letter-spacing: 0.3px;
   margin-top: 2px;
 }
-.perm-view     { background: #e8f0fe; color: #4285f4; }
-.perm-download { background: #dcfce7; color: #16a34a; }
-.perm-edit     { background: #fef9c3; color: #b45309; }
+
+.perm-view {
+  background: #e8f0fe;
+  color: #4285f4;
+}
+
+.perm-download {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.perm-edit {
+  background: #fef9c3;
+  color: #b45309;
+}
