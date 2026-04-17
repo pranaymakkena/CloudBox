@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
@@ -20,14 +20,14 @@ function Folders() {
   const [renameName, setRenameName] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(null);
 
-  useEffect(() => { fetchFolders(); }, []);
-
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     try {
       const res = await API.get("/files/folders");
       setFolders(res.data);
     } catch { toast.error("Failed to load folders"); }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchFolders(); }, [fetchFolders]);
 
   const handleFolderClick = async (name) => {
     if (expandedFolder === name) { setExpanded(null); return; }

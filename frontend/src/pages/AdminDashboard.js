@@ -12,7 +12,6 @@ function AdminDashboard() {
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState({});
   const [search, setSearch] = useState("");
-  const [loadingId, setLoadingId] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -40,8 +39,6 @@ function AdminDashboard() {
   // ✅ FIXED ENDPOINT
   const toggleSuspend = async (user) => {
     try {
-      setLoadingId(user.id);
-
       const url = user.suspended
         ? `/admin/unsuspend/${user.id}`
         : `/admin/suspend/${user.id}`;
@@ -53,8 +50,6 @@ function AdminDashboard() {
     } catch (err) {
       console.error(err);
       alert("Action failed");
-    } finally {
-      setLoadingId(null);
     }
   };
 

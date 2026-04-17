@@ -26,6 +26,7 @@
     "xlsx": "^0.18.5"
   },
   "scripts": {
+    "postinstall": "node scripts/strip-docx-preview-sourcemaps.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

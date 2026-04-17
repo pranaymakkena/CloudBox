@@ -5,7 +5,6 @@ import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import { useSearch } from "../context/SearchContext";
-import { getDirectFileUrl, triggerDownload } from "../utils/fileAccess";
 import { useFileSync } from "../hooks/useFileSync";
 import "../styles/fileGrid.css";
 import "../styles/style.css";
@@ -43,7 +42,7 @@ function SharedWithMe() {
       setViewer(prev => ({ ...prev, arrayBuffer: res.data }));
       toast.info("Document updated by collaborator");
     } catch { }
-  }, [viewer, docxEditMode]);
+  }, [viewer, docxEditMode, toast]);
 
   useFileSync({
     fileId: viewer?.type === "docx" ? viewer.fileId : null,
@@ -51,16 +50,16 @@ function SharedWithMe() {
     onUpdate: handleSyncUpdate,
   });
 
-  useEffect(() => { fetchShares(); }, []);
-
-  const fetchShares = async () => {
+  const fetchShares = useCallback(async () => {
     try {
       const res = await API.get("/files/shared-with-me");
       setShares(res.data);
     } catch {
       toast.error("Failed to load shared files");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchShares(); }, [fetchShares]);
 
   const filtered = useMemo(() => {
     return shares.filter((s) => {
@@ -138,7 +137,7 @@ function SharedWithMe() {
         toast.error("Failed to render document")
       );
     }
-  }, [viewer, docxEditMode]);
+  }, [viewer, docxEditMode, toast]);
 
   return (
     <Layout type="user">

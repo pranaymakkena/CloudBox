@@ -48,7 +48,7 @@ export default function Kanban() {
       }
     });
     return () => unsub();
-  }, []);
+  }, [docRef]);
 
   const saveBoard = async (newBoard) => {
     setBoard(newBoard);

@@ -5,7 +5,6 @@ import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import { useSearch } from "../context/SearchContext";
-import { getDirectFileUrl, triggerDownload } from "../utils/fileAccess";
 import { useFileSync } from "../hooks/useFileSync";
 import "../styles/myfiles.css";
 import "../styles/style.css";
@@ -80,16 +79,16 @@ export default function MyFiles() {
   const [sharePerm, setSharePerm] = useState("");
   const docxRef = useRef(null);
 
-  useEffect(() => { setQuery(""); fetchFiles(); fetchFolders(); }, []);
-
-  const fetchFiles = async () => {
+  const fetchFiles = useCallback(async () => {
     try { const r = await API.get("/files"); setFiles(r.data); }
     catch { toast.error("Failed to load files"); }
-  };
-  const fetchFolders = async () => {
+  }, [toast]);
+  const fetchFolders = useCallback(async () => {
     try { const r = await API.get("/files/folders"); setFolders(r.data); }
     catch { }
-  };
+  }, []);
+
+  useEffect(() => { setQuery(""); fetchFiles(); fetchFolders(); }, [fetchFiles, fetchFolders, setQuery]);
 
   const filtered = useMemo(() => {
     let r = files.filter(f => {
@@ -257,7 +256,7 @@ export default function MyFiles() {
       docxRef.current.innerHTML = "";
       renderAsync(viewer.arrayBuffer, docxRef.current).catch(() => toast.error("Render failed"));
     }
-  }, [viewer, docxEditMode]);
+  }, [viewer, docxEditMode, toast]);
 
   // sync: reload docx if another user saves
   const handleSyncUpdate = useCallback(async () => {
@@ -267,7 +266,7 @@ export default function MyFiles() {
       setViewer(p => ({ ...p, arrayBuffer: r.data }));
       toast.info("Document updated by another user");
     } catch { }
-  }, [viewer, docxEditMode]);
+  }, [viewer, docxEditMode, toast]);
 
   useFileSync({
     fileId: viewer?.type === "docx" ? viewer.fileId : null,

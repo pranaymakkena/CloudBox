@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
 import Toast from "../../components/common/Toast";
@@ -10,9 +10,7 @@ function AdminUsers() {
   const [loadingId, setLoadingId] = useState(null);
   const [storageLimitInputs, setStorageLimitInputs] = useState({});
 
-  useEffect(() => { fetchUsers(); }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const res = await API.get("/admin/users");
       setUsers(res.data);
@@ -24,7 +22,9 @@ function AdminUsers() {
     } catch (err) {
       toast.error("Failed to fetch users");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
   const toggleSuspend = async (user) => {
     try {

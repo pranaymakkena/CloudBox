@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { renderAsync } from "docx-preview";
 import * as XLSX from "xlsx";
 import API from "../api/axiosConfig";
@@ -18,16 +18,16 @@ function Upload() {
   const [fileType, setFileType] = useState("");
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => { fetchFolders(); }, []);
-
-  const fetchFolders = async () => {
+  const fetchFolders = useCallback(async () => {
     try {
       const res = await API.get("/files/folders");
       setFolders(res.data);
     } catch {
       toast.error("Failed to load folders");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchFolders(); }, [fetchFolders]);
 
   const handleFileChange = async (e) => {
 
@@ -157,11 +157,11 @@ function Upload() {
               <div style={{ marginTop: "20px" }}>
 
                 {fileType === "image" && (
-                  <img src={preview} style={{ maxWidth: "100%" }} />
+                  <img src={preview} alt={file?.name || "Selected file preview"} style={{ maxWidth: "100%" }} />
                 )}
 
                 {fileType === "pdf" && (
-                  <iframe src={preview} width="100%" height="400px" />
+                  <iframe src={preview} title={file?.name || "PDF preview"} width="100%" height="400px" />
                 )}
 
                 {fileType === "video" && (

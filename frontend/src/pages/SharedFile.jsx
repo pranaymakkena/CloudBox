@@ -71,7 +71,7 @@ export default function SharedFile() {
 
   async function loadEditText() {
     try {
-      const res = await axios.get(`${BASE}/public/file/${token}`, { responseType: "arraybuffer" });
+      await axios.get(`${BASE}/public/file/${token}`, { responseType: "arraybuffer" });
       // Extract text via a simple approach — send to backend
       const r2 = await axios.post(`${BASE}/public/docx-text/${token}`, null);
       setEditText(r2.data.text || "");

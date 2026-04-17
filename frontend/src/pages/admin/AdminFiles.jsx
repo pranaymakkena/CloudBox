@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
 import Toast from "../../components/common/Toast";
@@ -10,16 +10,16 @@ function AdminFiles() {
   const [files, setFiles] = useState([]);
   const [confirmDelete, setConfirmDelete] = useState(null);
 
-  useEffect(() => { fetchFiles(); }, []);
-
-  const fetchFiles = async () => {
+  const fetchFiles = useCallback(async () => {
     try {
       const res = await API.get("/admin/files");
       setFiles(res.data);
     } catch {
       toast.error("Failed to fetch files");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchFiles(); }, [fetchFiles]);
 
   const deleteFile = async (id) => {
     try {

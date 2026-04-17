@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
@@ -19,16 +19,16 @@ export default function Trash() {
   const [files, setFiles] = useState([]);
   const [confirmEmpty, setConfirmEmpty] = useState(false);
 
-  const fetchTrash = async () => {
+  const fetchTrash = useCallback(async () => {
     try {
       const res = await API.get("/files/trash");
       setFiles(res.data);
     } catch {
       toast.error("Failed to load trash");
     }
-  };
+  }, [toast]);
 
-  useEffect(() => { fetchTrash(); }, []);
+  useEffect(() => { fetchTrash(); }, [fetchTrash]);
 
   const restore = async (id) => {
     try {

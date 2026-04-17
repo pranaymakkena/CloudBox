@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
 import Toast from "../../components/common/Toast";
@@ -8,16 +8,16 @@ function AdminFileSharingControl() {
   const { messages, removeToast, toast } = useToast();
   const [shares, setShares] = useState([]);
 
-  useEffect(() => { fetchShares(); }, []);
-
-  const fetchShares = async () => {
+  const fetchShares = useCallback(async () => {
     try {
       const res = await API.get("/admin/shares");
       setShares(res.data);
     } catch (err) {
       toast.error("Failed to load sharing data");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchShares(); }, [fetchShares]);
 
   const revokeAccess = async (id) => {
     if (!window.confirm("Revoke access?")) return;

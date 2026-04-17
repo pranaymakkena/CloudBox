@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
 import Toast from "../../components/common/Toast";
@@ -9,16 +9,16 @@ function AdminLogs() {
   const [logs, setLogs] = useState([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => { fetchLogs(); }, []);
-
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       const res = await API.get("/admin/logs");
       setLogs(res.data);
     } catch (err) {
       toast.error("Failed to fetch logs");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchLogs(); }, [fetchLogs]);
 
   // 🔍 filter logs
   const filteredLogs = logs.filter(log =>

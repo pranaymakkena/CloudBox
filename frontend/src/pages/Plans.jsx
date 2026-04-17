@@ -91,7 +91,7 @@ export default function Plans() {
       const { orderId, amount, currency, keyId } = res.data;
 
       // Dev/test mode: if no real Razorpay key, simulate payment directly
-      if (!keyId || keyId.startsWith("rzp_test_") && res.data.simulated) {
+      if (!keyId || (keyId.startsWith("rzp_test_") && res.data.simulated)) {
         toast.success("Payment received! Your " + plan.name + " plan is pending admin approval.");
         setLoading(null);
         return;

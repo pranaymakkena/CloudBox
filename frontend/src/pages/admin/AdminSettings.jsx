@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
 import Toast from "../../components/common/Toast";
@@ -9,9 +9,7 @@ function AdminSettings() {
   const [storageLimit, setStorageLimit] = useState("");
   const [allowSignup, setAllowSignup] = useState(true);
 
-  useEffect(() => { fetchSettings(); }, []);
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
       const res = await API.get("/admin/settings");
       setStorageLimit(res.data.storageLimit || 0);
@@ -19,7 +17,9 @@ function AdminSettings() {
     } catch (err) {
       toast.error("Failed to load settings");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchSettings(); }, [fetchSettings]);
 
   const saveSettings = async () => {
     try {

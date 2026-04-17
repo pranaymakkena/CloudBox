@@ -106,8 +106,6 @@ export default function StorageUsed() {
       .sort((a, b) => b.bytes - a.bytes);
   }, [files, limitBytes]);
 
-  const topFiles = useMemo(() =>
-    [...files].sort((a, b) => (b.fileSize || 0) - (a.fileSize || 0)).slice(0, 8), [files]);
   if (loading) return (
     <Layout type="user">
       <div className="su-spinner-wrap">

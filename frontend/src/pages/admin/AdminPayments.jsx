@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
 import Toast from "../../components/common/Toast";
@@ -22,14 +22,14 @@ export default function AdminPayments() {
   const [filter, setFilter] = useState("PENDING_APPROVAL");
   const [loadingId, setLoadingId] = useState(null);
 
-  useEffect(() => { fetchPayments(); }, []);
-
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       const res = await API.get("/admin/payments");
       setPayments(res.data);
     } catch { toast.error("Failed to load payments"); }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchPayments(); }, [fetchPayments]);
 
   const approve = async (id) => {
     setLoadingId(id);

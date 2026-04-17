@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
@@ -10,16 +10,16 @@ function ActivityHistory() {
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => { fetchActivities(); }, []);
-
-  const fetchActivities = async () => {
+  const fetchActivities = useCallback(async () => {
     try {
       const res = await API.get("/user/activity");
       setActivities(res.data);
     } catch (err) {
       toast.error("Failed to load activity history");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchActivities(); }, [fetchActivities]);
 
   const filteredActivities = activities.filter((activity) =>
     activity.action?.toLowerCase().includes(search.toLowerCase()) ||

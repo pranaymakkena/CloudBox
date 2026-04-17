@@ -367,9 +367,9 @@ export function Footer() {
           <CloudBoxLogo size={30} textSize={18} variant="white" style={{ marginBottom: 14 }} />
           <p>Secure, fast, and reliable cloud storage built for modern teams.</p>
           <div className="footer-social">
-            <a className="social-btn" href="#" aria-label="Twitter">𝕏</a>
-            <a className="social-btn" href="#" aria-label="GitHub">⌥</a>
-            <a className="social-btn" href="#" aria-label="LinkedIn">in</a>
+            <button type="button" className="social-btn" aria-label="Twitter">𝕏</button>
+            <button type="button" className="social-btn" aria-label="GitHub">⌥</button>
+            <button type="button" className="social-btn" aria-label="LinkedIn">in</button>
           </div>
         </div>
         <div className="footer-links">
@@ -377,35 +377,35 @@ export function Footer() {
           <ul>
             <li><a href="#features">Features</a></li>
             <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#">Security</a></li>
-            <li><a href="#">Changelog</a></li>
+            <li><button type="button">Security</button></li>
+            <li><button type="button">Changelog</button></li>
           </ul>
         </div>
         <div className="footer-links">
           <h4>Company</h4>
           <ul>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Press</a></li>
+            <li><button type="button">About</button></li>
+            <li><button type="button">Blog</button></li>
+            <li><button type="button">Careers</button></li>
+            <li><button type="button">Press</button></li>
           </ul>
         </div>
         <div className="footer-links">
           <h4>Support</h4>
           <ul>
-            <li><a href="#">Help Center</a></li>
-            <li><a href="#">Contact</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
+            <li><button type="button">Help Center</button></li>
+            <li><button type="button">Contact</button></li>
+            <li><button type="button">Privacy Policy</button></li>
+            <li><button type="button">Terms of Service</button></li>
           </ul>
         </div>
       </div>
       <div className="footer-bottom">
         <p>© 2026 CloudBox. All rights reserved.</p>
         <div className="footer-bottom-links">
-          <a href="#">Privacy</a>
-          <a href="#">Terms</a>
-          <a href="#">Cookies</a>
+          <button type="button">Privacy</button>
+          <button type="button">Terms</button>
+          <button type="button">Cookies</button>
         </div>
       </div>
     </footer>

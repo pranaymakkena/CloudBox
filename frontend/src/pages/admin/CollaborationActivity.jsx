@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
 import Toast from "../../components/common/Toast";
@@ -9,16 +9,16 @@ function CollaborationActivity() {
   const [activities, setActivities] = useState([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => { fetchActivities(); }, []);
-
-  const fetchActivities = async () => {
+  const fetchActivities = useCallback(async () => {
     try {
       const res = await API.get("/admin/collaboration");
       setActivities(res.data);
     } catch (err) {
       toast.error("Failed to fetch activity");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchActivities(); }, [fetchActivities]);
 
   const filteredActivities = activities.filter((activity) =>
     activity.userEmail?.toLowerCase().includes(search.toLowerCase()) ||

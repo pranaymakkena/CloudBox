@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import API from "../../api/axiosConfig";
 import Layout from "../../components/layout/Layout";
 import Toast from "../../components/common/Toast";
@@ -8,16 +8,16 @@ function AdminNotifications() {
   const { messages, removeToast, toast } = useToast();
   const [notifications, setNotifications] = useState([]);
 
-  useEffect(() => { fetchNotifications(); }, []);
-
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     try {
       const res = await API.get("/admin/notifications");
       setNotifications(res.data);
     } catch (err) {
       toast.error("Failed to load notifications");
     }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchNotifications(); }, [fetchNotifications]);
 
   return (
     <Layout type="admin">

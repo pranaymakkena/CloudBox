@@ -1,11 +1,10 @@
-﻿import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { renderAsync } from "docx-preview";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
 import { useToast } from "../hooks/useToast";
 import { getSessionUser } from "../services/sessionService";
-import { getDirectFileUrl } from "../utils/fileAccess";
 import { useFileSync } from "../hooks/useFileSync";
 import "../styles/collaboration.css";
 import "../styles/style.css";
@@ -57,18 +56,7 @@ export default function Collaboration() {
   const bottomRef = useRef(null);
   const docxRef = useRef(null);
 
-  useEffect(() => { fetchFiles(); }, []);
-
-  useEffect(() => {
-    if (selectedFileId) fetchComments(selectedFileId);
-    else setComments([]);
-  }, [selectedFileId]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [comments]);
-
-  async function fetchFiles() {
+  const fetchFiles = useCallback(async () => {
     try {
       const res = await API.get("/files/collaboration");
       setFiles(res.data);
@@ -76,16 +64,27 @@ export default function Collaboration() {
     } catch {
       toast.error("Failed to load collaboration files");
     }
-  }
+  }, [toast]);
 
-  async function fetchComments(fileId) {
+  const fetchComments = useCallback(async (fileId) => {
     try {
       const res = await API.get(`/files/collaboration/${fileId}/comments`);
       setComments(res.data);
     } catch {
       toast.error("Failed to load comments");
     }
-  }
+  }, [toast]);
+
+  useEffect(() => { fetchFiles(); }, [fetchFiles]);
+
+  useEffect(() => {
+    if (selectedFileId) fetchComments(selectedFileId);
+    else setComments([]);
+  }, [selectedFileId, fetchComments]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [comments]);
 
   async function sendComment() {
     if (!selectedFileId) { toast.warning("Select a file first"); return; }
@@ -183,7 +182,7 @@ export default function Collaboration() {
       setViewer(prev => ({ ...prev, arrayBuffer: res.data }));
       toast.info("Document updated by a collaborator");
     } catch { }
-  }, [viewer, docxEditMode]);
+  }, [viewer, docxEditMode, toast]);
 
   useFileSync({
     fileId: viewer?.type === "docx" ? viewer.fileId : null,
@@ -197,7 +196,7 @@ export default function Collaboration() {
       docxRef.current.innerHTML = "";
       renderAsync(viewer.arrayBuffer, docxRef.current).catch(() => toast.error("Failed to render document"));
     }
-  }, [viewer, docxEditMode]);
+  }, [viewer, docxEditMode, toast]);
 
   const visibleFiles = files.filter(f => f.fileName.toLowerCase().includes(search.toLowerCase()));
   const selectedFile = files.find(f => String(f.fileId) === selectedFileId);

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import API from "../api/axiosConfig";
 import Layout from "../components/layout/Layout";
 import Toast from "../components/common/Toast";
@@ -49,14 +49,14 @@ function SharedByMe() {
 
   const search = query || localSearch;
 
-  useEffect(() => { fetchShares(); }, []);
-
-  const fetchShares = async () => {
+  const fetchShares = useCallback(async () => {
     try {
       const res = await API.get("/files/shared-by-me");
       setShares(res.data);
     } catch { toast.error("Failed to load shared files"); }
-  };
+  }, [toast]);
+
+  useEffect(() => { fetchShares(); }, [fetchShares]);
 
   const filtered = useMemo(() => shares.filter(s => {
     const ms = s.fileName.toLowerCase().includes(search.toLowerCase()) ||
