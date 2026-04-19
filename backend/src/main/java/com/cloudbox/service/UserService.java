@@ -6,6 +6,7 @@ import com.cloudbox.model.SystemLog;
 import com.cloudbox.model.User;
 import com.cloudbox.model.UserNotification;
 import com.cloudbox.repository.AdminSettingRepository;
+import com.cloudbox.repository.PaymentRepository;
 import com.cloudbox.repository.SystemLogRepository;
 import com.cloudbox.repository.UserNotificationRepository;
 import com.cloudbox.repository.UserRepository;
@@ -24,6 +25,7 @@ public class UserService {
     private final SystemEventService systemEventService;
     private final FileService fileService;
     private final AdminSettingRepository adminSettingRepository;
+    private final PaymentRepository paymentRepository;
 
     public UserService(
             UserRepository userRepository,
@@ -31,13 +33,15 @@ public class UserService {
             UserNotificationRepository userNotificationRepository,
             SystemEventService systemEventService,
             FileService fileService,
-            AdminSettingRepository adminSettingRepository) {
+            AdminSettingRepository adminSettingRepository,
+            PaymentRepository paymentRepository) {
         this.userRepository = userRepository;
         this.systemLogRepository = systemLogRepository;
         this.userNotificationRepository = userNotificationRepository;
         this.systemEventService = systemEventService;
         this.fileService = fileService;
         this.adminSettingRepository = adminSettingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     // ================= GET PROFILE (SAFE) =================
@@ -124,11 +128,29 @@ public class UserService {
         if (user.getPlan() == null || user.getPlan().name().equals("FREE"))
             throw new RuntimeException("You are already on the FREE plan");
 
+        com.cloudbox.model.Plan cancelledPlan = user.getPlan();
+
         user.setPlan(com.cloudbox.model.Plan.FREE);
         user.setStorageLimitMb(15360L); // reset to 15 GB
         userRepository.save(user);
 
-        systemEventService.log(email, "CANCEL_PLAN", "Cancelled plan, reverted to FREE");
+        // Record a REFUNDED payment entry for admin tracking
+        paymentRepository.findTopByUserEmailAndStatusOrderByPaidAtDesc(email, "APPROVED")
+                .ifPresent(original -> {
+                    com.cloudbox.model.Payment refund = new com.cloudbox.model.Payment();
+                    refund.setUserEmail(email);
+                    refund.setRazorpayOrderId(original.getRazorpayOrderId());
+                    refund.setRazorpayPaymentId(original.getRazorpayPaymentId());
+                    refund.setRazorpaySignature(original.getRazorpaySignature());
+                    refund.setPlan(cancelledPlan);
+                    refund.setAmountPaise(original.getAmountPaise());
+                    refund.setStatus("REFUNDED");
+                    refund.setCreatedAt(java.time.LocalDateTime.now());
+                    refund.setPaidAt(java.time.LocalDateTime.now());
+                    paymentRepository.save(refund);
+                });
+
+        systemEventService.log(email, "CANCEL_PLAN", "Cancelled " + cancelledPlan + " plan, reverted to FREE");
         return mapToDTO(user);
     }
 
