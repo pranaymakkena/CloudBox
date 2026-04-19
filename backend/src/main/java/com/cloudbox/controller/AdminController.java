@@ -175,6 +175,11 @@ public class AdminController {
 
     // ================= PAYMENTS =================
 
+    @GetMapping("/payments/summary")
+    public ResponseEntity<Map<String, Object>> getPaymentSummary() {
+        return ResponseEntity.ok(paymentService.getPaymentSummary());
+    }
+
     @GetMapping("/payments")
     public ResponseEntity<List<Payment>> getAllPayments() {
         return ResponseEntity.ok(paymentService.getAllPayments());

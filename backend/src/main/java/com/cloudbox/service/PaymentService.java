@@ -207,6 +207,25 @@ public class PaymentService {
         return paymentRepository.findByUserEmailOrderByCreatedAtDesc(userEmail);
     }
 
+    public Map<String, Object> getPaymentSummary() {
+        long totalReceived = paymentRepository.sumApprovedAmountPaise();
+        long totalRefunded = paymentRepository.sumRefundedAmountPaise();
+        long approvedCount = paymentRepository.countByStatus("APPROVED");
+        long rejectedCount = paymentRepository.countByStatus("REJECTED");
+        long refundedCount = paymentRepository.countByStatus("REFUNDED");
+        long pendingCount = paymentRepository.countByStatus("PENDING_APPROVAL");
+
+        return Map.of(
+            "totalReceivedPaise", totalReceived,
+            "totalRefundedPaise", totalRefunded,
+            "netRevenuePaise", totalReceived - totalRefunded,
+            "approvedCount", approvedCount,
+            "rejectedCount", rejectedCount,
+            "refundedCount", refundedCount,
+            "pendingCount", pendingCount
+        );
+    }
+
     private boolean verifySignature(String payload, String signature) {
         try {
             Mac mac = Mac.getInstance("HmacSHA256");

@@ -8,24 +8,30 @@ const STATUS_COLORS = {
   PENDING_APPROVAL: { bg: "#fef9c3", color: "#b45309" },
   APPROVED: { bg: "#dcfce7", color: "#16a34a" },
   REJECTED: { bg: "#fee2e2", color: "#dc2626" },
+  REFUNDED: { bg: "#ede9fe", color: "#7c3aed" },
   CREATED: { bg: "#f0f4fa", color: "#5b6b8a" },
 };
 
 function formatAmount(paise) {
-  if (!paise) return "—";
-  return "₹" + (paise / 100).toFixed(2);
+  if (!paise && paise !== 0) return "—";
+  return "₹" + (paise / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 });
 }
 
 export default function AdminPayments() {
   const { messages, removeToast, toast } = useToast();
   const [payments, setPayments] = useState([]);
+  const [summary, setSummary] = useState(null);
   const [filter, setFilter] = useState("PENDING_APPROVAL");
   const [loadingId, setLoadingId] = useState(null);
 
   const fetchPayments = useCallback(async () => {
     try {
-      const res = await API.get("/admin/payments");
-      setPayments(res.data);
+      const [paymentsRes, summaryRes] = await Promise.all([
+        API.get("/admin/payments"),
+        API.get("/admin/payments/summary"),
+      ]);
+      setPayments(paymentsRes.data);
+      setSummary(summaryRes.data);
     } catch { toast.error("Failed to load payments"); }
   }, [toast]);
 
@@ -66,6 +72,38 @@ export default function AdminPayments() {
             }}>{pendingCount} pending</span>
           )}
         </h2>
+
+        {/* Revenue Summary Cards */}
+        {summary && (
+          <div className="stats-row" style={{ marginBottom: 24 }}>
+            <div className="stat-card stat-admin-green">
+              <div className="stat-icon"><i className="fas fa-rupee-sign"></i></div>
+              <div className="stat-text">
+                <h4>Total Received</h4>
+                <h2>{formatAmount(summary.totalReceivedPaise)}</h2>
+                <small style={{ color: "#6b7280" }}>{summary.approvedCount} approved payments</small>
+              </div>
+            </div>
+            <div className="stat-card stat-admin-orange">
+              <div className="stat-icon"><i className="fas fa-undo"></i></div>
+              <div className="stat-text">
+                <h4>Refunded / Cancelled</h4>
+                <h2>{formatAmount(summary.totalRefundedPaise)}</h2>
+                <small style={{ color: "#6b7280" }}>
+                  {summary.refundedCount} cancellations · {summary.rejectedCount} rejected
+                </small>
+              </div>
+            </div>
+            <div className="stat-card stat-admin-blue">
+              <div className="stat-icon"><i className="fas fa-chart-line"></i></div>
+              <div className="stat-text">
+                <h4>Net Revenue</h4>
+                <h2>{formatAmount(summary.netRevenuePaise)}</h2>
+                <small style={{ color: "#6b7280" }}>{summary.pendingCount} pending review</small>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Filter tabs */}
         <div style={{ display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
@@ -145,3 +183,4 @@ export default function AdminPayments() {
     </Layout>
   );
 }
+
