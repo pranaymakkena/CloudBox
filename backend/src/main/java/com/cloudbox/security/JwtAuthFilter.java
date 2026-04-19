@@ -19,6 +19,9 @@ import java.util.List;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+    private static final String ACCOUNT_SUSPENDED_MESSAGE = "ACCOUNT_SUSPENDED:Your account has been suspended by an administrator.";
+    private static final String ACCOUNT_DELETED_MESSAGE = "ACCOUNT_DELETED:Your account no longer exists. Please contact support if this seems wrong.";
+
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -51,7 +54,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                 if (user == null) {
                     SecurityContextHolder.clearContext();
-                    filterChain.doFilter(request, response);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("text/plain;charset=UTF-8");
+                    response.getWriter().write(ACCOUNT_DELETED_MESSAGE);
                     return;
                 }
 
@@ -59,7 +64,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.clearContext();
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     response.setContentType("text/plain;charset=UTF-8");
-                    response.getWriter().write("Account suspended by admin");
+                    response.getWriter().write(ACCOUNT_SUSPENDED_MESSAGE);
                     return;
                 }
 

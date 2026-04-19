@@ -79,10 +79,11 @@ public class AuthService {
     public String login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException(
+                        "ACCOUNT_DELETED:Your account no longer exists. Please contact support if this seems wrong."));
 
         if (user.isSuspended()) {
-            throw new RuntimeException("Account suspended by admin");
+            throw new RuntimeException("ACCOUNT_SUSPENDED:Your account has been suspended by an administrator.");
         }
 
         // Account lockout check
@@ -134,7 +135,8 @@ public class AuthService {
         }
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException(
+                        "ACCOUNT_DELETED:Your account no longer exists. Please contact support if this seems wrong."));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

@@ -1,9 +1,29 @@
 import { jwtDecode } from "jwt-decode";
 
 const SESSION_KEYS = ["token", "role", "email", "name"];
+const SESSION_NOTICE_KEY = "session_notice";
 
 export const clearSession = () => {
   SESSION_KEYS.forEach((key) => localStorage.removeItem(key));
+};
+
+export const setSessionNotice = (message) => {
+  if (!message) {
+    localStorage.removeItem(SESSION_NOTICE_KEY);
+    return;
+  }
+
+  localStorage.setItem(SESSION_NOTICE_KEY, message);
+};
+
+export const consumeSessionNotice = () => {
+  const message = localStorage.getItem(SESSION_NOTICE_KEY);
+
+  if (message) {
+    localStorage.removeItem(SESSION_NOTICE_KEY);
+  }
+
+  return message;
 };
 
 const isTokenExpired = (decodedToken) => {

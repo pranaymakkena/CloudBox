@@ -23,15 +23,13 @@ function Login() {
   
   useEffect(() => {
     const session = getValidatedSession();
-    console.log(session);
-    
+
     if (session) {
       navigate(getDashboardRouteForRole(session.decoded.role), {
         replace: true,
       });
     }
   }, [navigate]);
-  
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -58,6 +56,10 @@ function Login() {
       } else if (msg.startsWith("Account locked")) {
         setLocked(true);
         setAttemptsLeft(0);
+      } else if (msg.startsWith("ACCOUNT_SUSPENDED:")) {
+        toast.error(msg.replace("ACCOUNT_SUSPENDED:", "").trim());
+      } else if (msg.startsWith("ACCOUNT_DELETED:")) {
+        toast.error(msg.replace("ACCOUNT_DELETED:", "").trim());
       } else {
         toast.error(
           isBackendUnavailableError(err)

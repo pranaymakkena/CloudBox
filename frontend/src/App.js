@@ -45,6 +45,7 @@ import Plans from "./pages/Plans";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { SearchProvider } from "./context/SearchContext";
 import BackendStatusBanner from "./components/BackendStatusBanner";
+import SessionNoticeToast from "./components/SessionNoticeToast";
 
 import "./index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
@@ -54,6 +55,7 @@ function App() {
     <SearchProvider>
       <BrowserRouter>
         <BackendStatusBanner />
+        <SessionNoticeToast />
         <Routes>
 
           {/* ================= PUBLIC ================= */}
