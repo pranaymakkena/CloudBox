@@ -10,7 +10,7 @@ const PROVIDERS = [
     {
         key: "MINIO",
         name: "MinIO",
-        icon: "fa-server",
+        icon: "fa-solid fa-server",
         color: "#6366f1",
         description: "Self-hosted S3-compatible storage",
         fields: [
@@ -24,7 +24,7 @@ const PROVIDERS = [
     {
         key: "AWS_S3",
         name: "Amazon S3",
-        icon: "fa-aws",
+        icon: "fab fa-aws",
         color: "#ff9900",
         description: "AWS Simple Storage Service",
         fields: [
@@ -37,7 +37,7 @@ const PROVIDERS = [
     {
         key: "AZURE_BLOB",
         name: "Azure Blob Storage",
-        icon: "fa-microsoft",
+        icon: "fab fa-microsoft",
         color: "#0078d4",
         description: "Microsoft Azure Blob Storage",
         fields: [
@@ -50,7 +50,7 @@ const PROVIDERS = [
     {
         key: "GCS",
         name: "Google Cloud Storage",
-        icon: "fa-google",
+        icon: "fab fa-google",
         color: "#4285f4",
         description: "Google Cloud Platform Storage",
         fields: [
@@ -62,7 +62,7 @@ const PROVIDERS = [
     {
         key: "LOCAL",
         name: "Local Storage",
-        icon: "fa-folder",
+        icon: "fa-solid fa-folder",
         color: "#6b7280",
         description: "Local filesystem storage (fallback)",
         fields: [
@@ -298,7 +298,7 @@ function CloudProviders() {
                                 return (
                                     <div key={provider.id} className="cp-provider-card configured">
                                         <div className="cp-card-header" style={{ background: providerInfo.color || '#6366f1' }}>
-                                            <i className={`fa-solid ${providerInfo.icon || 'fa-cloud'}`}></i>
+                                            <i className={`${providerInfo.icon || 'fa-cloud'}`}></i>
                                             <span>{provider.providerName}</span>
                                             {provider.isDefault && <span className="cp-default-badge">Default</span>}
                                         </div>
@@ -347,7 +347,7 @@ function CloudProviders() {
                             return (
                                 <div key={provider.key} className={`cp-provider-card ${isConfigured ? 'configured' : ''}`}>
                                     <div className="cp-card-header" style={{ background: provider.color }}>
-                                        <i className={`fa-solid ${provider.icon}`}></i>
+                                        <i className={`${provider.icon}`}></i>
                                         <span>{provider.name}</span>
                                         {configured?.isDefault && <span className="cp-default-badge">Default</span>}
                                     </div>
