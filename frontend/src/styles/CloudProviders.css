@@ -1,0 +1,360 @@
+/* Cloud Providers Page Styles */
+
+.cp-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.cp-header {
+    margin-bottom: 32px;
+}
+
+.cp-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cp-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.cp-header h1 i {
+    color: #6366f1;
+    margin-right: 12px;
+}
+
+.cp-header p {
+    color: #64748b;
+    font-size: 15px;
+}
+
+.cp-section {
+    margin-bottom: 40px;
+}
+
+.cp-section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cp-section h2 i {
+    color: #6366f1;
+}
+
+.cp-provider-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.cp-provider-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.cp-provider-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.cp-provider-card:focus-within {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16), 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.cp-provider-card.configured {
+    border-color: #6366f1;
+}
+
+.cp-card-header {
+    padding: 16px 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.cp-card-header i {
+    font-size: 20px;
+}
+
+.cp-default-badge {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.cp-card-body {
+    padding: 20px;
+}
+
+.cp-description {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.cp-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.cp-status i.fa-check {
+    color: #10b981;
+}
+
+.cp-status i.fa-times {
+    color: #ef4444;
+}
+
+.cp-added {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.cp-configured-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0fdf4;
+    color: #166534;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 8px;
+}
+
+.cp-card-actions {
+    padding: 16px 20px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cp-config-form {
+    padding: 20px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.cp-form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.cp-form-row {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cp-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #334155;
+    font-size: 13px;
+    user-select: none;
+}
+
+.cp-checkbox input {
+    width: 16px;
+    height: 16px;
+    accent-color: #6366f1;
+}
+
+.cp-form-note {
+    color: #64748b;
+    font-size: 12.5px;
+}
+
+.cp-form-group {
+    margin-bottom: 16px;
+}
+
+.cp-form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.cp-required {
+    color: #ef4444;
+    margin-left: 6px;
+    font-weight: 700;
+}
+
+.cp-hint {
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 12.5px;
+    line-height: 1.35;
+}
+
+.cp-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.cp-input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.cp-form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.cp-test-pill {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.3;
+    margin-top: 12px;
+    border: 1px solid transparent;
+}
+
+.cp-test-pill.ok {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.cp-test-pill.bad {
+    background: #fff1f2;
+    color: #9f1239;
+    border-color: #fecdd3;
+}
+
+.cp-test-pill i {
+    margin-top: 2px;
+}
+
+.cp-info {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e2e8f0;
+}
+
+.cp-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cp-info h3 i {
+    color: #6366f1;
+}
+
+.cp-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cp-info li {
+    color: #64748b;
+    font-size: 14px;
+    padding: 8px 0;
+    padding-left: 24px;
+    position: relative;
+}
+
+.cp-info li::before {
+    content: "•";
+    position: absolute;
+    left: 8px;
+    color: #6366f1;
+    font-weight: bold;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: #64748b;
+}
+
+.loading-container .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cp-provider-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cp-form-actions {
+        flex-direction: column;
+    }
+
+    .cp-form-actions button {
+        width: 100%;
+    }
+}
+
+@media (min-width: 900px) {
+    .cp-form-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 16px;
+    }
+}

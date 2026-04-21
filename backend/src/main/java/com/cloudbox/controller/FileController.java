@@ -17,7 +17,6 @@ import com.cloudbox.service.CollaborationService;
 import com.cloudbox.service.FolderService;
 import com.cloudbox.service.FileShareService;
 import com.cloudbox.service.FileService;
-import com.cloudbox.service.MinioStorageService;
 import com.cloudbox.service.PermissionValidatorService;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -44,7 +43,6 @@ public class FileController {
     private final FolderService folderService;
     private final CollaborationService collaborationService;
     private final PermissionValidatorService permissionValidatorService;
-    private final MinioStorageService storageService;
     private final FileRepository fileRepository;
 
     public FileController(
@@ -53,14 +51,12 @@ public class FileController {
             FolderService folderService,
             CollaborationService collaborationService,
             PermissionValidatorService permissionValidatorService,
-            MinioStorageService storageService,
             FileRepository fileRepository) {
         this.fileService = fileService;
         this.fileShareService = fileShareService;
         this.folderService = folderService;
         this.collaborationService = collaborationService;
         this.permissionValidatorService = permissionValidatorService;
-        this.storageService = storageService;
         this.fileRepository = fileRepository;
     }
 
@@ -85,17 +81,11 @@ public class FileController {
             @PathVariable Long id,
             Authentication auth) throws Exception {
         FileEntity file = fileService.getFileForDownload(id, auth.getName());
-
-        String key = file.getStorageKey();
-        if (key == null || key.isBlank()) {
-            String url = file.getFileUrl();
-            if (url != null && url.contains("/"))
-                key = url.substring(url.lastIndexOf("/") + 1);
-        }
+        String key = resolveStorageKey(file);
         if (key == null || key.isBlank())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
-        byte[] content = storageService.getFileBytes(key);
+        byte[] content = fileService.getFileContent(file.getId(), auth.getName());
         String contentType = file.getContentType();
         if (contentType == null || contentType.isBlank()) {
             contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
@@ -248,20 +238,11 @@ public class FileController {
         String email = auth.getName();
         FileEntity file = fileService.getFileIfAccessible(id, email);
 
-        // Use MinioStorageService directly — resolves storageKey to MinIO object
-        String key = file.getStorageKey();
-        if (key == null || key.isBlank()) {
-            // fallback: extract key from fileUrl
-            String url = file.getFileUrl();
-            if (url != null && url.contains("/")) {
-                key = url.substring(url.lastIndexOf("/") + 1);
-            }
-        }
-        if (key == null || key.isBlank()) {
+        String key = resolveStorageKey(file);
+        if (key == null || key.isBlank())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
 
-        byte[] content = storageService.getFileBytes(key);
+        byte[] content = fileService.getFileContent(id, email);
 
         String contentType = file.getContentType();
         if (contentType == null || contentType.isBlank() || contentType.equals("application/octet-stream")) {
@@ -307,7 +288,7 @@ public class FileController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         StringBuilder sb = new StringBuilder();
-        byte[] fileBytes = storageService.getFileBytes(key);
+        byte[] fileBytes = fileService.getFileContent(id, auth.getName());
         try (XWPFDocument doc = new XWPFDocument(new ByteArrayInputStream(fileBytes))) {
             for (XWPFParagraph p : doc.getParagraphs()) {
                 sb.append(p.getText()).append("\n");
@@ -338,7 +319,7 @@ public class FileController {
         String newText = body.getOrDefault("text", "");
         String[] lines = newText.split("\n", -1);
 
-        byte[] fileBytes = storageService.getFileBytes(key);
+        byte[] fileBytes = fileService.getFileContent(id, auth.getName());
         try (XWPFDocument doc = new XWPFDocument(new ByteArrayInputStream(fileBytes))) {
             int size = doc.getParagraphs().size();
             for (int i = size - 1; i >= 0; i--) {
@@ -351,7 +332,7 @@ public class FileController {
             }
             try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                 doc.write(out);
-                storageService.replaceFile(key, out.toByteArray(), file.getContentType());
+                fileService.replaceFileContent(id, auth.getName(), out.toByteArray(), file.getContentType());
             }
         }
         return ResponseEntity.ok("Saved");
@@ -447,13 +428,18 @@ public class FileController {
 
     @GetMapping("/stream/{storageKey}")
     public ResponseEntity<ByteArrayResource> streamFile(@PathVariable String storageKey) throws Exception {
-        var opt = fileRepository.findAll().stream()
-                .filter(f -> storageKey.equals(f.getStorageKey())).findFirst();
-        byte[] content = storageService.getFileBytes(storageKey);
-        String ct = opt.map(FileEntity::getContentType)
-                .filter(s -> s != null && !s.isBlank())
-                .orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        String name = opt.map(FileEntity::getFileName).orElse(storageKey);
+        var opt = fileRepository.findFirstByStorageKey(storageKey);
+        if (opt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        FileEntity file = opt.get();
+        // This endpoint is used for direct file URLs; keep it public-ish but scoped to
+        // the stored object.
+        byte[] content = fileService.getPublicFileContent(file.getId());
+        String ct = file.getContentType() != null && !file.getContentType().isBlank()
+                ? file.getContentType()
+                : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        String name = file.getFileName() != null ? file.getFileName() : storageKey;
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(ct))
                 .header(HttpHeaders.CONTENT_DISPOSITION,

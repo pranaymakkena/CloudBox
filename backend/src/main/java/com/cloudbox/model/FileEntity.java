@@ -2,10 +2,13 @@ package com.cloudbox.model;
 
 import java.time.LocalDateTime;
 
+import com.cloudbox.storage.ProviderType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,6 +36,10 @@ public class FileEntity {
     @JsonIgnore
     @Column(name = "storage_key")
     private String storageKey;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "storage_provider")
+    private ProviderType storageProvider;
 
     private String ownerEmail;
     private String folder;
@@ -92,6 +99,14 @@ public class FileEntity {
 
     public void setStorageKey(String storageKey) {
         this.storageKey = storageKey;
+    }
+
+    public ProviderType getStorageProvider() {
+        return storageProvider;
+    }
+
+    public void setStorageProvider(ProviderType storageProvider) {
+        this.storageProvider = storageProvider;
     }
 
     public String getOwnerEmail() {

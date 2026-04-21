@@ -42,6 +42,7 @@ import Trash from "./pages/Trash";
 
 import SharedFile from "./pages/SharedFile";
 import Plans from "./pages/Plans";
+import CloudProviders from "./pages/CloudProviders";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import { SearchProvider } from "./context/SearchContext";
 import BackendStatusBanner from "./components/BackendStatusBanner";
@@ -280,6 +281,16 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
                 <StorageUsed />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ================= CLOUD PROVIDERS ================= */}
+          <Route
+            path="/cloud-providers"
+            element={
+              <ProtectedRoute allowedRoles={["USER", "ADMIN"]}>
+                <CloudProviders />
               </ProtectedRoute>
             }
           />

@@ -257,10 +257,13 @@ public class ChatService {
             body.put("messages", List.of(
                     Map.of("role", "system", "content", systemPrompt),
                     Map.of("role", "user", "content", userMessage)));
-            ResponseEntity<Map> response = restTemplate.postForEntity(OPENAI_URL,
+            // Use raw type to avoid generic type casting issues
+            @SuppressWarnings("rawtypes")
+            ResponseEntity<Map> rawResponse = restTemplate.postForEntity(OPENAI_URL,
                     new HttpEntity<>(body, headers), Map.class);
-            if (response.getBody() != null) {
-                var choices = (List<?>) response.getBody().get("choices");
+            // Extract data from raw response
+            if (rawResponse.getBody() != null) {
+                var choices = (List<?>) rawResponse.getBody().get("choices");
                 if (choices != null && !choices.isEmpty()) {
                     var message = (Map<?, ?>) ((Map<?, ?>) choices.get(0)).get("message");
                     return (String) message.get("content");
