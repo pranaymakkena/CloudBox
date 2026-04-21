@@ -59,9 +59,18 @@ public class MinioS3CompatibleAdapter implements CloudStorageAdapter {
     public boolean testConnection() {
         validateConfigured();
         try {
-            s3Client.headBucket(HeadBucketRequest.builder().bucket(bucketName).build());
+            s3Client.listObjectsV2(b -> b.bucket(bucketName).maxKeys(1));
+
+            log.info("Connection successful for bucket '{}' at '{}'", bucketName, endpoint);
             return true;
+
         } catch (S3Exception e) {
+            log.error("S3 error while testing connection: {}",
+                    e.awsErrorDetails() != null ? e.awsErrorDetails().errorMessage() : e.getMessage(), e);
+            return false;
+
+        } catch (Exception e) {
+            log.error("Unexpected error while testing connection", e);
             return false;
         }
     }
